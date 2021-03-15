@@ -12,7 +12,7 @@ interface RunnerConfig {
 	config: BotConfiguration
 }
 
-export default async function runner(id:string) {
+export default async function runner(accountId: string, deploymentId: string) {
 	// Get bot and bot data
 	let bot = botStore.getBot(id);
 	let {config, state, data} = await botStore.getRunData(id);

@@ -25,6 +25,8 @@ custom:
   dynamodb:
     stages:
       - ${self:provider.stage}
+    start:
+        migrate: true
 
 provider:
   name: aws

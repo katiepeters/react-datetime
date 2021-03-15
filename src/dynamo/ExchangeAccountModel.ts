@@ -23,7 +23,7 @@ export default {
 		return await Db.getSingle(accountId, resourceId);
 	},
 	async create(account: DbExchangeAccountInput): Promise<void> {
-		let exchange = {
+		let exchange: DbExchangeAccount = {
 			...account,
 			resourceId: `EXCHANGE#${account.exchangeAccountId}`
 		};

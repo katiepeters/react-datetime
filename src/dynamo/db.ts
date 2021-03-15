@@ -1,4 +1,7 @@
 const AWS = require('aws-sdk');
+AWS.config.update({
+	endpoint: "http://localhost:8000"
+});
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 type TableAtrributeValue = string | string[]
@@ -6,7 +9,7 @@ type TableAtrributeValue = string | string[]
 export interface TableItem {
 	accountId: string
 	resourceId: string
-	[attribute:string]: string | string[]
+	[attribute:string]: any
 }
 
 export class DBModel<T> {

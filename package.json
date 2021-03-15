@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dynamo": "serverless dynamodb start --delayTransientStatuses",
     "offline": "serverless offline",
-    "invoke": "aws lambda invoke /dev/null --endpoint-url http://localhost:3002 --function-name awstrader-dev-hello --payload '{\"isTest\": true, \"accountId\":\"testAccount\", \"deploymentId\":\"testDeployment\"}' --cli-binary-format raw-in-base64-out"
+    "invoke": "aws lambda invoke /dev/null --endpoint-url http://localhost:3002 --function-name awstrader-dev-hello --payload '{\"isTest\": true, \"accountId\":\"testAccount\", \"deploymentId\":\"testDeployment\"}' --cli-binary-format raw-in-base64-out",
+    "dynamo:browse": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +18,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "dynamodb-admin": "^4.0.1",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.8.0",
     "serverless-plugin-typescript": "^1.1.9",

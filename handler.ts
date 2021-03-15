@@ -1,6 +1,11 @@
 import { DBModel, TableItem } from './src/dynamo/db';
 import AccountModel from './src/dynamo/AccountModel';
 import ExchangeAccountModel from './src/dynamo/ExchangeAccountModel';
+import BotDeploymentModel from './src/dynamo/BotDeploymentModel';
+import BotModel from './src/dynamo/BotModel';
+import * as ts from "typescript";
+const fs = require('fs');
+const path = require('path');
 
 export async function hello( event ){ 
   console.log('Hi there!', event);
@@ -81,11 +86,40 @@ async function setTestData( event ) {
       accountId,
       exchangeAccountId: 'testExchange',
       provider: 'bitfinex',
-      exchangeType: 'real',
+      type: 'real',
       key: 'Mma7B6ISTUNVcnUPOrDJgVgcNRh3VbmeIalaBDvUpml',
       secret: 'ckm9hrkka000dyq349ngb2jro'
     });
 
+    await BotDeploymentModel.create({
+      accountId,
+      botDeploymentId: 'testDeployment',
+      orders: {},
+      config: {
+        exchangeAccountId: 'EXCHANGE#testExchange',
+        symbols: ['BTC/USD']
+      },
+      state: {}
+    });
 
+    await BotModel.create({
+      accountId,
+      botId: 'testBot',
+      code: fs.readFileSync(path.join(__dirname, '../src/bots/testBot.ts'), 'utf8')
+    });
+  }
+  else {
+    console.log('Test data was already there');
+    let botEntry = await BotModel.getSingle('testAccount', 'BOT#testBot');
+    console.log(botEntry);
+    if (botEntry) {
+      let code = `class Bot ${botEntry.code.split(/extends\s+TradeBot/)[1]}; Bot;`;
+      let jsCode = ts.transpile(code);
+      let Bot = eval(jsCode);
+      const bot = new Bot();
+      console.log( bot.hello("Javi") );
+      // @ts-ignore: Bot won't be defined in ts context
+      console.log(Bot);
+    }
   }
 }
