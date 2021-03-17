@@ -27,6 +27,10 @@ custom:
       - ${self:provider.stage}
     start:
         migrate: true
+  serverless-offline:
+    httpPort: 3030
+    websocketPort: 3031
+    lambdaPort: 3032
 
 provider:
   name: aws

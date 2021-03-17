@@ -1,3 +1,5 @@
+
+import { BotCandles, BotConfiguration, BotConfigurationExtra, BotState } from './bot
 import Trader from "./runner/Trader"
 import utils from './utils/utils';
 export interface BotInput {
