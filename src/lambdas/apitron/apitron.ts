@@ -1,8 +1,10 @@
-import { DBModel, TableItem } from './dynamo/db';
-import AccountModel from './dynamo/AccountModel';
-import ExchangeAccountModel from './dynamo/ExchangeAccountModel';
-import BotDeploymentModel from './dynamo/BotDeploymentModel';
-import BotModel from './dynamo/BotModel';
+import { DBModel, TableItem } from '../_common/dynamo/db';
+import AccountModel from '../_common/dynamo/AccountModel';
+import ExchangeAccountModel from '../_common/dynamo/ExchangeAccountModel';
+import BotDeploymentModel from '../_common/dynamo/BotDeploymentModel';
+import BotModel from '../_common/dynamo/BotModel';
+import lambdaUtil from '../_common/utils/lambda';
+
 const fs = require('fs');
 const path = require('path');
 
@@ -75,6 +77,34 @@ app.get('/deployments', function (req, res) {
 app.get('/exchanges', function (req, res) {
 	res.send('/exchanges not implemented yet');
 });
+
+app.post('/runnow', function(req, res) {
+	const { accountId, deploymentId } = req.body;
+	if (!accountId) return returnMissingAttr(res, 'accountId');
+	if (!deploymentId) return returnMissingAttr(res, 'deploymentId');
+
+	console.log('getting deployment');
+	BotDeploymentModel.getSingle(accountId, deploymentId)
+		.then( deployment => {
+			if (!deployment ){
+				return res.status(404)
+					.json({error: 'not_found'})
+				;
+			}
+			
+			console.log('deployment found');
+
+			const params = {
+				FunctionName: 'awstrader-dev-supplierdo',
+				InvocationType: 'Event',
+				Payload: {accountId, deploymentId}
+			}
+			lambdaUtil.invoke( params ).then( result => {
+				console.log(result);
+				res.status(200).end();
+			})
+		})
+})
 
 export const apitron = serverless(app);
 

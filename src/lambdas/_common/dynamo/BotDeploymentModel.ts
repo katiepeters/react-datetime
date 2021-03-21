@@ -57,8 +57,8 @@ interface OrderInput {
 const Db = new DBModel<DBBotDeploymentRaw>();
 
 export default {
-	async getSingle(accountId: string, resourceId: string): Promise<DBBotDeployment | void> {
-		let entry = await Db.getSingle(accountId, resourceId);
+	async getSingle(accountId: string, deploymentId: string): Promise<DBBotDeployment | void> {
+		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
 		if( !entry ) return entry;
 
 		return {
@@ -71,7 +71,7 @@ export default {
 		let toStore = {
 			id: deployment.id,
 			accountId: deployment.accountId,
-			resourceId: `EXCHANGE#${deployment.id}`,
+			resourceId: `DEPLOYMENT#${deployment.id}`,
 			config: deployment.config,
 			data: JSON.stringify({
 				exchangeAccountId: deployment.orders,

@@ -54,8 +54,13 @@ functions:
     handler: executor/executor.executor
   schedulator:
     handler: schedulator/schedulator.schedulator
+    role: apiRole
     events:
       - schedule: cron(2 * * * ? *) # every hour at the minute 2
+  supplierdo:
+    handler: supplierdo/supplierdo.supplierdo
+    role: apiRole
+
 
 resources:
   Resources:
