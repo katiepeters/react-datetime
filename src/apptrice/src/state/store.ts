@@ -1,9 +1,12 @@
 const ors = require('@arqex/ors');
 
 const store = ors({
-	account: false,
+	authenticatedId: 'testAccount',
+	accounts: {
+		testAccount: {id: 'testAccount'} 
+	},
 	deployments: {},
 	bots: {},
 });
 
-export default store;
+export default store; 

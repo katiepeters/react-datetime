@@ -8,7 +8,7 @@ export default class Menu extends React.Component {
 					<a>Deployments</a>
 				</div>
 				<div>
-					<a>Bots</a>
+					<a href="#/bots">Bots</a>
 				</div>
 			</div>
 		)

@@ -4,7 +4,12 @@
   "rules": [
     {
       "background": "011627",
+      "foreground": "eeeeee",
       "token": ""
+    },
+    {
+      "token": "number", 
+      "foreground": "99ddff"
     },
     {
       "foreground": "637777",

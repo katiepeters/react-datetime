@@ -1,6 +1,7 @@
 import { TableItem, DBModel } from './db';
 
 interface DbExchangeAccount extends TableItem {
+	id: string
 	provider: 'bitfinex'
 	type: 'real' | 'virtual'
 	key: string
@@ -9,7 +10,7 @@ interface DbExchangeAccount extends TableItem {
 
 interface DbExchangeAccountInput {
 	accountId: string
-	exchangeAccountId: string
+	id: string
 	provider: 'bitfinex'
 	type: 'real' | 'virtual'
 	key: string
@@ -25,9 +26,8 @@ export default {
 	async create(account: DbExchangeAccountInput): Promise<void> {
 		let exchange: DbExchangeAccount = {
 			...account,
-			resourceId: `EXCHANGE#${account.exchangeAccountId}`
+			resourceId: `EXCHANGE#${account.id}`
 		};
-		delete exchange.exchangeAccountId;
 		return await Db.put( exchange );
 	}
 }

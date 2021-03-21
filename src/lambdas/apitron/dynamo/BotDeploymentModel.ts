@@ -1,5 +1,21 @@
 import { TableItem, DBModel } from './db';
-import {Orders} from '../runner/Trader';
+
+interface Order extends OrderInput {
+	id: string
+	foreignId: string | null
+	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
+	errorReason: string | null
+	price: number | null
+	executedPrice: number | null
+	createdAt: number
+	placedAt: number | null
+	closedAt: number | null
+}
+
+interface Orders {
+	[orderId: string]: Order
+}
+
 
 interface DBBotDeploymentConfig {
 	exchangeAccountId: string
@@ -11,22 +27,31 @@ interface DBBotDeploymentState {
 }
 
 interface DBBotDeployment extends TableItem {
+	id: string
 	orders: Orders
 	config: DBBotDeploymentConfig
 	state: DBBotDeploymentState
 }
 
 interface DBBotDeploymentRaw extends TableItem {
+	id: string
 	config: DBBotDeploymentConfig
 	data: string
 }
 
 interface DBBotDeploymentInput {
 	accountId: string
-	botDeploymentId: string
+	id: string
 	config: DBBotDeploymentConfig
 	orders: Orders
 	state: DBBotDeploymentState
+}
+
+interface OrderInput {
+	symbol: string
+	type: 'limit' | 'market'
+	direction: 'buy' | 'sell'
+	amount: number
 }
 
 const Db = new DBModel<DBBotDeploymentRaw>();
@@ -44,8 +69,9 @@ export default {
 
 	async create( deployment: DBBotDeploymentInput ){
 		let toStore = {
+			id: deployment.id,
 			accountId: deployment.accountId,
-			resourceId: `EXCHANGE#${deployment.botDeploymentId}`,
+			resourceId: `EXCHANGE#${deployment.id}`,
 			config: deployment.config,
 			data: JSON.stringify({
 				exchangeAccountId: deployment.orders,

@@ -21,10 +21,12 @@ export class DBModel<T> {
 	}
 
 	async getSingle( accountId: string, resourceId: string ): Promise<T|void> {
-		let res = await dynamoDb.get({
+		const payload = {
 			TableName: process.env.ACCOUNTS_TABLE,
-			Key: {accountId, resourceId}
-		}).promise();
+			Key: { accountId, resourceId }
+		};
+		console.log( payload );
+		let res = await dynamoDb.get(payload).promise();
 		return res.Item;
 	}
 
