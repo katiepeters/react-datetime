@@ -6,6 +6,35 @@ interface LambaInvokeOptions {
 	Payload: any
 };
 
+interface SupplierdoPayload {
+	accountId: string
+	deploymentId: string
+}
+
+export interface BotExecutorPayload {
+	code: string,
+	candles: BotCandles,
+	config: BotConfiguration,
+	state: BotState
+}
+
+type BotCandles = {
+	[symbol: string]: ArrayCandle[]
+}
+
+type BotState = {
+	[attribute: string]: any
+}
+
+type ArrayCandle = [
+	number, number, number, number, number, number
+]
+
+interface BotConfigurationExtra {
+	[key: string]: any
+}
+
+
 let lambdaOptions: any = { region: process.env.region };
 if (process.env.IS_OFFLINE ) {
 	console.log('LOCAL ENVIRONMENT');
@@ -34,6 +63,20 @@ const lambdaUtil = {
 
 				resolve(response);
 			})
+		});
+	},
+	invokeSupplierdo( payload: SupplierdoPayload ): Promise<any> {
+		return this.invoke({
+			FunctionName: 'awstrader-dev-supplierdo',
+			InvocationType: 'Event',
+			Payload: payload
+		});
+	},
+	invokeExecutor( payload ): Promise<any> {
+		return this.invoke({
+			FunctionName: 'awstrader-dev-executor',
+			InvocationType: 'Event',
+			Payload: payload
 		});
 	}
 }

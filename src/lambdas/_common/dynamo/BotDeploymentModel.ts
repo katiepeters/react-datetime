@@ -19,6 +19,8 @@ interface Orders {
 
 interface DBBotDeploymentConfig {
 	exchangeAccountId: string
+	exchangeType: string
+	interval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	symbols: string[]
 }
 
@@ -28,6 +30,7 @@ interface DBBotDeploymentState {
 
 interface DBBotDeployment extends TableItem {
 	id: string
+	botId: string
 	orders: Orders
 	config: DBBotDeploymentConfig
 	state: DBBotDeploymentState
@@ -35,6 +38,7 @@ interface DBBotDeployment extends TableItem {
 
 interface DBBotDeploymentRaw extends TableItem {
 	id: string
+	botId: string
 	config: DBBotDeploymentConfig
 	data: string
 }
@@ -42,6 +46,7 @@ interface DBBotDeploymentRaw extends TableItem {
 interface DBBotDeploymentInput {
 	accountId: string
 	id: string
+	botId: string
 	config: DBBotDeploymentConfig
 	orders: Orders
 	state: DBBotDeploymentState
@@ -71,10 +76,11 @@ export default {
 		let toStore = {
 			id: deployment.id,
 			accountId: deployment.accountId,
+			botId: deployment.botId,
 			resourceId: `DEPLOYMENT#${deployment.id}`,
 			config: deployment.config,
 			data: JSON.stringify({
-				exchangeAccountId: deployment.orders,
+				orders: deployment.orders,
 				state: deployment.state
 			})
 		};

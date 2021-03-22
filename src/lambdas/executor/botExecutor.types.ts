@@ -59,6 +59,7 @@ interface BotInput {
 }
 
 interface Balance {
+	asset: string,
 	free: number,
 	locked: number
 }

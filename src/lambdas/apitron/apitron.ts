@@ -1,4 +1,3 @@
-import { DBModel, TableItem } from '../_common/dynamo/db';
 import AccountModel from '../_common/dynamo/AccountModel';
 import ExchangeAccountModel from '../_common/dynamo/ExchangeAccountModel';
 import BotDeploymentModel from '../_common/dynamo/BotDeploymentModel';
@@ -94,15 +93,12 @@ app.post('/runnow', function(req, res) {
 			
 			console.log('deployment found');
 
-			const params = {
-				FunctionName: 'awstrader-dev-supplierdo',
-				InvocationType: 'Event',
-				Payload: {accountId, deploymentId}
-			}
-			lambdaUtil.invoke( params ).then( result => {
-				console.log(result);
-				res.status(200).end();
-			})
+			lambdaUtil.invokeSupplierdo({accountId, deploymentId})
+				.then(result => {
+					console.log(result);
+					res.status(200).end();
+				})
+			;
 		})
 })
 
@@ -134,9 +130,12 @@ async function setTestData(event) {
 		await BotDeploymentModel.create({
 			accountId,
 			id: 'testDeployment',
+			botId: 'testBot',
 			orders: {},
 			config: {
 				exchangeAccountId: 'EXCHANGE#testExchange',
+				exchangeType: 'bitfinex',
+				interval: '1h',
 				symbols: ['BTC/USD']
 			},
 			state: {}

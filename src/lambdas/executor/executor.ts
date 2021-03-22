@@ -1,5 +1,14 @@
-export async function executor(event) {
-	console.log('Executor called');
+import Trader from "./Trader";
+
+interface RunnerConfig {
+	bot: TradeBot
+	botId: string
+	candles: BotCandles
+	config: BotConfiguration
+}
+
+export async function executor(event: RunnerConfig) {
+	console.log('Executor called', event);
 
 	return {
 		statusCode: 200,
