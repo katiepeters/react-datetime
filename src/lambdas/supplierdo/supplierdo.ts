@@ -1,6 +1,8 @@
 import BotDeploymentModel from '../_common/dynamo/BotDeploymentModel';
 import BotModel from '../_common/dynamo/BotModel';
+import ExchangeAccountModel from '../_common/dynamo/ExchangeAccountModel';
 import dataFetcher from '../_common/exchangeDataFetcher/exchangeDataFetcher';
+import exchanger from '../_common/exchanges/exchanger';
 import lambdaUtil, {BotExecutorPayload} from '../_common/utils/lambda';
 
 export async function supplierdo({ accountId, deploymentId }) {
@@ -20,6 +22,26 @@ export async function supplierdo({ accountId, deploymentId }) {
 	if( !bot ) {
 		return {statusCode: 404};
 	}
+
+	const exchangeAccount = await ExchangeAccountModel.getSingle(accountId, deployment.config.exchangeAccountId);
+	console.log('Exchange account', exchangeAccount, deployment.config);
+	if( exchangeAccount ){
+		let adapter = exchanger.getAdapter({
+			accountId,
+			exchange: exchangeAccount.provider,
+			key: exchangeAccount.key,
+			secret: exchangeAccount.secret
+		});
+
+		console.log('ADAPTER', adapter)
+		if (adapter) {
+			let portfolio = await adapter.getPortfolio();
+			console.log('PORTFOLIO!', portfolio);
+			let orders = await adapter.getOrderHistory();
+			console.log('ORDERS!', orders);
+		}
+	}
+	
 	
 	const botInput: BotExecutorPayload = {
 		code: bot?.code,

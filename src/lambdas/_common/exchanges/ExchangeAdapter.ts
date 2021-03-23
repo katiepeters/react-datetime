@@ -1,3 +1,5 @@
+import { ArrayCandle, LimitOrderInput, MarketOrderInput, Order, Orders, Portfolio } from "../../lambda.types";
+
 export interface CandleQuery {
 	exchange: string
 	market: string
@@ -8,11 +10,13 @@ export interface CandleQuery {
 
 export interface ExchangeOrder {
 	id: string
+	market: string
+	type: 'limit' | 'market'
 	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
-	errorReason: string | null
+	direction: 'buy' | 'sell'
+	amount: number
 	price: number | null
 	executedPrice: number | null
-	createdAt: number
 	placedAt: number | null
 	closedAt: number | null
 }
@@ -25,7 +29,7 @@ export interface ExchangeCredentials {
 export interface ExchangeAdapter {
 	getPortfolio(): Promise<Portfolio>
 	getCandles(options: CandleQuery): Promise<ArrayCandle[]>
-	placeOrder(order: LimitOrderInput | MarketOrderInput): Promise<Order>
+	placeOrder(order: LimitOrderInput | MarketOrderInput): Promise<ExchangeOrder>
 	cancelOrder(orderId: string): Promise<boolean>
 	getOpenOrders(): Promise<ExchangeOrder[]>
 	getOrderHistory(): Promise<ExchangeOrder[]>

@@ -1,6 +1,4 @@
-type ArrayCandle = [
-	number, number, number, number, number, number
-]
+import { ArrayCandle } from "../../../lambda.types";
 
 export interface DataFetcherInput {
 	exchange: string

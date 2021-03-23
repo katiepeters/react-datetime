@@ -74,7 +74,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	componentDidMount() {
 		let promises = [
 			fetch('/editorTheme.json').then(res => res.json()),
-			fetch('/editorTypes.d.ts').then(res => res.text())
+			fetch('/editorTypes.ts').then(res => res.text())
 		];
 
 		Promise.all(promises).then(([theme, types]) => {

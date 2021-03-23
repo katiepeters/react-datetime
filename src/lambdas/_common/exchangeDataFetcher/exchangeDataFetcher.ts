@@ -1,3 +1,4 @@
+import { ArrayCandle } from '../../lambda.types';
 import { DataFetcher } from './adapters/adapterTypes';
 import bitfinexAdapter from './adapters/bitfinexDataAdapter';
 
@@ -8,10 +9,6 @@ interface ExchangeDataFetcherInput {
 	lastCandleAt?: number
 	candleCount?: number
 }
-
-type ArrayCandle = [
-	number, number, number, number, number, number
-]
 
 const fetcher = {
 	async getData(config: ExchangeDataFetcherInput): Promise<ArrayCandle[]> {

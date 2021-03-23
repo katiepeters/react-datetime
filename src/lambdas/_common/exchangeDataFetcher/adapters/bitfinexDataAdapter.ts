@@ -1,13 +1,10 @@
+import { ArrayCandle } from "../../../lambda.types";
 import { DataFetcher, DataFetcherInput } from "./adapterTypes";
 
 const fetch = require('node-fetch');
 const baseUrl = 'https://api-pub.bitfinex.com/v2';
 
 let cache = {};
-
-type ArrayCandle = [
-	number, number, number, number, number, number
-]
 
 const dataAdapter: DataFetcher = {
 	async fetch(input: DataFetcherInput): Promise<ArrayCandle[]> {

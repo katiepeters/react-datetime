@@ -20,8 +20,8 @@ interface DbExchangeAccountInput {
 const Db = new DBModel<DbExchangeAccount>();
 
 export default {
-	async getSingle(accountId: string, resourceId: string): Promise<DbExchangeAccount | void> {
-		return await Db.getSingle(accountId, resourceId);
+	async getSingle(accountId: string, exchangeId: string): Promise<DbExchangeAccount | void> {
+		return await Db.getSingle(accountId, `EXCHANGE#${exchangeId}`);
 	},
 	async create(account: DbExchangeAccountInput): Promise<void> {
 		let exchange: DbExchangeAccount = {

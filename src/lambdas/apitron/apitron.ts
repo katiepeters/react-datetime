@@ -124,7 +124,7 @@ async function setTestData(event) {
 			provider: 'bitfinex',
 			type: 'real',
 			key: 'Mma7B6ISTUNVcnUPOrDJgVgcNRh3VbmeIalaBDvUpml',
-			secret: 'ckm9hrkka000dyq349ngb2jro'
+			secret: 'U2FsdGVkX18urwMNykZfeGeUbn4cGGgWgI7uGl3/qzeexDPcmUQX6cEAr9s5bcKe5wUhIKfwiysejvfD9h5lJw=='
 		});
 
 		await BotDeploymentModel.create({
@@ -133,7 +133,7 @@ async function setTestData(event) {
 			botId: 'testBot',
 			orders: {},
 			config: {
-				exchangeAccountId: 'EXCHANGE#testExchange',
+				exchangeAccountId: 'testExchange',
 				exchangeType: 'bitfinex',
 				interval: '1h',
 				symbols: ['BTC/USD']

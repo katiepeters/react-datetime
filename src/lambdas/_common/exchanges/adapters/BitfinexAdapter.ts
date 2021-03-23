@@ -2,13 +2,14 @@
 import { RESTv2 } from 'bfx-api-node-rest';
 import { Order as BfxOrder } from 'bfx-api-node-models';
 import { CandleQuery, ExchangeAdapter, ExchangeCredentials, ExchangeOrder } from '../ExchangeAdapter';
+import { ArrayCandle, LimitOrderInput, MarketOrderInput, Order, Portfolio } from '../../../lambda.types';
 
 const fetch = require('node-fetch');
 const baseUrl = 'https://api-pub.bitfinex.com/v2';
 
 let cache = {};
 
-class BitfinexAdapter implements ExchangeAdapter {
+export default class BitfinexAdapter implements ExchangeAdapter {
 	bfx: RESTv2
 	constructor( credentials: ExchangeCredentials ){
 		this.bfx = new RESTv2({
@@ -21,11 +22,11 @@ class BitfinexAdapter implements ExchangeAdapter {
 		let wallets = await this.bfx.wallets();
 		let portfolio: Portfolio = {};
 		wallets.forEach( wallet => {
-			if( wallet[0] === 'EXCHANGE' ){
+			if (wallet[0] === 'exchange' ){
 				portfolio[ wallet[1] ] = {
 					asset: wallet[1],
 					free: wallet[4],
-					locked: wallet[2] - wallet[4]
+					total: wallet[2]
 				};
 			}
 		});
@@ -52,7 +53,7 @@ class BitfinexAdapter implements ExchangeAdapter {
 		return candles;
 	}
 
-	async placeOrder(order: LimitOrderInput | MarketOrderInput): Promise<Order> {
+	async placeOrder(order: LimitOrderInput | MarketOrderInput): Promise<ExchangeOrder> {
 		let orderOptions: any = {
 			type: order.type.toUpperCase(),
 			symbol: getSymbol(order.symbol),
@@ -63,21 +64,21 @@ class BitfinexAdapter implements ExchangeAdapter {
 		}
 
 		let bfxOrder = new BfxOrder(orderOptions);
-		let placedOrder = await this.bfx.submitOrder( orderOptions );
 
-		return {
-			...order,
-			foreignId: placedOrder[0]
-		};
+		return convertToExchangeOrder( bfxOrder );
 	}
 	cancelOrder(orderId: string): Promise<boolean> {
 		throw new Error('Method not implemented.');
 	}
-	getOpenOrders(): Promise<ExchangeOrder[]> {
-		throw new Error('Method not implemented.');
+	async getOpenOrders(): Promise<ExchangeOrder[]> {
+		let orders = await this.bfx.activeOrders();
+		console.log('RAW ORDERS', orders);
+		return orders.map( convertToExchangeOrder );
 	}
-	getOrderHistory(): Promise<ExchangeOrder[]> {
-		throw new Error('Method not implemented.');
+	async getOrderHistory(): Promise<ExchangeOrder[]> {
+		let orders = await this.bfx.orderHistory({}, null, Date.now(), 20);
+		console.log('RAW ORDERS', orders);
+		return orders.map(convertToExchangeOrder);
 	}
 }
 
@@ -89,4 +90,39 @@ function getKey(options: CandleQuery): string {
 
 function getSymbol(market) {
 	return `t${market.replace('/', '')}`;
+}
+
+function convertToExchangeOrder(rawOrder): ExchangeOrder {
+	let bfxOrder = new BfxOrder(rawOrder);
+	let status = getOrderStatus(bfxOrder.status);
+	return {
+		id: bfxOrder.id,
+		market: getOrderMarket(bfxOrder.symbol),
+		type: bfxOrder.type.includes('LIMIT') ? 'limit' : 'market',
+		status,
+		direction: bfxOrder.amount > 0 ? 'buy' : 'sell',
+		amount: Math.abs(bfxOrder.amount || bfxOrder.amountOrig),
+		price: bfxOrder.price || null,
+		executedPrice: bfxOrder.priceAvg || null,
+		placedAt: bfxOrder.mtsCreate,
+		closedAt: status === 'cancelled' || status === 'completed' ? bfxOrder.mtsUpdate : null
+	}
+}
+
+function getOrderMarket( symbol: string ) {
+	return symbol.slice(1, symbol.length -3) + '/' + symbol.slice(-3);
+}
+
+function getOrderStatus(status: string): 'pending' | 'placed' | 'completed' | 'cancelled' | 'error' {
+	let str = status.split(' ')[0];
+	switch ( str ){
+		case 'ACTIVE':
+		case 'PARTIALLY FILLED':
+			return 'placed';
+		case 'EXECUTED':
+			return 'completed';
+		case 'CANCELED':
+			return 'cancelled';
+	}
+	return 'pending';
 }

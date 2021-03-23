@@ -1,3 +1,4 @@
+import { BotCandles, BotConfiguration, TradeBot } from "../lambda.types";
 import Trader from "./Trader";
 
 interface RunnerConfig {
@@ -8,7 +9,7 @@ interface RunnerConfig {
 }
 
 export async function executor(event: RunnerConfig) {
-	console.log('Executor called', event);
+	console.log('Executor called');
 
 	return {
 		statusCode: 200,

@@ -1,3 +1,5 @@
+import { ArrayCandle, BotConfiguration } from "../../lambda.types";
+
 const AWS = require('aws-sdk');
 
 interface LambaInvokeOptions {
@@ -26,14 +28,6 @@ type BotState = {
 	[attribute: string]: any
 }
 
-type ArrayCandle = [
-	number, number, number, number, number, number
-]
-
-interface BotConfigurationExtra {
-	[key: string]: any
-}
-
 
 let lambdaOptions: any = { region: process.env.region };
 if (process.env.IS_OFFLINE ) {
@@ -50,7 +44,6 @@ const lambdaUtil = {
 				Payload: JSON.stringify(params.Payload)
 			};
 
-			console.log('invoking lambda', payload)
 			lambda.invoke(payload, (err, response) => {
 				if (err) {
 					console.error(err);

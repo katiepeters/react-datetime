@@ -1,32 +1,34 @@
-import { ArrayCandle } from "../typings"
-
-interface BotConfigurationExtra {
+export interface BotConfigurationExtra {
 	[key: string]: any
 }
 
-type BotCandles = {
+export type ArrayCandle = [
+	number, number, number, number, number, number
+]
+
+export type BotCandles = {
 	[symbol: string]: ArrayCandle[]
 }
 
-type BotState = {
+export type BotState = {
 	[attribute: string]: any
 }
 
-interface BotConfiguration {
+export interface BotConfiguration {
 	symbols: string[]
 	interval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	exchange: 'bitfinex'
 	[key: string]: any
 }
 
-interface Trader {
+export interface Trader {
 	getPortfolio(): Portfolio
 	getOrder(id: string): Order | void
 	placeOrder(orderInput: LimitOrderInput | MarketOrderInput): Order
 	cancelOrder(orderId: string)
 }
 
-interface CandleUtils {
+export interface CandleUtils {
 	getLast(candles: ArrayCandle[]): ArrayCandle
 	getTime(candle: ArrayCandle): number
 	getOpen(candle: ArrayCandle): number
@@ -38,17 +40,17 @@ interface CandleUtils {
 	getAmplitude(candle: ArrayCandle): number
 }
 
-interface SymbolsUtils {
+export interface SymbolsUtils {
 	getBase(symbol: string): string
 	getQuoted(symbol: string): string
 }
 
-interface BotUtils {
+export interface BotUtils {
 	candles: CandleUtils
 	symbols: SymbolsUtils
 }
 
-interface BotInput {
+export interface BotInput {
 	candles: BotCandles
 	config: BotConfiguration
 	trader: Trader
@@ -56,17 +58,17 @@ interface BotInput {
 	utils: BotUtils
 }
 
-interface Balance {
+export interface Balance {
 	asset: string,
 	free: number,
-	locked: number
+	total: number
 }
 
-interface Portfolio {
+export interface Portfolio {
 	[asset: string]: Balance
 }
 
-interface OrderInput {
+export interface OrderInput {
 	id: string
 	symbol: string
 	type: 'limit' | 'market'
@@ -74,7 +76,7 @@ interface OrderInput {
 	amount: number
 }
 
-interface Order extends OrderInput {
+export interface Order extends OrderInput {
 	id: string
 	foreignId: string | null
 	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
@@ -86,22 +88,23 @@ interface Order extends OrderInput {
 	closedAt: number | null
 }
 
-interface LimitOrderInput extends OrderInput {
+export interface LimitOrderInput extends OrderInput {
 	type: 'limit'
 	price: number
 }
 
-interface MarketOrderInput extends OrderInput {
+export interface MarketOrderInput extends OrderInput {
 	type: 'market'
 }
 
-interface Orders {
+export interface Orders {
 	[orderId: string]: Order
 }
 
-abstract class TradeBot {
+export abstract class TradeBot {
 	extraConfiguration(): BotConfigurationExtra {
 		return {}
 	}
 	abstract onData(input: BotInput): void
 }
+
