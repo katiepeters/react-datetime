@@ -1,0 +1,22 @@
+{
+  "name": "awstrader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dynamo:serve": "cd src/lambdas && npm run dynamo",
+    "dynamo:browse": "cd src/lambdas && npm run dynamo:browse",
+    "lambda:serve": "cd src/lambdas && npm run offline"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arqex/awstrader.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arqex/awstrader/issues"
+  },
+  "homepage": "https://github.com/arqex/awstrader#readme"
+}

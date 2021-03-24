@@ -82,11 +82,9 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 	}
 }
 
-
 function getKey(options: CandleQuery): string {
 	return `${options.market}:${options.interval}:${options.lastCandleAt}:${options.candleCount}`;
 }
-
 
 function getSymbol(market) {
 	return `t${market.replace('/', '')}`;
@@ -97,7 +95,7 @@ function convertToExchangeOrder(rawOrder): ExchangeOrder {
 	let status = getOrderStatus(bfxOrder.status);
 	return {
 		id: bfxOrder.id,
-		market: getOrderMarket(bfxOrder.symbol),
+		symbol: getOrderSymbol(bfxOrder.symbol),
 		type: bfxOrder.type.includes('LIMIT') ? 'limit' : 'market',
 		status,
 		direction: bfxOrder.amount > 0 ? 'buy' : 'sell',
@@ -109,7 +107,7 @@ function convertToExchangeOrder(rawOrder): ExchangeOrder {
 	}
 }
 
-function getOrderMarket( symbol: string ) {
+function getOrderSymbol( symbol: string ) {
 	return symbol.slice(1, symbol.length -3) + '/' + symbol.slice(-3);
 }
 

@@ -1,4 +1,4 @@
-import { ArrayCandle } from "../typings"
+import { ArrayCandle } from "../lambda.types"
 
 interface BotConfigurationExtra {
 	[key: string]: any

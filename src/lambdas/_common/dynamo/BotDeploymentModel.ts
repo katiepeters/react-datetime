@@ -13,9 +13,9 @@ interface Order extends OrderInput {
 }
 
 interface Orders {
-	[orderId: string]: Order
+	foreignIdIndex: {[foreignId: string]: string}
+	items: {[orderId: string]: Order}
 }
-
 
 interface DBBotDeploymentConfig {
 	exchangeAccountId: string
@@ -40,7 +40,8 @@ interface DBBotDeploymentRaw extends TableItem {
 	id: string
 	botId: string
 	config: DBBotDeploymentConfig
-	data: string
+	orders: string
+	state: string
 }
 
 interface DBBotDeploymentInput {
@@ -50,6 +51,13 @@ interface DBBotDeploymentInput {
 	config: DBBotDeploymentConfig
 	orders: Orders
 	state: DBBotDeploymentState
+}
+
+interface DBBotDeploymentUpdate {
+	botId?: string
+	config?: DBBotDeploymentConfig
+	orders?: Orders
+	state?: DBBotDeploymentState
 }
 
 interface OrderInput {
@@ -68,7 +76,8 @@ export default {
 
 		return {
 			...entry,
-			...JSON.parse(entry.data)
+			orders: JSON.parse(entry.orders),
+			state: JSON.parse(entry.state)
 		};
 	},
 
@@ -79,16 +88,22 @@ export default {
 			botId: deployment.botId,
 			resourceId: `DEPLOYMENT#${deployment.id}`,
 			config: deployment.config,
-			data: JSON.stringify({
-				orders: deployment.orders,
-				state: deployment.state
-			})
+			orders: JSON.stringify(deployment.orders),
+			state: JSON.stringify(deployment.state)
 		};
 		
 		return await Db.put(toStore);
 	},
 
-	async update( deployment: DBBotDeploymentInput ){
-		return await this.create(deployment);
+	async update(accountId: string, deploymentId: string, update: DBBotDeploymentUpdate ){
+
+		let rawUpdate:any = {...update};
+		if( rawUpdate.state ){
+			rawUpdate.state = JSON.stringify(rawUpdate.state);
+		}
+		if (rawUpdate.orders) {
+			rawUpdate.orders = JSON.stringify(rawUpdate.orders);
+		}
+		return await Db.update(accountId, `DEPLOYMENT#${deploymentId}`, rawUpdate);
 	}
 }

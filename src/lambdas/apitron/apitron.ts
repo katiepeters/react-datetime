@@ -131,7 +131,10 @@ async function setTestData(event) {
 			accountId,
 			id: 'testDeployment',
 			botId: 'testBot',
-			orders: {},
+			orders: {
+				foreignIdIndex: {},
+				items: {}
+			},
 			config: {
 				exchangeAccountId: 'testExchange',
 				exchangeType: 'bitfinex',

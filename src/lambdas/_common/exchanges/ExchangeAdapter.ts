@@ -1,7 +1,6 @@
 import { ArrayCandle, LimitOrderInput, MarketOrderInput, Order, Orders, Portfolio } from "../../lambda.types";
 
 export interface CandleQuery {
-	exchange: string
 	market: string
 	interval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	lastCandleAt: number
@@ -10,7 +9,7 @@ export interface CandleQuery {
 
 export interface ExchangeOrder {
 	id: string
-	market: string
+	symbol: string
 	type: 'limit' | 'market'
 	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
 	direction: 'buy' | 'sell'
