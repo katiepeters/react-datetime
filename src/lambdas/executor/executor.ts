@@ -1,15 +1,30 @@
 import { BotCandles, BotConfiguration, TradeBot } from "../lambda.types";
+import * as ts from "typescript";
+import { BotExecutorPayload } from "../_common/utils/lambda";
 import Trader from "./Trader";
+import botUtils from '../_common/utils/botUtils';
 
-interface RunnerConfig {
-	bot: TradeBot
-	botId: string
-	candles: BotCandles
-	config: BotConfiguration
-}
-
-export async function executor(event: RunnerConfig) {
+export async function executor(event: BotExecutorPayload) {
 	console.log('Executor called');
+
+	const Bot = getBot(event.botSource)
+	if( !Bot ){
+		return {error: 'bot_unparseable'};
+	}
+
+	const trader = new Trader(
+		event.portfolio, event.orders
+	);
+
+	Bot.onData({
+		candles: event.candles,
+		config: event.config,
+		trader,
+		state: event.state,
+		utils: botUtils
+	})
+
+	console.log('BOT', trader);
 
 	return {
 		statusCode: 200,
@@ -22,4 +37,20 @@ export async function executor(event: RunnerConfig) {
 			2
 		),
 	};
+}
+
+
+function getBot( botCode: string ): TradeBot | void {
+	let code = `class Bot ${botCode.split(/extends\s+TradeBot/)[1]}; Bot;`;
+	let Bot;
+	try {
+		let jsCode = ts.transpile(code);
+		Bot = eval(jsCode);
+	}
+	catch( err ) {
+		console.error('Bot code not valid: ', err);
+	}
+	if( Bot ){
+		return new Bot();
+	}
 }

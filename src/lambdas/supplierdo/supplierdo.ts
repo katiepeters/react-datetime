@@ -41,43 +41,17 @@ export async function supplierdo({ accountId, deploymentId }) {
 	const orders = mergeOrders( deployment.orders, exchangeOrders );
 
 	BotDeploymentModel.update(accountId, deployment.id, {orders});
-
-	const exchangeData = await dataFetcher.getData({
-		exchange: deployment.config.exchangeType,
-		market: deployment.config.symbols[0],
-		interval: deployment.config.interval
-	});
-
-	console.log('Exchange account', exchangeAccount, deployment.config);
-	if( exchangeAccount ){
-		let adapter = exchanger.getAdapter({
-			accountId,
-			exchange: exchangeAccount.provider,
-			key: exchangeAccount.key,
-			secret: exchangeAccount.secret
-		});
-
-		console.log('ADAPTER', adapter)
-		if (adapter) {
-			let portfolio = await adapter.getPortfolio();
-			console.log('PORTFOLIO!', portfolio);
-			let orders = await adapter.getOrderHistory();
-			console.log('ORDERS!', orders);
-		}
-	}
-	
-	
 	const botInput: BotExecutorPayload = {
-		code: bot?.code,
-		candles: {
-			[deployment.config.symbols[0]]: exchangeData
-		},
+		botSource: bot?.code,
+		candles: candles,
 		config: {
 			symbols: deployment.config.symbols,
 			interval: deployment.config.interval,
 			exchange: 'bitfinex'
 		},
-		state: deployment.state
+		state: deployment.state,
+		orders: orders.items,
+		portfolio
 	}
 
 	lambdaUtil.invokeExecutor(botInput)
@@ -142,11 +116,9 @@ function mergeOrders( orders:any, exchangeOrders: ExchangeOrder[] ) {
 		foreignIdIndex: {...foreignIdIndex},
 		items: {...items}
 	}
-
-	console.log('Current orders', foreignIdIndex, items, exchangeOrders);
+	
 	exchangeOrders.forEach( exchangeOrder => {
 		let storedOrderId = foreignIdIndex[exchangeOrder.id];
-		console.log( storedOrderId );
 		if( storedOrderId ){
 			mergedOrders.items[storedOrderId] = mergeOrder( items[storedOrderId], exchangeOrder );
 		}

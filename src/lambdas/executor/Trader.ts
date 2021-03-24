@@ -1,45 +1,5 @@
 import { v4 as uuid } from 'uuid';
-
-interface Balance {
-	free: number,
-	locked: number
-}
-
-interface Portfolio {
-	[asset: string]: Balance
-}
-
-interface OrderInput {
-	symbol: string
-	type: 'limit' | 'market'
-	direction: 'buy' | 'sell'
-	amount: number
-}
-
-export interface Order extends OrderInput {
-	id: string
-	foreignId: string | null
-	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
-	errorReason: string | null
-	price: number | null
-	executedPrice: number | null
-	createdAt: number
-	placedAt: number | null
-	closedAt: number | null
-}
-
-interface LimitOrderInput extends OrderInput {
-	type: 'limit'
-	price: number
-}
-
-interface MarketOrderInput extends OrderInput {
-	type: 'market'
-}
-
-export interface Orders {
-	[orderId: string]: Order
-}
+import { LimitOrderInput, MarketOrderInput, Order, Orders, Portfolio } from '../lambda.types';
 
 export default class Trader {
 	portfolio: Portfolio
@@ -66,7 +26,7 @@ export default class Trader {
 		let order: Order = {
 			price: null,
 			...orderInput,
-			id: uuid,
+			id: uuid(),
 			status: 'pending',
 			foreignId: null,
 			errorReason: null,

@@ -1,3 +1,5 @@
+import { ArrayCandle } from "../../lambda.types";
+
 function getLast(candles: ArrayCandle[]): ArrayCandle {
 	return candles[candles.length - 1];
 }

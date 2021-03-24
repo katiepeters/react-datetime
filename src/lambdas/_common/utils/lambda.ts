@@ -1,4 +1,4 @@
-import { ArrayCandle, BotConfiguration } from "../../lambda.types";
+import { ArrayCandle, BotConfiguration, Orders, Portfolio } from "../../lambda.types";
 
 const AWS = require('aws-sdk');
 
@@ -14,10 +14,12 @@ interface SupplierdoPayload {
 }
 
 export interface BotExecutorPayload {
-	code: string,
+	botSource: string,
 	candles: BotCandles,
 	config: BotConfiguration,
-	state: BotState
+	state: BotState,
+	orders: Orders,
+	portfolio: Portfolio
 }
 
 type BotCandles = {
