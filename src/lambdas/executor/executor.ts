@@ -1,6 +1,5 @@
-import { BotCandles, BotConfiguration, TradeBot } from "../lambda.types";
+import { BotCandles, BotConfiguration, TradeBot, BotExecutorPayload, BotExecutorResult } from "../lambda.types";
 import * as ts from "typescript";
-import { BotExecutorPayload } from "../_common/utils/lambda";
 import Trader from "./Trader";
 import botUtils from '../_common/utils/botUtils';
 
@@ -15,27 +14,21 @@ export async function executor(event: BotExecutorPayload) {
 	const trader = new Trader(
 		event.portfolio, event.orders
 	);
-
+	
+	// Pass a state object that can be updated
+	let state = {...event.state};
 	Bot.onData({
 		candles: event.candles,
 		config: event.config,
 		trader,
-		state: event.state,
+		state: state,
 		utils: botUtils
-	})
-
-	console.log('BOT', trader);
+	});
 
 	return {
-		statusCode: 200,
-		body: JSON.stringify(
-			{
-				message: 'Go Serverless v1.0! Your function executed successfully!',
-				input: event,
-			},
-			null,
-			2
-		),
+		ordersToCancel: trader.ordersToCancel,
+		ordersToPlace: trader.ordersToPlace,
+		state: state
 	};
 }
 

@@ -1,13 +1,12 @@
 import BotDeploymentModel from '../_common/dynamo/BotDeploymentModel';
 import BotModel from '../_common/dynamo/BotModel';
 import ExchangeAccountModel from '../_common/dynamo/ExchangeAccountModel';
-import dataFetcher from '../_common/exchangeDataFetcher/exchangeDataFetcher';
 import { ExchangeAdapter, ExchangeOrder } from '../_common/exchanges/ExchangeAdapter';
 import exchanger from '../_common/exchanges/exchanger';
 import exchangeUtils from '../_common/exchanges/exchangeUtils';
-import lambdaUtil, {BotExecutorPayload} from '../_common/utils/lambda';
+import lambdaUtil from '../_common/utils/lambda';
 import {v4 as uuid} from 'uuid';
-import { Order } from '../lambda.types';
+import { Order, BotExecutorPayload } from '../lambda.types';
 
 export async function supplierdo({ accountId, deploymentId }) {
 	const deployment = await BotDeploymentModel.getSingle(accountId, deploymentId);
@@ -54,11 +53,48 @@ export async function supplierdo({ accountId, deploymentId }) {
 		portfolio
 	}
 
-	lambdaUtil.invokeExecutor(botInput)
-		.then( result =>{
-			console.log('Result from the executor', result);
-		})
-	;
+	const result = await lambdaUtil.invokeExecutor(botInput);
+
+	if( result.ordersToCancel.length ){
+		let foreignIds: string[] = [];
+		result.ordersToCancel.forEach( id => {
+			let order = orders.items[id];
+			if( !order || !order.foreignId ){
+				return console.warn(`Trying to cancel an unknown order ${id}`);
+			}
+			
+			foreignIds.push( order.foreignId );
+		});
+
+		console.log('cancelling orders', foreignIds);
+		await exchangeAdapter.cancelOrders(foreignIds);
+		result.ordersToCancel.forEach( id => {
+			if( orders.items[id] ){
+				orders.items[id].status = 'cancelled';
+				orders.items[id].closedAt = Date.now();
+			}
+		});
+	}
+
+	if( result.ordersToPlace.length ) {
+		// @ts-ignore
+		let placedOrders = await exchangeAdapter.placeOrders( result.ordersToPlace );
+		console.log('Placed orders', placedOrders);
+		let ordersToUpdate = placedOrders.map( (placed, i) => (
+			mergeOrder( result.ordersToPlace[i], placed )
+		));
+
+		console.log('placing orders', ordersToUpdate.length);
+		ordersToUpdate.forEach( order => {
+			orders.items[order.id] = order;
+			if (order.foreignId) {
+				orders.foreignIdIndex[order?.foreignId] = order.id;
+			}
+		});
+	}
+
+	BotDeploymentModel.update(accountId, deployment.id, {orders, state: result.state});
+	// console.log('Result from the executor', result);
 
 	return {
 		statusCode: 200,
@@ -90,7 +126,7 @@ async function getExchangeData( adapter: ExchangeAdapter, symbols: any ){
 async function getPortfolioAndOrders( adapter: ExchangeAdapter ) {
 	const portfolio = await adapter.getPortfolio();
 	const openOrders = await adapter.getOpenOrders();
-	const closedOrders = await adapter.getOpenOrders();
+	const closedOrders = await adapter.getOrderHistory();
 
 	return {portfolio, orders: openOrders.concat(closedOrders) };
 }
@@ -137,8 +173,8 @@ function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {
 		...exchangeOrder,
 		id: storedOrder.id,
 		foreignId: exchangeOrder.id,
-		errorReason: null,
-		createdAt: Date.now(),
+		createdAt: storedOrder.createdAt,
+		source: storedOrder.source
 	}
 }
 
@@ -148,6 +184,7 @@ function createOrder( id: string, exchangeOrder: ExchangeOrder ): Order {
 		id: id,
 		foreignId: exchangeOrder.id,
 		errorReason: null,
-		createdAt: Date.now()
+		createdAt: Date.now(),
+		source: 'external'
 	}
 }

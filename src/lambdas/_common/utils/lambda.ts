@@ -1,4 +1,4 @@
-import { ArrayCandle, BotConfiguration, Orders, Portfolio } from "../../lambda.types";
+import { ArrayCandle, BotConfiguration, BotExecutorResult, Orders, Portfolio } from "../../lambda.types";
 
 const AWS = require('aws-sdk');
 
@@ -11,15 +11,6 @@ interface LambaInvokeOptions {
 interface SupplierdoPayload {
 	accountId: string
 	deploymentId: string
-}
-
-export interface BotExecutorPayload {
-	botSource: string,
-	candles: BotCandles,
-	config: BotConfiguration,
-	state: BotState,
-	orders: Orders,
-	portfolio: Portfolio
 }
 
 type BotCandles = {
@@ -67,10 +58,10 @@ const lambdaUtil = {
 			Payload: payload
 		});
 	},
-	invokeExecutor( payload ): Promise<any> {
+	invokeExecutor( payload ): Promise<BotExecutorResult> {
 		return this.invoke({
 			FunctionName: 'awstrader-dev-executor',
-			InvocationType: 'Event',
+			InvocationType: 'RequestResponse',
 			Payload: payload
 		});
 	}

@@ -80,6 +80,7 @@ export interface Order extends OrderInput {
 	id: string
 	foreignId: string | null
 	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
+	source: 'bot' | 'external'
 	errorReason: string | null
 	price: number | null
 	executedPrice: number | null
@@ -107,4 +108,17 @@ export abstract class TradeBot {
 	}
 	abstract onData(input: BotInput): void
 }
+export interface BotExecutorPayload {
+	botSource: string,
+	candles: BotCandles,
+	config: BotConfiguration,
+	state: BotState,
+	orders: Orders,
+	portfolio: Portfolio
+}
 
+export interface BotExecutorResult {
+	ordersToCancel: string[]
+	ordersToPlace: Order[]
+	state: BotState
+}

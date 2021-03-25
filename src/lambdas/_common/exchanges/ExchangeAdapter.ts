@@ -12,6 +12,7 @@ export interface ExchangeOrder {
 	symbol: string
 	type: 'limit' | 'market'
 	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
+	errorReason: string | null
 	direction: 'buy' | 'sell'
 	amount: number
 	price: number | null
@@ -28,8 +29,8 @@ export interface ExchangeCredentials {
 export interface ExchangeAdapter {
 	getPortfolio(): Promise<Portfolio>
 	getCandles(options: CandleQuery): Promise<ArrayCandle[]>
-	placeOrder(order: LimitOrderInput | MarketOrderInput): Promise<ExchangeOrder>
-	cancelOrder(orderId: string): Promise<boolean>
+	placeOrders(orders: (LimitOrderInput | MarketOrderInput)[]): Promise<ExchangeOrder[]>
+	cancelOrders(orderIds: string[]): Promise<boolean[]>
 	getOpenOrders(): Promise<ExchangeOrder[]>
 	getOrderHistory(): Promise<ExchangeOrder[]>
 }

@@ -53,22 +53,37 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 		return candles;
 	}
 
-	async placeOrder(order: LimitOrderInput | MarketOrderInput): Promise<ExchangeOrder> {
-		let orderOptions: any = {
-			type: order.type.toUpperCase(),
-			symbol: getSymbol(order.symbol),
-			amount: order.direction === 'buy' ? order.amount : order.amount * -1
-		}
-		if( order.type === 'limit' ){
-			orderOptions.price = order.price;
-		}
+	async placeOrders(orders: (LimitOrderInput | MarketOrderInput)[]): Promise<ExchangeOrder[]> {
+		let toSubmit = orders.map( order => {
+			let bfxOptions: any = {
+				type: getBfxOrderType(order.type),
+				symbol: getSymbol(order.symbol),
+				amount: order.direction === 'buy' ? order.amount : -order.amount
+			};
 
-		let bfxOrder = new BfxOrder(orderOptions);
+			if (order.type === 'limit') {
+				bfxOptions.price = order.price;
+			}
 
-		return convertToExchangeOrder( bfxOrder );
+			return new BfxOrder(bfxOptions);
+		});
+
+		let results = await this.bfx.submitOrderMulti( toSubmit );
+		// console.log( 'Orders placed', results.notifyInfo );	
+		let placed = results.notifyInfo.map( result => {
+			let order = convertToExchangeOrder( result[4] );
+			if( result[6] === 'ERROR' ){
+				order.status = 'error';
+				order.errorReason = result[7];
+			}
+			return order;
+		})
+		return placed;
 	}
-	cancelOrder(orderId: string): Promise<boolean> {
-		throw new Error('Method not implemented.');
+	async cancelOrders(orderIds: string[]): Promise<boolean[]> {
+		let results = await this.bfx.cancelOrders(orderIds);
+		console.log( 'Orders cancelled', results );
+		return results;
 	}
 	async getOpenOrders(): Promise<ExchangeOrder[]> {
 		let orders = await this.bfx.activeOrders();
@@ -98,6 +113,7 @@ function convertToExchangeOrder(rawOrder): ExchangeOrder {
 		symbol: getOrderSymbol(bfxOrder.symbol),
 		type: bfxOrder.type.includes('LIMIT') ? 'limit' : 'market',
 		status,
+		errorReason: null,
 		direction: bfxOrder.amount > 0 ? 'buy' : 'sell',
 		amount: Math.abs(bfxOrder.amount || bfxOrder.amountOrig),
 		price: bfxOrder.price || null,
@@ -111,7 +127,16 @@ function getOrderSymbol( symbol: string ) {
 	return symbol.slice(1, symbol.length -3) + '/' + symbol.slice(-3);
 }
 
+function getBfxOrderType( type: string ) {
+	if( type === 'limit' ){
+		return 'EXCHANGE LIMIT';
+	}
+	return 'EXCHANGE MARKET';
+}
+
 function getOrderStatus(status: string): 'pending' | 'placed' | 'completed' | 'cancelled' | 'error' {
+	if( !status ) return 'pending';
+
 	let str = status.split(' ')[0];
 	switch ( str ){
 		case 'ACTIVE':
