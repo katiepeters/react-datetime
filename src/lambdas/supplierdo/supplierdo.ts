@@ -9,6 +9,7 @@ import {v4 as uuid} from 'uuid';
 import { Order, BotExecutorPayload } from '../lambda.types';
 
 export async function supplierdo({ accountId, deploymentId }) {
+	let {bot, exchangeAccount, deployment, error} = getModels(accountId, deploymentId);
 	const deployment = await BotDeploymentModel.getSingle(accountId, deploymentId);
 
 	if (!deployment) {
