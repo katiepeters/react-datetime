@@ -7,7 +7,7 @@ import exchangeUtils from '../_common/exchanges/exchangeUtils';
 import lambdaUtil from '../_common/utils/lambda';
 import {v4 as uuid} from 'uuid';
 import { Order, BotExecutorPayload, Portfolio, BotCandles } from '../lambda.types';
-import { DbBot, DBBotDeployment, DbExchangeAccount } from '../model.types';
+import { DbBot, DBBotDeployment, DbExchangeAccount, DeploymentOrders } from '../model.types';
 
 export async function supplierdo({ accountId, deploymentId }) {
 	try {
@@ -31,15 +31,13 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	const orders = mergeOrders( deployment.orders, exchangeOrders );
 	BotDeploymentModel.update(accountId, deployment.id, {orders});
 
-
-
 	const botInput: BotExecutorPayload = {
 		botSource: bot?.code,
 		candles: candles,
 		config: {
 			symbols: deployment.config.symbols,
 			interval: deployment.config.interval,
-			exchange: 'bitfinex'
+			exchange: deployment.config.exchangeType
 		},
 		state: deployment.state,
 		orders: orders.items,
@@ -48,58 +46,10 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 
 	const result = await lambdaUtil.invokeExecutor(botInput);
 
-	if( result.ordersToCancel.length ){
-		let foreignIds: string[] = [];
-		result.ordersToCancel.forEach( id => {
-			let order = orders.items[id];
-			if( !order || !order.foreignId ){
-				return console.warn(`Trying to cancel an unknown order ${id}`);
-			}
-			
-			foreignIds.push( order.foreignId );
-		});
-
-		console.log('cancelling orders', foreignIds);
-		await exchangeAdapter.cancelOrders(foreignIds);
-		result.ordersToCancel.forEach( id => {
-			if( orders.items[id] ){
-				orders.items[id].status = 'cancelled';
-				orders.items[id].closedAt = Date.now();
-			}
-		});
-	}
-
-	if( result.ordersToPlace.length ) {
-		// @ts-ignore
-		let placedOrders = await exchangeAdapter.placeOrders( result.ordersToPlace );
-		console.log('Placed orders', placedOrders);
-		let ordersToUpdate = placedOrders.map( (placed, i) => (
-			mergeOrder( result.ordersToPlace[i], placed )
-		));
-
-		console.log('placing orders', ordersToUpdate.length);
-		ordersToUpdate.forEach( order => {
-			orders.items[order.id] = order;
-			if (order.foreignId) {
-				orders.foreignIdIndex[order?.foreignId] = order.id;
-			}
-		});
-	}
+	await cancelOrders( exchangeAdapter, result.ordersToCancel, orders );
+	await placeOrders( exchangeAdapter, result.ordersToPlace, orders );
 
 	BotDeploymentModel.update(accountId, deployment.id, {orders, state: result.state});
-	// console.log('Result from the executor', result);
-
-	return {
-		statusCode: 200,
-		body: JSON.stringify(
-			{
-				message: 'Go Serverless v1.0! Your function executed successfully!',
-				input: {accountId, deploymentId},
-			},
-			null,
-			2
-		),
-	};
 }
 interface ExchangeData {
 	portfolio: Portfolio
@@ -122,10 +72,7 @@ async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeplo
 		}
 	});
 
-	console.log('Updating data from orders', orderIds);
-
 	const orders = await adapter.getOrders(orderIds);
-	console.log(`Gotten ${orders.length} orders`);
 	return { portfolio, orders, candles };
 }
 
@@ -251,4 +198,46 @@ function getAdapter( accountId: string, exchangeAccount: DbExchangeAccount ): Ex
 	}
 
 	return exchangeAdapter;
+}
+
+async function cancelOrders(exchangeAdapter: ExchangeAdapter, orderIds: string[], storedOrders: DeploymentOrders ): Promise<void> {
+	if(!orderIds.length) return;
+	
+	let foreignIds: string[] = [];
+	orderIds.forEach(id => {
+		let order = storedOrders.items[id];
+		if (!order || !order.foreignId) {
+			return console.warn(`Trying to cancel an unknown order ${id}`);
+		}
+
+		foreignIds.push(order.foreignId);
+	});
+
+	console.log('cancelling orders', foreignIds);
+	await exchangeAdapter.cancelOrders(foreignIds);
+	orderIds.forEach(id => {
+		if (storedOrders.items[id]) {
+			storedOrders.items[id].status = 'cancelled';
+			storedOrders.items[id].closedAt = Date.now();
+		}
+	});
+}
+
+async function placeOrders(exchangeAdapter: ExchangeAdapter, ordersToPlace: Order[], storedOrders: DeploymentOrders ): Promise<void> {
+	if (!ordersToPlace.length) return;
+	
+	// @ts-ignore
+	let placedOrders = await exchangeAdapter.placeOrders(ordersToPlace);
+	console.log('Placed orders', placedOrders);
+	let ordersToUpdate = placedOrders.map((placed, i) => (
+		mergeOrder(ordersToPlace[i], placed)
+	));
+
+	console.log('placing orders', ordersToUpdate.length);
+	ordersToUpdate.forEach(order => {
+		storedOrders.items[order.id] = order;
+		if (order.foreignId) {
+			storedOrders.foreignIdIndex[order?.foreignId] = order.id;
+		}
+	});
 }

@@ -1,3 +1,5 @@
+import { ExchangeProvider } from "./lambda.types";
+
 export interface TableItem {
 	accountId: string
 	resourceId: string
@@ -44,14 +46,14 @@ export interface Order extends OrderInput {
 	closedAt: number | null
 }
 
-export interface Orders {
+export interface DeploymentOrders {
 	foreignIdIndex: { [foreignId: string]: string }
 	items: { [orderId: string]: Order }
 }
 
 export interface DBBotDeploymentConfig {
 	exchangeAccountId: string
-	exchangeType: string
+	exchangeType: ExchangeProvider
 	interval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	symbols: string[]
 }
@@ -63,7 +65,7 @@ export interface DBBotDeploymentState {
 export interface DBBotDeployment extends TableItem {
 	id: string
 	botId: string
-	orders: Orders
+	orders: DeploymentOrders
 	config: DBBotDeploymentConfig
 	state: DBBotDeploymentState
 }
@@ -81,14 +83,14 @@ export interface DBBotDeploymentInput {
 	id: string
 	botId: string
 	config: DBBotDeploymentConfig
-	orders: Orders
+	orders: DeploymentOrders
 	state: DBBotDeploymentState
 }
 
 export interface DBBotDeploymentUpdate {
 	botId?: string
 	config?: DBBotDeploymentConfig
-	orders?: Orders
+	orders?: DeploymentOrders
 	state?: DBBotDeploymentState
 }
 
