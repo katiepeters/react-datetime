@@ -85,6 +85,17 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 		console.log( 'Orders cancelled', results );
 		return results;
 	}
+	async getOrders(orderIds: string[]): Promise<ExchangeOrder[]> {
+		if( !orderIds.length ) return [];
+
+		// Can't Promise.all because nonce errors
+		const openOrders = await this.bfx.activeOrdersWithIds(orderIds);
+		const closedOrders = await this.bfx.orderHistoryWithIds(orderIds);
+
+		const orders = openOrders.concat( closedOrders );
+		console.log( orders );
+		return orders;
+	}
 	async getOpenOrders(): Promise<ExchangeOrder[]> {
 		let orders = await this.bfx.activeOrders();
 		console.log('RAW ORDERS', orders);

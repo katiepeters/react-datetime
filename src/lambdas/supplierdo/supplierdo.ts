@@ -6,41 +6,33 @@ import exchanger from '../_common/exchanges/exchanger';
 import exchangeUtils from '../_common/exchanges/exchangeUtils';
 import lambdaUtil from '../_common/utils/lambda';
 import {v4 as uuid} from 'uuid';
-import { Order, BotExecutorPayload } from '../lambda.types';
+import { Order, BotExecutorPayload, Portfolio, BotCandles } from '../lambda.types';
+import { DbBot, DBBotDeployment, DbExchangeAccount } from '../model.types';
 
 export async function supplierdo({ accountId, deploymentId }) {
-	let {bot, exchangeAccount, deployment, error} = getModels(accountId, deploymentId);
-	const deployment = await BotDeploymentModel.getSingle(accountId, deploymentId);
-
-	if (!deployment) {
-		console.warn(`Supplierdo called on an unknonw deploymentId`, accountId, deploymentId);
-		return { statusCode: 404 };
+	try {
+		await handleRunRequest( accountId, deploymentId );
+	}
+	catch(err) {
+		console.warn(err);
+		return {error: err.code};
 	}
 
-	const [bot, exchangeAccount] = await Promise.all([
-		BotModel.getSingle(accountId, deployment.botId),
-		ExchangeAccountModel.getSingle(accountId, deployment.config.exchangeAccountId)
-	]);
+	return {error: false};
+}
 
-	if( !bot || !exchangeAccount) {
-		return {statusCode: 404};
-	}
+async function handleRunRequest( accountId: string, deploymentId: string ) {
+	// Get data
+	const {bot, exchangeAccount, deployment} = await getModels(accountId, deploymentId);
+	const exchangeAdapter = getAdapter(accountId, exchangeAccount);
+	const { portfolio, orders: exchangeOrders, candles} = await getExchangeData( exchangeAdapter, deployment );
 
-	const exchangeAdapter = exchanger.getAdapter({
-		accountId,
-		exchange: exchangeAccount.provider,
-		key: exchangeAccount.key,
-		secret: exchangeAccount.secret
-	});
-
-	if( !exchangeAdapter ) {
-		return {statusCode: 500};
-	}
-
-	const { portfolio, orders: exchangeOrders, candles} = await getExchangeData( exchangeAdapter, deployment.config );
+	// Store any updated order from the last run
 	const orders = mergeOrders( deployment.orders, exchangeOrders );
-
 	BotDeploymentModel.update(accountId, deployment.id, {orders});
+
+
+
 	const botInput: BotExecutorPayload = {
 		botSource: bot?.code,
 		candles: candles,
@@ -109,30 +101,36 @@ export async function supplierdo({ accountId, deploymentId }) {
 		),
 	};
 }
-
-
-async function getExchangeData( adapter: ExchangeAdapter, symbols: any ){
-	const [ portfolioOrders, candles ] = await Promise.all([
-		getPortfolioAndOrders( adapter ),
-		getCandles( adapter, symbols )
+interface ExchangeData {
+	portfolio: Portfolio
+	orders: ExchangeOrder[],
+	candles: BotCandles
+}
+async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeployment ): Promise<ExchangeData>{
+	// First get candles (virtual exchanges will refresh its data)
+	const [ portfolio, candles ] = await Promise.all([
+		adapter.getPortfolio(),
+		getCandles( adapter, deployment.config )
 	]);
 
-	return {
-		portfolio: portfolioOrders.portfolio,
-		orders: portfolioOrders.orders,
-		candles
-	};
-}
+	// Then get updated orders (virtual exchanges will use previously fetched candles)
+	let orderIds: string[] = [];
+	Object.values( deployment.orders.items ).forEach( order => {
+		if( order.status === 'placed' ){
+			// @ts-ignore
+			orderIds.push( order.foreignId );
+		}
+	});
 
-async function getPortfolioAndOrders( adapter: ExchangeAdapter ) {
-	const portfolio = await adapter.getPortfolio();
-	const openOrders = await adapter.getOpenOrders();
-	const closedOrders = await adapter.getOrderHistory();
+	console.log('Updating data from orders', orderIds);
 
-	return {portfolio, orders: openOrders.concat(closedOrders) };
+	const orders = await adapter.getOrders(orderIds);
+	console.log(`Gotten ${orders.length} orders`);
+	return { portfolio, orders, candles };
 }
 
 async function getCandles( adapter: ExchangeAdapter, config: any ) {
+	console.log('Config', )
 	let promises = config.symbols.map( (symbol:string) => adapter.getCandles({
 		market: symbol,
 		interval: config.interval,
@@ -174,8 +172,7 @@ function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {
 		...exchangeOrder,
 		id: storedOrder.id,
 		foreignId: exchangeOrder.id,
-		createdAt: storedOrder.createdAt,
-		source: storedOrder.source
+		createdAt: storedOrder.createdAt
 	}
 }
 
@@ -185,7 +182,73 @@ function createOrder( id: string, exchangeOrder: ExchangeOrder ): Order {
 		id: id,
 		foreignId: exchangeOrder.id,
 		errorReason: null,
-		createdAt: Date.now(),
-		source: 'external'
+		createdAt: Date.now()
 	}
+}
+
+interface BotModels {
+	deployment: DBBotDeployment,
+	exchangeAccount: DbExchangeAccount,
+	bot: DbBot
+}
+
+interface BotModelsError {
+	error: boolean,
+	message: string
+}
+
+interface CodeErrorInput {
+	code: string
+	message?: string
+	extra?: {[attr: string]: any}
+}
+class CodeError extends Error {
+	code: string
+	extra: { [attr: string]: any }
+	constructor(input: CodeErrorInput) {
+		let message = input.message || input.code;
+		super( message );
+		this.code = input.code;
+		this.extra = input.extra || {}
+	}
+}
+
+async function getModels( accountId: string, deploymentId: string ): Promise<BotModels> {
+	const deployment = await BotDeploymentModel.getSingle(accountId, deploymentId);
+
+	if (!deployment) {
+		throw new CodeError({code: 'unknown_deployment'});
+	}
+
+	const [bot, exchangeAccount] = await Promise.all([
+		BotModel.getSingle(accountId, deployment.botId),
+		ExchangeAccountModel.getSingle(accountId, deployment.config.exchangeAccountId)
+	]);
+
+	if (!bot) {
+		throw new CodeError({ code: 'unknown_bot' });
+	}
+
+	if (!exchangeAccount) {
+		throw new CodeError({ code: 'unknown_exchangeAccount' });
+	}
+
+	return {
+		deployment, exchangeAccount, bot
+	};
+}
+
+function getAdapter( accountId: string, exchangeAccount: DbExchangeAccount ): ExchangeAdapter {
+	const exchangeAdapter = exchanger.getAdapter({
+		accountId,
+		exchange: exchangeAccount.provider,
+		key: exchangeAccount.key,
+		secret: exchangeAccount.secret
+	});
+
+	if (!exchangeAdapter) {
+		throw new CodeError({ code: 'unknown_adapter', extra: { adapter: exchangeAccount.key } });
+	}
+
+	return exchangeAdapter;
 }

@@ -4,14 +4,6 @@ AWS.config.update({
 });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-type TableAtrributeValue = string | string[]
-
-export interface TableItem {
-	accountId: string
-	resourceId: string
-	[attribute:string]: any
-}
-
 export class DBModel<T> {
 	async put(item: T ): Promise<void> {
 		await dynamoDb.put({
@@ -42,7 +34,7 @@ export class DBModel<T> {
 		return res.Items;
 	}
 
-	async update(accountId: string, resourceId: string, update: { [attribute: string]: TableAtrributeValue} ): Promise<void>{
+	async update(accountId: string, resourceId: string, update: { [attribute: string]: any} ): Promise<void>{
 		let AttributeUpdates = {};
 		for( let key in update ){
 			AttributeUpdates[key] = {Action: 'PUT', Value: update[key]};

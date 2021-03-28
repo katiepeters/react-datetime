@@ -1,13 +1,5 @@
-import {TableItem, DBModel} from './db';
-
-interface DBAccount extends TableItem {
-	id: string
-	resourceId: 'ACCOUNT'
-}
-
-interface DBAccountInput {
-	id: string
-}
+import { DBAccount, DBAccountInput } from '../../model.types';
+import {DBModel} from './db';
 
 const Db = new DBModel<DBAccount>();
 

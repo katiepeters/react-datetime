@@ -28,7 +28,6 @@ export default class Trader {
 			...orderInput,
 			id: uuid(),
 			status: 'pending',
-			source: 'bot',
 			foreignId: null,
 			errorReason: null,
 			executedPrice: null,

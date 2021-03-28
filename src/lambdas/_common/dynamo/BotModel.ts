@@ -1,17 +1,5 @@
-import { TableItem, DBModel } from './db';
-
-interface DbBot extends TableItem {
-	id: string
-	name: string
-	code: string
-}
-
-interface DbBotInput {
-	id: string
-	name: string
-	accountId: string
-	code: string
-}
+import { DbBot, DbBotInput } from '../../model.types';
+import { DBModel } from './db';
 
 
 const Db = new DBModel<DbBot>();

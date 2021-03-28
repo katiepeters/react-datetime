@@ -31,6 +31,7 @@ export interface ExchangeAdapter {
 	getCandles(options: CandleQuery): Promise<ArrayCandle[]>
 	placeOrders(orders: (LimitOrderInput | MarketOrderInput)[]): Promise<ExchangeOrder[]>
 	cancelOrders(orderIds: string[]): Promise<boolean[]>
+	getOrders(ids: string[]): Promise<ExchangeOrder[]>
 	getOpenOrders(): Promise<ExchangeOrder[]>
 	getOrderHistory(): Promise<ExchangeOrder[]>
 }

@@ -80,7 +80,6 @@ export interface Order extends OrderInput {
 	id: string
 	foreignId: string | null
 	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
-	source: 'bot' | 'external'
 	errorReason: string | null
 	price: number | null
 	executedPrice: number | null

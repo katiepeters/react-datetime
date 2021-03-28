@@ -1,21 +1,5 @@
-import { TableItem, DBModel } from './db';
-
-interface DbExchangeAccount extends TableItem {
-	id: string
-	provider: 'bitfinex'
-	type: 'real' | 'virtual'
-	key: string
-	secret: string
-}
-
-interface DbExchangeAccountInput {
-	accountId: string
-	id: string
-	provider: 'bitfinex'
-	type: 'real' | 'virtual'
-	key: string
-	secret: string
-}
+import { DBModel } from './db';
+import { DbExchangeAccount, DbExchangeAccountInput } from '../../model.types';
 
 const Db = new DBModel<DbExchangeAccount>();
 
