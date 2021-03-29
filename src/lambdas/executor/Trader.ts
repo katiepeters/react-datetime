@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { LimitOrderInput, MarketOrderInput, Order, Orders, Portfolio } from '../lambda.types';
+import { OrderInput, Order, Orders, Portfolio } from '../lambda.types';
 
 export default class Trader {
 	portfolio: Portfolio
@@ -22,7 +22,7 @@ export default class Trader {
 		return this.orders[id];
 	}
 
-	placeOrder(orderInput: LimitOrderInput | MarketOrderInput): Order {
+	placeOrder(orderInput: OrderInput): Order {
 		let order: Order = {
 			price: null,
 			...orderInput,

@@ -2,7 +2,7 @@
 import { RESTv2 } from 'bfx-api-node-rest';
 import { Order as BfxOrder } from 'bfx-api-node-models';
 import { CandleQuery, ExchangeAdapter, ExchangeCredentials, ExchangeOrder } from '../ExchangeAdapter';
-import { ArrayCandle, LimitOrderInput, MarketOrderInput, Order, Portfolio } from '../../../lambda.types';
+import { ArrayCandle, OrderInput, Portfolio } from '../../../lambda.types';
 
 const fetch = require('node-fetch');
 const baseUrl = 'https://api-pub.bitfinex.com/v2';
@@ -53,7 +53,7 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 		return candles;
 	}
 
-	async placeOrders(orders: (LimitOrderInput | MarketOrderInput)[]): Promise<ExchangeOrder[]> {
+	async placeOrders(orders: OrderInput[]): Promise<ExchangeOrder[]> {
 		let toSubmit = orders.map( order => {
 			let bfxOptions: any = {
 				type: getBfxOrderType(order.type),

@@ -31,6 +31,7 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	const orders = mergeOrders( deployment.orders, exchangeOrders );
 	BotDeploymentModel.update(accountId, deployment.id, {orders});
 
+	// Run the bot
 	const botInput: BotExecutorPayload = {
 		botSource: bot?.code,
 		candles: candles,
@@ -43,12 +44,13 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 		orders: orders.items,
 		portfolio
 	}
-
 	const result = await lambdaUtil.invokeExecutor(botInput);
 
+	// Update orders
 	await cancelOrders( exchangeAdapter, result.ordersToCancel, orders );
 	await placeOrders( exchangeAdapter, result.ordersToPlace, orders );
 
+	// Store bot results
 	BotDeploymentModel.update(accountId, deployment.id, {orders, state: result.state});
 }
 interface ExchangeData {
@@ -77,7 +79,6 @@ async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeplo
 }
 
 async function getCandles( adapter: ExchangeAdapter, config: any ) {
-	console.log('Config', )
 	let promises = config.symbols.map( (symbol:string) => adapter.getCandles({
 		market: symbol,
 		interval: config.interval,
@@ -137,11 +138,6 @@ interface BotModels {
 	deployment: DBBotDeployment,
 	exchangeAccount: DbExchangeAccount,
 	bot: DbBot
-}
-
-interface BotModelsError {
-	error: boolean,
-	message: string
 }
 
 interface CodeErrorInput {

@@ -1,4 +1,4 @@
-import { ArrayCandle, LimitOrderInput, MarketOrderInput, Order, Orders, Portfolio } from "../../lambda.types";
+import { ArrayCandle, OrderInput, Portfolio } from "../../lambda.types";
 
 export interface CandleQuery {
 	market: string
@@ -29,7 +29,7 @@ export interface ExchangeCredentials {
 export interface ExchangeAdapter {
 	getPortfolio(): Promise<Portfolio>
 	getCandles(options: CandleQuery): Promise<ArrayCandle[]>
-	placeOrders(orders: (LimitOrderInput | MarketOrderInput)[]): Promise<ExchangeOrder[]>
+	placeOrders(orders: OrderInput[]): Promise<ExchangeOrder[]>
 	cancelOrders(orderIds: string[]): Promise<boolean[]>
 	getOrders(ids: string[]): Promise<ExchangeOrder[]>
 	getOpenOrders(): Promise<ExchangeOrder[]>

@@ -26,7 +26,7 @@ export interface BotConfiguration {
 export interface Trader {
 	getPortfolio(): Portfolio
 	getOrder(id: string): Order | void
-	placeOrder(orderInput: LimitOrderInput | MarketOrderInput): Order
+	placeOrder(orderInput: OrderInput): Order
 	cancelOrder(orderId: string)
 }
 
@@ -76,6 +76,7 @@ export interface OrderInput {
 	type: 'limit' | 'market'
 	direction: 'buy' | 'sell'
 	amount: number
+	price: number | null
 }
 
 export interface Order extends OrderInput {
@@ -88,15 +89,6 @@ export interface Order extends OrderInput {
 	createdAt: number
 	placedAt: number | null
 	closedAt: number | null
-}
-
-export interface LimitOrderInput extends OrderInput {
-	type: 'limit'
-	price: number
-}
-
-export interface MarketOrderInput extends OrderInput {
-	type: 'market'
 }
 
 export interface Orders {
