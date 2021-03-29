@@ -45,7 +45,11 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	async placeOrders(orders: OrderInput[]): Promise<ExchangeOrder[]> {
-		return orders.map( this._placeOrder );
+		const placed = orders.map( this._placeOrder );
+		// Now we can complete any market order
+		this.updateOpenOrders();
+		// But return the placed orders to simulate real exchanges
+		return placed;
 	}
 
 	_placeOrder = (order: OrderInput): ExchangeOrder => {
@@ -222,11 +226,11 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 			let balance = this.getBalance(coin).free;
 			
 			if (order.type === 'market') {
-				return balance > order.amount * this.getCurrentPrice(order.symbol);
+				return balance >= order.amount * this.getCurrentPrice(order.symbol);
 			}
 			else {
 				// @ts-ignore
-				return balance > order.amount * order.price;
+				return balance >= order.amount * order.price;
 			}
 		}
 		else {
@@ -235,11 +239,11 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 			if (!balance) return false;
 
 			if (order.type === 'market') {
-				return balance > order.amount;
+				return balance >= order.amount;
 			}
 			else {
 				// @ts-ignore
-				return balance > order.amount;
+				return balance >= order.amount;
 			}
 		}
 	}
