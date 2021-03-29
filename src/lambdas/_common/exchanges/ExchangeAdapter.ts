@@ -26,6 +26,11 @@ export interface ExchangeCredentials {
 	secret: string
 }
 
+export interface ExchangeVirtualData {
+	portfolio: string,
+	orders: string
+}
+
 export interface ExchangeAdapter {
 	getPortfolio(): Promise<Portfolio>
 	getCandles(options: CandleQuery): Promise<ArrayCandle[]>
@@ -34,4 +39,5 @@ export interface ExchangeAdapter {
 	getOrders(ids: string[]): Promise<ExchangeOrder[]>
 	getOpenOrders(): Promise<ExchangeOrder[]>
 	getOrderHistory(): Promise<ExchangeOrder[]>
+	getVirtualData?: () => ExchangeVirtualData
 }

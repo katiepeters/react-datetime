@@ -50,6 +50,10 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	await cancelOrders( exchangeAdapter, result.ordersToCancel, orders );
 	await placeOrders( exchangeAdapter, result.ordersToPlace, orders );
 
+	if( exchangeAdapter.getVirtualData ){
+		await ExchangeAccountModel.update(accountId, exchangeAccount.id, exchangeAdapter.getVirtualData() )
+	}
+
 	// Store bot results
 	BotDeploymentModel.update(accountId, deployment.id, {orders, state: result.state});
 }
@@ -184,7 +188,7 @@ async function getModels( accountId: string, deploymentId: string ): Promise<Bot
 function getAdapter( accountId: string, exchangeAccount: DbExchangeAccount ): ExchangeAdapter {
 	const exchangeAdapter = exchanger.getAdapter({
 		accountId,
-		exchange: exchangeAccount.provider,
+		exchange: exchangeAccount.type === 'virtual' ? 'virtual' : exchangeAccount.provider,
 		key: exchangeAccount.key,
 		secret: exchangeAccount.secret
 	});

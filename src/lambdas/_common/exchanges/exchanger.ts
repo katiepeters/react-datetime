@@ -1,11 +1,13 @@
 import BitfinexAdapter from './adapters/BitfinexAdapter';
+import VirtualAdapter from './adapters/VirtualAdapter';
 import {ExchangeAdapter} from './ExchangeAdapter';
 
 const AES = require("crypto-js/aes");
 const utf8Encode = require("crypto-js/enc-utf8");
 
 const adapters = {
-	bitfinex: BitfinexAdapter
+	bitfinex: BitfinexAdapter,
+	virtual: VirtualAdapter
 };
 
 interface ExchangerConfig {

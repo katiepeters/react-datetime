@@ -13,5 +13,8 @@ export default {
 			resourceId: `EXCHANGE#${account.id}`
 		};
 		return await Db.put( exchange );
+	},
+	async update(accountId: string, exchangeId: string, update: any ){
+		return await Db.update(accountId, `EXCHANGE#${exchangeId}`, update);
 	}
 }
