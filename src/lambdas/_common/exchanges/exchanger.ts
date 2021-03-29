@@ -24,11 +24,12 @@ const exchanger = {
 			console.warn(`Cant find an adapter for ${config.exchange}`);
 			return;
 		}
-
-		console.log('Config secret', AES.decrypt(config.secret, config.accountId).toString(utf8Encode));
+		
 		return new Adapter({
 			key: config.key,
-			secret: AES.decrypt(config.secret, config.accountId).toString(utf8Encode)
+			secret: config.exchange === 'virtual' ?
+				config.secret : 
+				AES.decrypt(config.secret, config.accountId).toString(utf8Encode)
 		});
 	}
 }

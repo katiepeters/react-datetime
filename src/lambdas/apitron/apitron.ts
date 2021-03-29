@@ -132,8 +132,8 @@ async function setTestData(event) {
 			id: 'virtualExchange',
 			provider: 'bitfinex',
 			type: 'virtual',
-			key: '{"porfolio": {"BTC": {"asset": "BTC", "free": 0, "total": 0}, "USD": {"asset": "USD", "free": 1000, "total": 1000}}}',
-			secret: '{"orders": {}}'
+			key: '{"BTC": {"asset": "BTC", "free": 0, "total": 0}, "USD": {"asset": "USD", "free": 1000, "total": 1000}}',
+			secret: '{}'
 		});
 
 		await BotDeploymentModel.create({
@@ -148,7 +148,7 @@ async function setTestData(event) {
 				exchangeAccountId: 'virtualExchange',
 				exchangeType: 'bitfinex',
 				interval: '1h',
-				symbols: ['BTC/USD']
+				symbols: ['BTC/USD', 'ETH/USD']
 			},
 			state: {}
 		});

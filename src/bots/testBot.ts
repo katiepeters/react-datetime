@@ -6,6 +6,7 @@ export default class TestBot extends TradeBot {
 	}
 	onData({ config, state, trader, candles, utils }: BotInput ) {
 		config.symbols.forEach( symbol => {
+			// Limit order
 			if( state[symbol] ){
 				let order = trader.getOrder(state[symbol]);
 				console.log('Order found!', order);
@@ -26,10 +27,31 @@ export default class TestBot extends TradeBot {
 					symbol,
 					amount: 0.00035
 				});
-
 				state[symbol] = order.id;
 			}
 		});
+
+		// Market order
+		if( !state.marketOrder ){
+			let order = trader.placeOrder({
+				type: 'market',
+				direction: 'buy',
+				symbol: 'ETH/USD',
+				amount: 0.016
+			});
+			state.marketOrder = order.id;
+		}
+		else {
+			let portfolio = trader.getPortfolio();
+			let amount = portfolio.ETH.free;
+			trader.placeOrder({
+				type: 'market',
+				direction: 'sell',
+				symbol: 'ETH/USD',
+				amount
+			});
+			delete state.marketOrder;
+		}
 	}
 }
 

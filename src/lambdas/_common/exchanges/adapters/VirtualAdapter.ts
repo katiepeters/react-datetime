@@ -11,19 +11,17 @@ export interface ExchangeAccountData {
 }
 
 export default abstract class VirtualAdapter implements ExchangeAdapter {
-	accountId: string
-	exchangeAccountId: string
+	portfolio: Portfolio
 	orders: {[id: string]: ExchangeOrder}
 	openOrders: string[]
-	portfolio: Portfolio
 	lastDate: number
 	lastCandles: {[symbol: string]: ArrayCandle}
 
 	constructor(credentials: ExchangeCredentials) {
-		console.log('Key, portfolio', credentials.key);
-		console.log('Secret, orders', credentials.secret);
-		this.portfolio = JSON.parse(credentials.key).portfolio;
-		this.orders = JSON.parse(credentials.secret).orders;
+		this.portfolio = JSON.parse(credentials.key);
+		this.orders = JSON.parse(credentials.secret);
+		this.lastDate = -1;
+		this.lastCandles = {};
 		this.openOrders = [];
 		Object.values(this.orders).forEach( order => {
 			if( order.status === 'pending' || order.status === 'placed' ){
@@ -92,14 +90,15 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 		let {baseBalance, quotedBalance} = this.getOrderBalances( order );
 
 		const amount = order.amount;
-		let value = order.price || 1;
+		let price = order.price || 1;
 		if( order.type === 'market' ){
-			value = this.getLastPrice(order.symbol);
+			price = this.getLastPrice(order.symbol);
 		}
 		else if( order.status === 'completed' && order.executedPrice ){
-			value = order.executedPrice;
+			price = order.executedPrice;
 		}
 
+		const value = amount * price;
 		if( order.direction === 'buy' ){
 			if( order.status === 'placed' ){
 				quotedBalance.free -= value;
@@ -126,6 +125,10 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 				baseBalance.free += amount;
 			}
 		}
+
+		// Update balances
+		this.portfolio[symbols.getBase(order.symbol)] = baseBalance;
+		this.portfolio[symbols.getQuoted(order.symbol)] = quotedBalance;
 	}
 
 	getLastPrice( symbol:string ): number {
@@ -133,8 +136,8 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	getOrderBalances( order ){
-		let baseAsset = symbols.getBase(order.symbol);
-		let quotedAsset = symbols.getQuoted(order.symbol);
+		const baseAsset = symbols.getBase(order.symbol);
+		const quotedAsset = symbols.getQuoted(order.symbol);
 
 		return {
 			baseBalance: this.getBalance( baseAsset ),
@@ -143,11 +146,14 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	getBalance( asset: string ){
+		console.log( 'Portfolio', this.portfolio);
 		let balance: Balance = this.portfolio[asset];
 		if( balance ){
+			console.log(`${asset} balance found`, balance);
 			return {...balance };
 		}
 
+		console.log(`${asset} balance NOT found`, balance);
 		return {
 			asset: asset,
 			free: 0,
@@ -170,6 +176,7 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 
 		return results;
 	}
+	
 	cancelOrder( order: ExchangeOrder ){
 		let updatedOrder: ExchangeOrder = {
 			...order,
@@ -177,7 +184,7 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 			closedAt: this.lastDate
 		};
 		this.updateBalance(updatedOrder);
-		this.orders[order.id] = order;
+		this.orders[order.id] = updatedOrder;
 		
 		// Remove the order from the open order list
 		let i = this.openOrders.length;
@@ -212,9 +219,8 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 	hasEnoughFunds( order: OrderInput ){
 		if (order.direction === 'buy') {
 			let coin = symbols.getQuoted(order.symbol);
-			let balance = this.portfolio[coin]?.free;
-			if (!balance) return false;
-
+			let balance = this.getBalance(coin).free;
+			
 			if (order.type === 'market') {
 				return balance > order.amount * this.getCurrentPrice(order.symbol);
 			}
@@ -244,7 +250,7 @@ export default abstract class VirtualAdapter implements ExchangeAdapter {
 
 	updateOpenOrders() {
 		this.openOrders.forEach( orderId => {
-			let order = this.openOrders[orderId];
+			let order = this.orders[orderId];
 			this.checkOrderCompleted( order );
 		});
 	}

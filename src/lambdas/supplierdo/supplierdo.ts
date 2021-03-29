@@ -44,14 +44,20 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 		orders: orders.items,
 		portfolio
 	}
+
 	const result = await lambdaUtil.invokeExecutor(botInput);
+	const ordersToPlace = filterOrderToPlaceSymbols( result.ordersToPlace, deployment.config.symbols );
 
 	// Update orders
 	await cancelOrders( exchangeAdapter, result.ordersToCancel, orders );
-	await placeOrders( exchangeAdapter, result.ordersToPlace, orders );
+	await placeOrders( exchangeAdapter, ordersToPlace, orders );
 
 	if( exchangeAdapter.getVirtualData ){
-		await ExchangeAccountModel.update(accountId, exchangeAccount.id, exchangeAdapter.getVirtualData() )
+		const data = exchangeAdapter.getVirtualData();
+		await ExchangeAccountModel.update(accountId, exchangeAccount.id, {
+			key: data.portfolio,
+			secret: data.orders
+		});
 	}
 
 	// Store bot results
@@ -240,4 +246,18 @@ async function placeOrders(exchangeAdapter: ExchangeAdapter, ordersToPlace: Orde
 			storedOrders.foreignIdIndex[order?.foreignId] = order.id;
 		}
 	});
+}
+
+function filterOrderToPlaceSymbols( allOrders: Order[], symbols: string[] ): Order[] {
+	let symbolMap = new Set(symbols);
+	let toPlace: Order[] = [];
+	allOrders.forEach( order => {
+		if( symbolMap.has(order.symbol) ){
+			toPlace.push(order);
+		}
+		else {
+			console.warn(`Order symbol ${order.symbol} is not in the configured ones. Order won't be placed.`);
+		}
+	});
+	return toPlace;
 }
