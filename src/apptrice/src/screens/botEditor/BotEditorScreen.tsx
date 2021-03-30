@@ -4,6 +4,7 @@ import { ScreenProps } from '../../types';
 import botLoader from './bot.loader';
 import BotSaver from './BotSaver';
 import apiCacher from '../../state/apiCacher';
+import BootTools from './tools/BotTools';
 
 class BotEditorScreen extends React.Component<ScreenProps> {
 	state = {
@@ -29,15 +30,20 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		}
 
 		return (
-			<div>
-				<Editor
-					height="100vh"
-					defaultLanguage="javascript"
-					defaultValue={data.code}
-					theme="vs-dark"
-					options={{ minimap: { enabled: false } }}
-					onMount={this._initializeEditor}
-					onChange={this._onCodeChange} />
+			<div style={ styles.wrapper }>
+				<div style={styles.editor}>
+					<Editor
+						height="100vh"
+						defaultLanguage="javascript"
+						defaultValue={data.code}
+						theme="vs-dark"
+						options={{ minimap: { enabled: false } }}
+						onMount={this._initializeEditor}
+						onChange={this._onCodeChange} />
+				</div>
+				<div style={styles.tools}>
+					<BootTools />
+				</div>
 			</div>
 		);
 	}
@@ -86,3 +92,27 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 }
 
 export default BotEditorScreen;
+
+type StyleSheet = {
+	[id: string]: React.CSSProperties
+}
+
+const styles: StyleSheet = {
+	wrapper: {
+		display: 'flex',
+		flexGrow: 1,
+		flexDirection: 'row',
+		flexWrap: 'nowrap'
+	},
+	editor: {
+		display: 'flex',
+		flexGrow: 1,
+		minWidth: 0,
+		overflow: 'hidden'
+	},
+	tools: {
+		display: 'flex',
+		width: 250,
+		backgroundColor: '#102433',
+	}
+}

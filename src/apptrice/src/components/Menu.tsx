@@ -18,6 +18,8 @@ export default class Menu extends React.Component {
 
 const styles = {
 	menu: {
+		display: 'flex',
+		flexGrow: 1,
 		backgroundColor: '#102433',
 		width: 200
 	},

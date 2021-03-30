@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dynamo:serve": "cd src/lambdas && npm run dynamo",
     "dynamo:browse": "cd src/lambdas && npm run dynamo:browse",
-    "lambda:serve": "cd src/lambdas && npm run offline"
+    "lambda:serve": "cd src/lambdas && npm run offline",
+    "app:serve": "cd src/apptrice && npm run start"
   },
   "repository": {
     "type": "git",

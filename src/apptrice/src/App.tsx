@@ -9,7 +9,9 @@ class App extends React.Component {
 
     return (
       <div style={styles.appContainer as React.CSSProperties}>
-        <Menu />
+        <div style={styles.menuWrapper as React.CSSProperties}>
+          <Menu />
+        </div>
         <div style={styles.screen as React.CSSProperties}>
           <CurrentScreen
             store={store}
@@ -37,6 +39,12 @@ const styles = {
     flex: 1,
     alignItems: 'stretch',
     minHeight: '100vh'
+  },
+
+  menuWrapper: {
+    display: 'flex',
+    alignItems: 'stretch',
+    width: 200,
   },
 
   screen: {

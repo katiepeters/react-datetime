@@ -71,3 +71,11 @@ b {
 #root {
 	width: 100%;
 }
+
+input, select, textarea {
+	background-color: rgba(255,255,255,.2);
+	border: 1px solid rgba(255,255,255,.1);
+	border-radius: 2px;
+	padding: 4px;
+	color: #eee
+}
