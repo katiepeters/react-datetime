@@ -1,52 +1,86 @@
 import * as React from 'react';
+import Button from './Button';
 import InputGroup from './InputGroup';
+interface BootToolsProps {
+	onRun: (config: BacktestConfig) => void
+}
 
-export default class BootTools extends React.Component {
+export interface BacktestConfig {
+	baseAssets: string[],
+	quotedAsset: string,
+	interval: string
+	initialBalances: {[asset: string]: number}
+	startDate: string
+	endDate: string
+	fees: number,
+	slippage: number
+}
+
+export default class BootTools extends React.Component<BootToolsProps> {
 	state = {
-		baseSymbols: 'BTC,ETH',
-		quotedSymbol: 'USD',
+		baseAssets: 'BTC,ETH',
+		quotedAsset: 'USD',
 		interval: '1h',
 		initialBalances: {
 			USD: 1000
-		}
+		},
+		testingTimeframe : '7',
+		startDate: this.getInputDate(Date.now() - 7 * 24 * 60 * 60 * 1000),
+		endDate: this.getInputDate(Date.now()),
+		fees: '0.1%',
+		slippage: '0.2%'
 	}
+
 	render() {
 		return (
 			<div style={ styles.wrapper }>
-				<div style={ styles.fieldGroup }>
-					<div style={ styles.groupHeader}>
-						Bot config
+				{this.renderBotConfig()}
+				{this.renderTestingTimeframe() }
+				{this.renderInitialBalances() }
+				{this.renderExtraConfig() }
+				<div style={styles.fieldGroup}>
+					<div style={styles.control}>
+						<Button onClick={ this._onStartPressed }>Start backtesting</Button>
 					</div>
-					<div style={styles.field}>
-						<InputGroup
-							name="baseSymbols"
-							label="Base symbols">
-							<input name="baseSymbols"
-								value={this.state.baseSymbols}
-								onChange={e => this.setState({ baseSymbols: e.target.value })} />
-						</InputGroup>
+				</div>
+			</div>
+		);
+	}
+
+	renderBotConfig() {
+		return (
+			<div style={styles.fieldGroup}>
+				<div style={styles.groupHeader}>
+					Bot config
 					</div>
-					<div style={styles.field}>
-						<InputGroup name="quotedSymbol" label="Quoted symbol">
-							<input name="quotedSymbol"
-								value={this.state.quotedSymbol}
-								onChange={e => this.setState({ quotedSymbol: e.target.value })} />
-						</InputGroup>
-					</div>
-					<InputGroup name="interval" label="Execution interval">
-						<select name="interval"
-							value={this.state.interval}
-							onChange={e => this.setState({ interval: e.target.value })}>
-							<option>5m</option>
-							<option>10m</option>
-							<option>30m</option>
-							<option>1h</option>
-							<option>4h</option>
-							<option>1d</option>
-						</select>
+				<div style={styles.field}>
+					<InputGroup
+						name="baseAssets"
+						label="Base assets">
+						<input name="baseAssets"
+							value={this.state.baseAssets}
+							onChange={e => this.setState({ baseAssets: e.target.value })} />
 					</InputGroup>
 				</div>
-				{this.renderInitialBalances() }
+				<div style={styles.field}>
+					<InputGroup name="quotedAsset" label="Quoted asset">
+						<input name="quotedAsset"
+							value={this.state.quotedAsset}
+							onChange={e => this.setState({ quotedAsset: e.target.value })} />
+					</InputGroup>
+				</div>
+				<InputGroup name="interval" label="Execution interval">
+					<select name="interval"
+						value={this.state.interval}
+						onChange={e => this.setState({ interval: e.target.value })}>
+						<option>5m</option>
+						<option>10m</option>
+						<option>30m</option>
+						<option>1h</option>
+						<option>4h</option>
+						<option>1d</option>
+					</select>
+				</InputGroup>
 			</div>
 		);
 	}
@@ -55,22 +89,87 @@ export default class BootTools extends React.Component {
 		return (
 			<div style={styles.fieldGroup}>
 				<div style={styles.groupHeader}>
-					Testing timeframe
+					Testing time frame
 				</div>
-				<select>
-					<option value="1">1 day</option>
-					<option value="3">3 days</option>
-					<option value="7">1 week</option>
-					<option value="30">1 month</option>
-					<option value="90">3 months</option>
-					<option value="180">6 months</option>
-					<option value="365">1 year</option>
-					<option value="custom">Custom dates</option>
-				</select>
-				{ this.getSymbols().map(this._renderBalanceInput)}
+				<div style={styles.field}>
+					<InputGroup name="interval" label="Data from">
+						<select value={ this.state.testingTimeframe } onChange={ this._changeTimeframe }>
+							<option value="1">Last day</option>
+							<option value="3">Last 3 days</option>
+							<option value="7">Last week</option>
+							<option value="30">Last month</option>
+							<option value="90">Last 3 months</option>
+							<option value="180">Last 6 months</option>
+							<option value="365">Last year</option>
+							<option value="custom">Custom dates</option>
+						</select>
+					</InputGroup>
+				</div>
+				<div style={styles.field}>
+					<InputGroup name="startDate" label="From">
+						<input name="startDate"
+							placeholder="yyyy-mm-dd"
+							value={ this.state.startDate }
+							onChange={ e => this.setState({startDate: e.target.value})} />
+					</InputGroup>
+				</div>
+				<div style={styles.field}>
+					<InputGroup name="endDate" label="To">
+						<input name="endDate"
+							placeholder="yyyy-mm-dd"
+							value={ this.state.endDate }
+							onChange={e => this.setState({ endDate: e.target.value })} />
+					</InputGroup>
+				</div>
 			</div>
 		);
+	}
 
+	renderExtraConfig(){
+		return (
+			<div style={styles.fieldGroup}>
+				<div style={styles.groupHeader}>
+					Extra configuration
+				</div>
+				<div style={styles.field}>
+					<InputGroup name="fees" label="Fees">
+						<input name="fees"
+							value={ this.state.fees }
+							onChange={ e => this.updatePercentage('fees', e.target.value) } />
+					</InputGroup>
+				</div>
+				<div style={styles.field}>
+					<InputGroup name="slippage" label="Slippage">
+						<input name="slippage"
+							value={this.state.slippage}
+							onChange={e => this.updatePercentage('slippage', e.target.value)} />
+					</InputGroup>
+				</div>
+			</div>
+		)
+	}
+
+	updatePercentage( field: string, value: string){
+		if( value[value.length - 1] !== '%'){
+			this.setState({[field]: value + '%'});
+		}
+		else {
+			this.setState({ [field]: value});
+		}
+	}
+
+	_changeTimeframe = (e:any) => {
+		let selected = e.target.value;
+		if( selected === 'custom' ){
+			this.setState({testingTimeframe: selected});
+			return;
+		}
+
+		this.setState({
+			testingTimeframe: selected,
+			endDate: this.getInputDate( Date.now() ),
+			startDate: this.getInputDate( Date.now() - parseInt(selected) * 24 * 60 * 60 * 1000 )
+		});
 	}
 
 	renderInitialBalances() {
@@ -99,6 +198,37 @@ export default class BootTools extends React.Component {
 		);
 	}
 
+	_onStartPressed = () => {
+		let errors = this.getValidationErrors();
+		if( errors ){
+			this.setState({errors});
+		}
+
+		this.props.onRun( this.getConfig() );
+	}
+
+	getValidationErrors() {
+		return false;
+	}
+
+	getConfig(): BacktestConfig {
+		let { 
+			quotedAsset, interval, initialBalances,
+			startDate, endDate, fees, slippage
+		} = this.state;
+
+		return {
+			baseAssets: this.getSymbols(),
+			quotedAsset,
+			interval,
+			initialBalances,
+			startDate,
+			endDate,
+			fees: parseFloat(fees),
+			slippage: parseFloat(slippage)
+		};
+	}
+
 	updateInitialBalance( symbol:string, value: string ){
 		this.setState({
 			initialBalances: {
@@ -109,18 +239,22 @@ export default class BootTools extends React.Component {
 	}
 
 	getQuotedSymbol(){
-		return this.state.quotedSymbol;
+		return this.state.quotedAsset;
 	}
 
 	getSymbols() {
-		let symbols = [this.state.quotedSymbol];
-		this.state.baseSymbols.split(/\s*,\s*/).forEach( symbol => {
-			console.log( symbol );
+		let symbols = [this.state.quotedAsset];
+		this.state.baseAssets.split(/\s*,\s*/).forEach( symbol => {
 			if( symbol.trim() ){
 				symbols.push( symbol.trim() );
 			}
 		});
 		return symbols;
+	}
+
+	getInputDate( time: number ){
+		let date = new Date(time);
+		return date.toISOString().split('T')[0];
 	}
 }
 
@@ -138,5 +272,11 @@ const styles: { [id: string]: React.CSSProperties } = {
 	},
 	field: {
 		marginBottom: 8
+	},
+	control: {
+		display: 'flex',
+		flexGrow: 1,
+		flexDirection: 'column',
+		alignItems: 'stretch'
 	}
 }

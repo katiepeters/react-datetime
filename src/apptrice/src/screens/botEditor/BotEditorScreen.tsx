@@ -4,7 +4,7 @@ import { ScreenProps } from '../../types';
 import botLoader from './bot.loader';
 import BotSaver from './BotSaver';
 import apiCacher from '../../state/apiCacher';
-import BootTools from './tools/BotTools';
+import BootTools, {BacktestConfig} from './tools/BotTools';
 
 class BotEditorScreen extends React.Component<ScreenProps> {
 	state = {
@@ -37,15 +37,19 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 						defaultLanguage="javascript"
 						defaultValue={data.code}
 						theme="vs-dark"
-						options={{ minimap: { enabled: false } }}
+						options={{ minimap: { enabled: false }, automaticLayout: true }}
 						onMount={this._initializeEditor}
 						onChange={this._onCodeChange} />
 				</div>
 				<div style={styles.tools}>
-					<BootTools />
+					<BootTools onRun={this._onRunBacktesting }/>
 				</div>
 			</div>
 		);
+	}
+
+	_onRunBacktesting( config: BacktestConfig ){
+		console.log( config );
 	}
 
 	_initializeEditor = (editor: any, monaco: any) => {
@@ -102,7 +106,8 @@ const styles: StyleSheet = {
 		display: 'flex',
 		flexGrow: 1,
 		flexDirection: 'row',
-		flexWrap: 'nowrap'
+		flexWrap: 'nowrap',
+		minWidth: 0
 	},
 	editor: {
 		display: 'flex',
