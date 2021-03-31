@@ -49,7 +49,9 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	}
 
 	_onRunBacktesting( config: BacktestConfig ){
-		console.log( config );
+		let symbols = config.baseAssets.map( base => `${base}/${config.quotedAsset}` );
+
+		console.log( config, symbols );
 	}
 
 	_initializeEditor = (editor: any, monaco: any) => {

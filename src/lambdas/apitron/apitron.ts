@@ -100,7 +100,12 @@ app.post('/runnow', function(req, res) {
 				})
 			;
 		})
+	;
 })
+
+app.get('/candles', function(req,res) {
+	const { symbol, interval, startDate, endDate, exchange = 'bitfinex' } = req.query;
+});
 
 export const apitron = serverless(app);
 

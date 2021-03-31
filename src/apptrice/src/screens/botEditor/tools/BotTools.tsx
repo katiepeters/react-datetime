@@ -16,6 +16,8 @@ export interface BacktestConfig {
 	slippage: number
 }
 
+const DAY = 24 * 60 * 60 * 1000;
+
 export default class BootTools extends React.Component<BootToolsProps> {
 	state = {
 		baseAssets: 'BTC,ETH',
@@ -25,8 +27,8 @@ export default class BootTools extends React.Component<BootToolsProps> {
 			USD: 1000
 		},
 		testingTimeframe : '7',
-		startDate: this.getInputDate(Date.now() - 7 * 24 * 60 * 60 * 1000),
-		endDate: this.getInputDate(Date.now()),
+		startDate: this.getInputDate(Date.now() - 8 * DAY),
+		endDate: this.getInputDate(Date.now() - DAY ),
 		fees: '0.1%',
 		slippage: '0.2%'
 	}
@@ -167,8 +169,8 @@ export default class BootTools extends React.Component<BootToolsProps> {
 
 		this.setState({
 			testingTimeframe: selected,
-			endDate: this.getInputDate( Date.now() ),
-			startDate: this.getInputDate( Date.now() - parseInt(selected) * 24 * 60 * 60 * 1000 )
+			endDate: this.getInputDate( Date.now() - DAY ),
+			startDate: this.getInputDate( Date.now() - (parseInt(selected) +1) * DAY )
 		});
 	}
 
@@ -218,7 +220,7 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		} = this.state;
 
 		return {
-			baseAssets: this.getSymbols(),
+			baseAssets: this.getSymbols().slice(1),
 			quotedAsset,
 			interval,
 			initialBalances,
