@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import apiClient from './apiClient';
+import apiClient, { CandleOptions } from './apiClient';
 import store from './store';
 
 export interface DbBot {
@@ -53,6 +53,15 @@ const apiCacher = {
 
 	loadDeploymentList(accountId: string) {
 		return apiClient.loadDeploymentList(accountId);
+	},
+
+	getCandles( options: CandleOptions ) {
+		return apiClient.loadCandles(options).then( res => {
+			let {symbol, interval, startDate, endDate} = options;
+			let key = `${symbol}:${interval}:${startDate}:${endDate}`;
+			store.candles[key] = res.data;
+			return res;
+		})
 	}
 }
 

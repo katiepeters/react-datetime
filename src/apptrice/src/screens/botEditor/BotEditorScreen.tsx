@@ -51,6 +51,10 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	_onRunBacktesting( config: BacktestConfig ){
 		let symbols = config.baseAssets.map( base => `${base}/${config.quotedAsset}` );
 
+		let start = ( new Date(config.startDate + 'T00:00:00.000Z') ).getDate();
+		const end = (new Date(config.startDate + 'T23:59:59.999Z')).getDate();
+		start = add200Candles( start, config.interval );
+
 		console.log( config, symbols );
 	}
 
@@ -95,6 +99,19 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 			})
 		});
 	}
+}
+
+const intervalTime = {
+	'5m': 5 * 60 * 1000,
+	'10m': 10 * 60 * 1000,
+	'30m': 30 * 60 * 1000,
+	'1h': 60 * 60 * 1000,
+	'4h': 4 * 60 * 60 * 1000,
+	'1d': 24 * 60 * 60 * 1000
+};
+function add200Candles( start: number, interval: string ) {
+	// @ts-ignore
+	return start - (intervalTime[interval] * 200);
 }
 
 export default BotEditorScreen;

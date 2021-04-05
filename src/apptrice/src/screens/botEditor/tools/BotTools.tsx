@@ -262,7 +262,9 @@ export default class BootTools extends React.Component<BootToolsProps> {
 
 const styles: { [id: string]: React.CSSProperties } = {
 	wrapper: {
-		width: '100%'
+		width: '100%',
+		height: '100vh',
+		overflow: 'auto'
 	},
 	fieldGroup: {
 		padding: '0 8px',

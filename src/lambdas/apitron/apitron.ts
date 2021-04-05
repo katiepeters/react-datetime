@@ -3,6 +3,8 @@ import ExchangeAccountModel from '../_common/dynamo/ExchangeAccountModel';
 import BotDeploymentModel from '../_common/dynamo/BotDeploymentModel';
 import BotModel from '../_common/dynamo/BotModel';
 import lambdaUtil from '../_common/utils/lambda';
+import BitfinexAdapter from '../_common/exchanges/adapters/BitfinexAdapter';
+import exchangeUtils from '../_common/exchanges/exchangeUtils';
 
 const fs = require('fs');
 const path = require('path');
@@ -103,15 +105,31 @@ app.post('/runnow', function(req, res) {
 	;
 })
 
-app.get('/candles', function(req,res) {
+app.get('/candles', async function(req,res) {
 	const { symbol, interval, startDate, endDate, exchange = 'bitfinex' } = req.query;
+	const adapter = new BitfinexAdapter({key: 'candles', secret: 'candles'});
+
+	const lastCandleAt = exchangeUtils.getLastCandleAt(interval, endDate);
+	const candleCount = getCandleCount(startDate, endDate, interval );
+	const options = {
+		market: symbol,
+		interval,
+		candleCount,
+		lastCandleAt
+	};
+
+	console.log( options );
+
+	const candles = await adapter.getCandles(options);
+
+	res.json(candles);
 });
 
 export const apitron = serverless(app);
 
-
-function isTest(event) {
-	return event && event.isTest;
+function getCandleCount( startDate, endDate, interval ){
+	let length = endDate - startDate;
+	return Math.ceil( length / exchangeUtils.intervalTime[interval] );
 }
 
 async function setTestData(event) {

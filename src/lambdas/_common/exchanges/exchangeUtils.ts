@@ -7,6 +7,7 @@ const intervalTime = {
 	'1d': 24 * 60 * 60 * 1000
 };
 const exchangeUtils = {
+	intervalTime,
 	getLastCandleAt(interval: string, ts: number) {
 		let rest = ts % intervalTime[interval];
 		return ts - rest;

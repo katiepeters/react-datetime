@@ -7,6 +7,7 @@ const store = ors({
 	},
 	deployments: {},
 	bots: {},
+	candles: {}
 });
 
 export default store; 
