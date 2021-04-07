@@ -1,6 +1,6 @@
-import { v4 as uuid } from 'uuid';
 import { OrderInput, Order, Orders, Portfolio } from '../lambda.types';
-
+// @ts-ignore (needed for compile the bot worker)
+const uuid = require('uuid/dist/v4');
 export default class Trader {
 	portfolio: Portfolio
 	orders: Orders

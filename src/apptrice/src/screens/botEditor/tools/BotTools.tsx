@@ -10,8 +10,8 @@ export interface BacktestConfig {
 	quotedAsset: string,
 	interval: string
 	initialBalances: {[asset: string]: number}
-	startDate: string
-	endDate: string
+	startDate: number
+	endDate: number
 	fees: number,
 	slippage: number
 }
@@ -219,13 +219,16 @@ export default class BootTools extends React.Component<BootToolsProps> {
 			startDate, endDate, fees, slippage
 		} = this.state;
 
+		let start = new Date(startDate + 'T00:00:00.000Z');
+		let end = new Date(endDate + 'T23:59:59.999Z');
+
 		return {
 			baseAssets: this.getSymbols().slice(1),
 			quotedAsset,
 			interval,
 			initialBalances,
-			startDate,
-			endDate,
+			startDate: start.getTime(),
+			endDate: end.getTime(),
 			fees: parseFloat(fees),
 			slippage: parseFloat(slippage)
 		};

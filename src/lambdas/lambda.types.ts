@@ -27,7 +27,7 @@ export interface Trader {
 	getPortfolio(): Portfolio
 	getOrder(id: string): Order | void
 	placeOrder(orderInput: OrderInput): Order
-	cancelOrder(orderId: string)
+	cancelOrder(orderId: string): void
 }
 
 export interface CandleUtils {

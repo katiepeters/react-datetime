@@ -1,5 +1,4 @@
 import { Portfolio, ArrayCandle, Order, OrderInput, Balance } from "../../../lambda.types";
-import ExchangeAccountModel from "../../dynamo/ExchangeAccountModel";
 import candles from "../../utils/candles";
 import symbols from "../../utils/symbols";
 import { CandleQuery, ExchangeAdapter, ExchangeCredentials, ExchangeOrder, ExchangeVirtualData } from "../ExchangeAdapter";
@@ -10,7 +9,7 @@ export interface ExchangeAccountData {
 	openOrders: Order[]
 }
 
-export default abstract class VirtualAdapter implements ExchangeAdapter {
+export default class VirtualAdapter implements ExchangeAdapter {
 	portfolio: Portfolio
 	orders: {[id: string]: ExchangeOrder}
 	openOrders: string[]
