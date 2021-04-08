@@ -1,6 +1,8 @@
 const path = require('path');
 
 module.exports = {
+  // mode: 'development',
+  devtool: 'none',
   entry: path.resolve(__dirname, './botWorkerSource.ts'),
   module: {
     rules: [
@@ -20,7 +22,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: 'wwph.js', // web worker placeholder
+    path: path.resolve(__dirname, '../../../../public'),
   },
 };

@@ -7,9 +7,13 @@ import {createBot} from './botWorker';
 
 export async function runBacktest( botSource: string, options: BacktestConfig ){
 	const symbols = getSymbols( options.baseAssets, options.quotedAsset );
-	const candles = await getBTCandles( symbols, options.interval, options.startDate, options.endDate );
+	const [candles, botWorkerSource] = await Promise.all([
+		getBTCandles(symbols, options.interval, options.startDate, options.endDate),
+		getWorkerSource()
+	]);
+
 	const totalIterations = getTotalIterations( candles );
-	const bot = createBot( botSource );
+	const bot = createBot( botSource, botWorkerSource );
 	if( !bot ){
 		console.log('ERROR creating bot');
 		return;
@@ -32,7 +36,12 @@ export async function runBacktest( botSource: string, options: BacktestConfig ){
 			portfolio,
 			orders: adapter.orders,
 			state,
-			candles: iterationCandles
+			candles: iterationCandles,
+			config: {
+				symbols,
+				interval: options.interval,
+				exchange: 'bitfinex'
+			}
 		});
 
 		state = results.state;
@@ -132,4 +141,19 @@ function getAdapter(iterationCandles: BotCandles, portfolio: Portfolio, orders: 
 	}
 
 	return adapter;
+}
+
+let workerSource: string;
+function getWorkerSource(): Promise<string> {
+	if( workerSource ){
+		return Promise.resolve(workerSource);
+	}
+
+	return fetch('/wwph.js')
+		.then( res => res.text() )
+		.then( source => {
+			workerSource = source;
+			return source;
+		})
+	;
 }

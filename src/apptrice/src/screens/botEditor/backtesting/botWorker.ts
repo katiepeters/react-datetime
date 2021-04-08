@@ -2,32 +2,27 @@
 // @global self
 
 import * as ts from "typescript";
-import { BotCandles, BotExecutorResult, BotState, Portfolio } from "../../../../../lambdas/lambda.types";
+import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio } from "../../../../../lambdas/lambda.types";
 import { ExchangeOrder } from "../../../../../lambdas/_common/exchanges/ExchangeAdapter";
 
 interface BotWorkerInput {
 	portfolio: Portfolio,
 	orders: { [id: string]: ExchangeOrder },
 	state: BotState,
-	candles: BotCandles
+	candles: BotCandles,
+	config: BotConfigurationExtra
 }
 
-export function createBot( botSource:string ) {
-	let code = `class Bot ${botSource.split(/extends\s+TradeBot/)[1]};`;
-	let jsCode;
-	try {
-		jsCode = ts.transpile(code);
-	}
-	catch (err) {
-		console.error('Bot code not valid: ', err);
-	}
-	if( !jsCode ){
-		return;
-	}
+export function createBot( botSource:string, botWorkerSource: string ) {
+	let jsCode = transpileBot( botSource );
+	if( !jsCode ) return;
 
-	const fnSrc = jsCode + '\n';
-	const wSrc = 'var w = ' + wrapper.toString() + ';\n' + 'w();';
-	const worker = SrcWorker(fnSrc + wSrc);
+	// Set the bot in the worker
+	const workerSource = botWorkerSource
+		.replace('console.log("#BOT"),', jsCode) // production
+		.replace('console.log("#BOT");', jsCode) // development
+	;
+	const worker = SrcWorker(workerSource);
 
 	return {
 		execute: async function (options: BotWorkerInput): Promise<BotExecutorResult>{
@@ -72,4 +67,23 @@ var wrapper = function () {
 		// @ts-ignore
 		self.postMessage( result );
 	};
+}
+
+function transpileBot( source: string ){
+	let compilerOptions = {
+		lib: ["es2016"]
+	};
+	let code = `class Bot ${source.split(/extends\s+TradeBot/)[1]};`;
+
+	let transpiled;
+	try {
+		transpiled = ts.transpile(code, compilerOptions);
+	}
+	catch (err) {
+		console.error('Bot code not valid: ', err);
+	}
+
+	if( transpiled ){
+		return `${transpiled};let bot = new Bot();`;
+	}
 }

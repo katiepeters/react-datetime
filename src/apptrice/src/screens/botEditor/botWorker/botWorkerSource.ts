@@ -2,13 +2,14 @@
 import Trader from '../../../../../lambdas/executor/Trader';
 import botUtils from '../../../../../lambdas/_common/utils/botUtils';
 
-const Bot: any = '#BOT#';
-const bot = new Bot();
+// WARNING: This line will be replaced by the bot source code. DO NOT UPDATE
+console.log("#BOT");
 
 self.onmessage = function (msg: any ){
 	let settings = msg.data;
 	const trader = new Trader( settings.portfolio, settings.orders );
 	let state = {...settings.state};
+	// @ts-ignore
 	bot.onData({
 		candles: settings.candles,
 		config: settings.config,
