@@ -7,7 +7,11 @@ const store = ors({
 	},
 	deployments: {},
 	bots: {},
-	candles: {}
+	candles: {},
+	currentBackTesting: null
 });
+
+// @ts-ignore
+window.store = store;
 
 export default store; 

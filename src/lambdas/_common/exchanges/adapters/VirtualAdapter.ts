@@ -149,14 +149,14 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	getBalance( asset: string ){
-		console.log( 'Portfolio', this.portfolio);
+		//console.log( 'Portfolio', this.portfolio);
 		let balance: Balance = this.portfolio[asset];
 		if( balance ){
-			console.log(`${asset} balance found`, balance);
+			// console.log(`${asset} balance found`, balance);
 			return {...balance };
 		}
 
-		console.log(`${asset} balance NOT found`, balance);
+		//console.log(`${asset} balance NOT found`, balance);
 		return {
 			asset: asset,
 			free: 0,

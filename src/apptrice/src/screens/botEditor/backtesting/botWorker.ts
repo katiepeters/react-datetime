@@ -13,9 +13,14 @@ interface BotWorkerInput {
 	config: BotConfigurationExtra
 }
 
-export function createBot( botSource:string, botWorkerSource: string ) {
+export interface BotWorker {
+	execute: (options: BotWorkerInput) => Promise<BotExecutorResult>,
+	terminate: () => void
+}
+
+export function createBot( botSource:string, botWorkerSource: string ): BotWorker|null {
 	let jsCode = transpileBot( botSource );
-	if( !jsCode ) return;
+	if( !jsCode ) return null;
 
 	// Set the bot in the worker
 	const workerSource = botWorkerSource
@@ -53,20 +58,6 @@ function SrcWorker(src: string) {
 		window.URL.createObjectURL( blob ),
 		{name: 'Bot'}
 	);
-}
-
-var wrapper = function () {
-	// Bot already defined
-	// @ts-ignore
-	let bot = new Bot();
-
-	self.onmessage = function (msg: any) {
-		debugger;
-
-		let result = bot.onData(msg.data);
-		// @ts-ignore
-		self.postMessage( result );
-	};
 }
 
 function transpileBot( source: string ){

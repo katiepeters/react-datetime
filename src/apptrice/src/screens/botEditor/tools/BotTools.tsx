@@ -1,8 +1,11 @@
 import * as React from 'react';
 import Button from './Button';
 import InputGroup from './InputGroup';
+import ProgressBar from './ProgressBar';
 interface BootToolsProps {
-	onRun: (config: BacktestConfig) => void
+	onRun: (config: BacktestConfig) => void,
+	onAbort: () => void,
+	currentBackTesting?: any
 }
 
 export interface BacktestConfig {
@@ -42,9 +45,10 @@ export default class BootTools extends React.Component<BootToolsProps> {
 				{this.renderExtraConfig() }
 				<div style={styles.fieldGroup}>
 					<div style={styles.control}>
-						<Button onClick={ this._onStartPressed }>Start backtesting</Button>
+						{ this.renderButton() }
 					</div>
 				</div>
+				{ this.renderProgress() }
 			</div>
 		);
 	}
@@ -151,6 +155,31 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		)
 	}
 
+	renderButton(){
+		if( this.isBtRunning() ){
+			return (
+				<Button onClick={this._onAbortBT}>
+					Abort
+				</Button>
+			);
+		}
+		return (
+			<Button onClick={this._onStartPressed}>
+				Start backtesting
+			</Button>
+		)
+	}
+
+	renderProgress() {
+		if( !this.isBtRunning() ) return ;
+
+		const {currentBackTesting} = this.props;
+		const progress = currentBackTesting.iteration / currentBackTesting.totalIterations * 100;
+		return (
+			<ProgressBar progress={ progress } />
+		);
+	}
+
 	updatePercentage( field: string, value: string){
 		if( value[value.length - 1] !== '%'){
 			this.setState({[field]: value + '%'});
@@ -209,6 +238,10 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		this.props.onRun( this.getConfig() );
 	}
 
+	_onAbortBT = () => {
+		this.props.onAbort();
+	}
+
 	getValidationErrors() {
 		return false;
 	}
@@ -260,6 +293,10 @@ export default class BootTools extends React.Component<BootToolsProps> {
 	getInputDate( time: number ){
 		let date = new Date(time);
 		return date.toISOString().split('T')[0];
+	}
+
+	isBtRunning(): boolean {
+		return this.props.currentBackTesting?.status === 'running' || false;
 	}
 }
 

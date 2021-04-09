@@ -1,0 +1,64 @@
+.row {
+	background: #233543;
+	width: 100%;
+	border: 1px solid #ffffff16;
+	display: flex;
+	align-items: center
+}
+
+.row:hover {
+	background-color: #ffffff11;
+}
+
+.cell {
+	padding: 8px;
+}
+
+.label {
+	font-size: 14px;
+	color: #222;
+	padding: 2px;
+	background: #ccc
+}
+
+.direction_buy {
+	background: green;
+}
+
+.direction_sell {
+	background: red;
+}
+
+.type_market {
+	background: green;
+}
+
+.type_limit {
+	background: red;
+}
+
+.status_error {
+	background: red;
+}
+
+.status_completed {
+	background: green;
+}
+
+.status_pending {
+	background: yellow;
+}
+
+.mainInfo {
+
+}
+
+.secondaryInfo {
+	opacity: .9;
+	font-size: 14px;
+	margin-top: 4;
+}
+
+.column_id {
+	width: 130
+}

@@ -1,0 +1,219 @@
+import { BotCandles, Orders, Portfolio } from "../../../lambdas/lambda.types";
+import VirtualAdapter from "../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
+import candles from "../../../lambdas/_common/utils/candles";
+import { BotWorker, createBot } from "../screens/botEditor/backtesting/botWorker";
+import { BacktestConfig } from "../screens/botEditor/tools/BotTools";
+import apiCacher from "../state/apiCacher";
+import store from "../state/store"
+
+let runningBot: BotWorker;
+const BtRunner = {
+	async start( botData: any, options: BacktestConfig ){
+		let bot = await prepareBot( botData.source );
+		if( !bot ){
+			console.log('ERROR creating bot');
+			return;
+		}
+
+		runningBot = bot;
+
+		let symbols = getSymbols(options.baseAssets, options.quotedAsset);
+		let candles = await getAllCandles(symbols, options.interval, options.startDate, options.endDate);
+
+		setBtStore( bot, getTotalIterations(candles));
+		await runIterations( bot, {symbols, candles, options} );
+		updateBtStore({status: 'completed'});
+		runningBot.terminate();
+	},
+
+	abort(){
+		if (store.currentBackTesting.status === 'running') {
+			updateBtStore({ status: 'aborted' });
+			runningBot.terminate();
+		}
+	}
+}
+
+export default BtRunner;
+
+
+async function getAllCandles(symbols: string[], interval: string, startDate: number, endDate: number) {
+	let start = add200Candles(startDate, interval);
+
+	let promises = symbols.map(symbol => apiCacher.getCandles({
+		symbol,
+		interval,
+		startDate: start,
+		endDate
+	}));
+
+	let candleArr = await Promise.all(promises);
+	let candles: BotCandles = {};
+	candleArr.forEach((res, i) => candles[symbols[i]] = res.data);
+	return candles;
+}
+
+
+const intervalTime = {
+	'5m': 5 * 60 * 1000,
+	'10m': 10 * 60 * 1000,
+	'30m': 30 * 60 * 1000,
+	'1h': 60 * 60 * 1000,
+	'4h': 4 * 60 * 60 * 1000,
+	'1d': 24 * 60 * 60 * 1000
+};
+function add200Candles(start: number, interval: string) {
+	// @ts-ignore
+	return start - (intervalTime[interval] * 200);
+}
+
+async function prepareBot( botSource: string ): Promise<BotWorker|null> {
+	const botWorkerSource = await getWorkerSource();
+	if( !botWorkerSource ) return null;
+	return createBot( botSource, botWorkerSource );
+}
+
+let workerSource: string;
+function getWorkerSource(): Promise<string> {
+	if (workerSource) {
+		return Promise.resolve(workerSource);
+	}
+
+	return fetch('/wwph.js')
+		.then(res => res.text())
+		.then(source => {
+			workerSource = source;
+			return source;
+		})
+	;
+}
+
+function getSymbols(baseAssets: string[], quotedAsset: string): string[] {
+	return baseAssets.map(base => `${base}/${quotedAsset}`);
+}
+
+function setBtStore(bot: any, totalIterations: number ){
+	store.currentBackTesting = {
+		status: 'running',
+		iteration: 0,
+		totalIterations,
+		orders: {},
+		balances: []
+	};
+}
+
+function updateBtStore( update: any ){
+	store.currentBackTesting = {
+		...store.currentBackTesting,
+		...update
+	};
+}
+
+interface IterationData {
+	symbols: string[],
+	candles: BotCandles,
+	options: BacktestConfig
+}
+
+async function runIterations(bot: BotWorker, { symbols, candles, options }: IterationData ) {
+	const totalIterations = getTotalIterations(candles);
+	let portfolio = createPortfolio(options);
+	let orders = {};
+	let openOrderIds: string[] = [];
+	let state = {};
+	let iteration = 0;
+
+	while (isRunning() && iteration < totalIterations) {
+		console.log(`Iteration ${iteration} out of ${totalIterations}`);
+		let iterationCandles = getIterationCandles(candles, iteration);
+
+		let adapter = getAdapter(iterationCandles, portfolio, orders, openOrderIds);
+		adapter.updateOpenOrders();
+
+		let results = await bot.execute({
+			portfolio,
+			orders: adapter.orders,
+			state,
+			candles: iterationCandles,
+			config: {
+				symbols,
+				interval: options.interval,
+				exchange: 'bitfinex'
+			}
+		});
+
+		state = results.state;
+		if (results.ordersToCancel.length > 0) {
+			adapter.cancelOrders(results.ordersToCancel);
+		}
+		if (results.ordersToPlace.length > 0) {
+			adapter.placeOrders(results.ordersToPlace);
+		}
+
+		portfolio = adapter.portfolio;
+		orders = adapter.orders;
+		openOrderIds = adapter.openOrders;
+
+		iteration++;
+		
+		updateBtStore({
+			iteration,
+			orders,
+			balances: [...store.currentBackTesting.balances, {...portfolio}]
+		});
+
+		console.log(Object.keys(orders).length);
+	}
+}
+
+function isRunning() {
+	return store.currentBackTesting?.status === 'running' || false;
+}
+
+function createPortfolio({ initialBalances }: BacktestConfig) {
+	let portfolio: Portfolio = {};
+	Object.keys(initialBalances).forEach(asset => {
+		portfolio[asset] = {
+			asset,
+			free: initialBalances[asset],
+			total: initialBalances[asset]
+		};
+	});
+	return portfolio;
+}
+
+function getTotalIterations(candles: BotCandles) {
+	let symbol = Object.keys(candles)[0];
+	return candles[symbol].length - 200;
+}
+
+function getIterationCandles(allCandles: BotCandles, iteration: number) {
+	let iterationCandles: BotCandles = {};
+	for (let asset in allCandles) {
+		iterationCandles[asset] = allCandles[asset].slice(iteration, iteration + 200);
+	}
+	return iterationCandles;
+}
+
+
+function getAdapter(iterationCandles: BotCandles, portfolio: Portfolio, orders: Orders, openOrderIds: string[]) {
+	// Create the empty adapter and set the attributes manually
+	let adapter = new VirtualAdapter({
+		key: '{}',
+		secret: '{}'
+	});
+
+	adapter.orders = orders;
+	adapter.openOrders = openOrderIds;
+	adapter.portfolio = portfolio;
+
+	// Set the last dates
+	for (let asset in iterationCandles) {
+		adapter.lastCandles[asset] = candles.getLast(iterationCandles[asset]);
+		if (adapter.lastDate === -1) {
+			adapter.lastDate = candles.getTime(candles.getLast(iterationCandles[asset]));
+		}
+	}
+
+	return adapter;
+}

@@ -5,8 +5,7 @@ import botLoader from './bot.loader';
 import BotSaver from './BotSaver';
 import apiCacher from '../../state/apiCacher';
 import BootTools, {BacktestConfig} from './tools/BotTools';
-import { createBot } from './backtesting/botWorker';
-import { runBacktest } from './backtesting/backtestRunner';
+import BtRunner from '../../utils/BtRunner';
 
 class BotEditorScreen extends React.Component<ScreenProps> {
 	state = {
@@ -44,22 +43,25 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 						onChange={this._onCodeChange} />
 				</div>
 				<div style={styles.tools}>
-					<BootTools onRun={this._onRunBacktesting }/>
+					<BootTools
+						onRun={this._onRunBt }
+						onAbort={this._onAbortBt}
+						currentBackTesting={ this.props.store.currentBackTesting } />
 				</div>
 			</div>
 		);
 	}
 
-	_onRunBacktesting = ( config: BacktestConfig ) => {
-		let symbols = config.baseAssets.map( base => `${base}/${config.quotedAsset}` );
+	_onRunBt = ( config: BacktestConfig ) => {
+		let botData = {
+			botId: this.getBotId(this.props),
+			source: this.botSaver.currentCode
+		};
+		BtRunner.start( botData, config );
+	}
 
-		let start = ( new Date(config.startDate + 'T00:00:00.000Z') ).getDate();
-		const end = (new Date(config.startDate + 'T23:59:59.999Z')).getDate();
-		start = add200Candles( start, config.interval );
-
-		console.log( config, symbols );
-
-		runBacktest( this.botSaver.currentCode, config);
+	_onAbortBt = () => {
+		BtRunner.abort();
 	}
 
 	_initializeEditor = (editor: any, monaco: any) => {
@@ -91,8 +93,6 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		if( value ){
 			this.botSaver.onCodeChange( value );
 		}
-
-		this.setState({botSource: value});
 	}
 
 	componentDidMount() {
@@ -111,19 +111,6 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	getBotId( props: ScreenProps ): string {
 		return props.router.location.params.id;
 	}
-}
-
-const intervalTime = {
-	'5m': 5 * 60 * 1000,
-	'10m': 10 * 60 * 1000,
-	'30m': 30 * 60 * 1000,
-	'1h': 60 * 60 * 1000,
-	'4h': 4 * 60 * 60 * 1000,
-	'1d': 24 * 60 * 60 * 1000
-};
-function add200Candles( start: number, interval: string ) {
-	// @ts-ignore
-	return start - (intervalTime[interval] * 200);
 }
 
 export default BotEditorScreen;

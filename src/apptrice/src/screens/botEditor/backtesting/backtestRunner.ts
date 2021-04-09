@@ -5,7 +5,7 @@ import { BotCandles, Orders, Portfolio } from "../../../../../lambdas/lambda.typ
 import candles from "../../../../../lambdas/_common/utils/candles";
 import {createBot} from './botWorker';
 
-export async function runBacktest( botSource: string, options: BacktestConfig ){
+export async function runBacktest( botSource: string, options: BacktestConfig, store: any ){
 	const symbols = getSymbols( options.baseAssets, options.quotedAsset );
 	const [candles, botWorkerSource] = await Promise.all([
 		getBTCandles(symbols, options.interval, options.startDate, options.endDate),
@@ -25,7 +25,13 @@ export async function runBacktest( botSource: string, options: BacktestConfig ){
 	let state = {};
 
 	let iteration = 0;
+	store.currentBackTesting = {
+		active: true,
+		iteration, totalIterations
+	};
+
 	while( iteration < totalIterations ){
+		console.log(`Iteration ${iteration} out of ${totalIterations}`);
 		let iterationCandles = getIterationCandles( candles, iteration );
 		
 		let adapter = getAdapter( iterationCandles, portfolio, orders, openOrderIds );
@@ -57,9 +63,12 @@ export async function runBacktest( botSource: string, options: BacktestConfig ){
 		openOrderIds = adapter.openOrders;
 
 		iteration++;
+		store.currentBackTesting.iteration = iteration;
 
 		console.log( Object.keys(orders).length );
 	}
+	console.log('Backtesting finished');
+	store.currentBackTesting.active = false;
 }
 
 
