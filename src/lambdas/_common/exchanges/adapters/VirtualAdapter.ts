@@ -252,13 +252,16 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	updateOpenOrders() {
-		this.openOrders.forEach( orderId => {
-			let order = this.orders[orderId];
-			this.checkOrderCompleted( order );
-		});
+		let i = this.openOrders.length;
+		while( i-- > 0 ){
+			let order = this.orders[this.openOrders[i]];
+			if( this.checkOrderCompleted(order) ){
+				this.openOrders.splice( i, 1 );
+			}
+		}
 	}
 
-	checkOrderCompleted( order: ExchangeOrder ) {
+	checkOrderCompleted( order: ExchangeOrder ): boolean {
 		let lastCandle = this.lastCandles[order.symbol];
 		if( !lastCandle ) return;
 
@@ -296,7 +299,10 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		if( updatedOrder ){
 			this.updateBalance( updatedOrder );
 			this.orders[updatedOrder.id] = updatedOrder;
+			return true;
 		}
+
+		return false;
 	}
 
 	getVirtualData(): ExchangeVirtualData{

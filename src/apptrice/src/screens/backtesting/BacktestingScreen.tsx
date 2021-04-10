@@ -3,7 +3,7 @@ import { ScreenProps } from '../../types';
 import BtRunner from '../../utils/BtRunner';
 import botLoader from '../botEditor/bot.loader';
 import BootTools, { BacktestConfig }  from '../botEditor/tools/BotTools';
-import BtOrdersSection from './btOrders/BtOrdersSection';
+import BtOrdersSection from './btOrders/BtOrdersScreen';
 
 export default class BacktestingScreen extends React.Component<ScreenProps> {
 	render() {

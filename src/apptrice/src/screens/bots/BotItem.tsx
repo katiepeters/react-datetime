@@ -8,7 +8,7 @@ export default class BotItem extends React.Component<BotItemProps> {
 	render() {
 		const { bot } = this.props;
 		return (
-			<a href={`#/botEditor/${bot.id}`}>
+			<a href={`#/bots/${bot.id}`}>
 				{ bot.name }
 			</a>
 		);

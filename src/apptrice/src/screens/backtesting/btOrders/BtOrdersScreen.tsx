@@ -1,12 +1,11 @@
 import * as React from 'react'
-import { ScreenProps } from '../../../types'
 import BtOrderItem from './BtOrderItem';
 
-interface BtOrdersSectionProps {
+interface BtOrdersScreenProps {
 	currentBackTesting?: any
 }
 
-export default class BtOrdersSection extends React.Component<BtOrdersSectionProps> {
+export default class BtOrdersScreen extends React.Component<BtOrdersScreenProps> {
 	render() {
 		let {currentBackTesting} = this.props;
 		if( !currentBackTesting ){
@@ -18,6 +17,15 @@ export default class BtOrdersSection extends React.Component<BtOrdersSectionProp
 			<div style={styles.wrapper}>
 				<h3>{orders.length} orders</h3>
 				<table>
+					<thead>
+						<tr>
+							<th>1</th>
+							<th>2</th>
+							<th>3</th>
+							<th>4</th>
+
+						</tr>
+					</thead>
 					<tbody>
 						{orders.map(this._renderOrder)}
 					</tbody>

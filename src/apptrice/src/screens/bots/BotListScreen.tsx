@@ -4,6 +4,11 @@ import BotList from './BotList'
 
 export default class BotListScreen extends React.Component<ScreenProps> {
 	render() {
+		let Subscreen = this.getSubscreen();
+		if (Subscreen) {
+			return <Subscreen {...this.props} />;
+		}
+
 		return (
 			<div>
 				<div>
@@ -11,9 +16,13 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 					<button>Create new bot</button>
 				</div>
 				<div>
-					<BotList accountId={ this.props.store.authenticatedId } />
+					<BotList accountId={this.props.store.authenticatedId} />
 				</div>
 			</div>
 		)
+	}
+
+	getSubscreen(){
+		return this.props.router.location.matches[1];
 	}
 }

@@ -1,0 +1,20 @@
+.container {
+	display: flex;
+	flex: 1;
+	height: 100vh;
+}
+
+.sidebarWrapper {
+	width: 250px;
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+	background-color: #233543;	
+	overflow-x: hidden;
+}
+
+.contentWrapper {
+	background-color: #324350;
+	display: flex;
+	flex: 1;
+}

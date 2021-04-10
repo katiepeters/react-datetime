@@ -5,25 +5,16 @@ import { BotWorker, createBot } from "../screens/botEditor/backtesting/botWorker
 import { BacktestConfig } from "../screens/botEditor/tools/BotTools";
 import apiCacher from "../state/apiCacher";
 import store from "../state/store"
+import {v4 as uuid} from 'uuid';
 
 let runningBot: BotWorker;
 const BtRunner = {
-	async start( botData: any, options: BacktestConfig ){
-		let bot = await prepareBot( botData.source );
-		if( !bot ){
-			console.log('ERROR creating bot');
-			return;
-		}
+	start( botData: any, options: BacktestConfig ): string{
+		const btid = createRun( botData.botId );
 
-		runningBot = bot;
+		prepareAndRun( botData, options );
 
-		let symbols = getSymbols(options.baseAssets, options.quotedAsset);
-		let candles = await getAllCandles(symbols, options.interval, options.startDate, options.endDate);
-
-		setBtStore( bot, getTotalIterations(candles));
-		await runIterations( bot, {symbols, candles, options} );
-		updateBtStore({status: 'completed'});
-		runningBot.terminate();
+		return btid;
 	},
 
 	abort(){
@@ -51,6 +42,27 @@ async function getAllCandles(symbols: string[], interval: string, startDate: num
 	let candles: BotCandles = {};
 	candleArr.forEach((res, i) => candles[symbols[i]] = res.data);
 	return candles;
+}
+
+async function prepareAndRun(botData: any, options: BacktestConfig){
+	let bot = await prepareBot(botData.source);
+	if (!bot) {
+		console.log('ERROR creating bot');
+		return;
+	}
+
+	updateBtStore({ status: 'candles'});
+
+	runningBot = bot;
+
+	let symbols = getSymbols(options.baseAssets, options.quotedAsset);
+	let candles = await getAllCandles(symbols, options.interval, options.startDate, options.endDate);
+
+	updateBtStore({ status: 'running'});
+
+	await runIterations(bot, { symbols, candles, options });
+	updateBtStore({ status: 'completed' });
+	runningBot.terminate();
 }
 
 
@@ -92,14 +104,18 @@ function getSymbols(baseAssets: string[], quotedAsset: string): string[] {
 	return baseAssets.map(base => `${base}/${quotedAsset}`);
 }
 
-function setBtStore(bot: any, totalIterations: number ){
+function createRun( botId: any ): string{
+	let btid = uuid();
 	store.currentBackTesting = {
-		status: 'running',
+		id: btid,
+		botId: botId,
+		status: 'init',
 		iteration: 0,
-		totalIterations,
+		totalIterations: 0,
 		orders: {},
 		balances: []
 	};
+	return btid;
 }
 
 function updateBtStore( update: any ){
@@ -129,6 +145,8 @@ async function runIterations(bot: BotWorker, { symbols, candles, options }: Iter
 
 		let adapter = getAdapter(iterationCandles, portfolio, orders, openOrderIds);
 		adapter.updateOpenOrders();
+		orders = adapter.orders;
+		openOrderIds = adapter.openOrders;
 
 		let results = await bot.execute({
 			portfolio,
@@ -164,6 +182,8 @@ async function runIterations(bot: BotWorker, { symbols, candles, options }: Iter
 
 		console.log(Object.keys(orders).length);
 	}
+
+	console.log('Portfolio', portfolio);
 }
 
 function isRunning() {
