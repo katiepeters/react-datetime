@@ -27,6 +27,9 @@ export default class BtScreen extends React.Component<ScreenProps> {
 	}
 
 	renderSidebar() {
+		if( this.getActiveMenuItem() === 'details' ){
+			return this.renderDetailsSidebar();
+		}
 		return (
 			<div className="sidebar">
 				<h2>Backtesting</h2>
@@ -35,6 +38,19 @@ export default class BtScreen extends React.Component<ScreenProps> {
 					active={ this.getActiveMenuItem() } />
 			</div>
 		);
+	}
+
+	renderDetailsSidebar() {
+		return (
+			<div className="sidebar">
+				<div>
+					<a href={`#/backtesting/${this.getBotId()}`}>←</a> <h2>Backtesting</h2>
+				</div>
+				<MenuLinkList
+					items={this.getDetailsMenuItems()}
+					active={this.getActiveDetailsMenuItem()} />
+			</div>
+		)
 	}
 
 	getMenuItems() {
@@ -58,8 +74,30 @@ export default class BtScreen extends React.Component<ScreenProps> {
 		return btid ? 'details' : 'run';
 	}
 
+	getDetailsMenuItems() {
+		let { id, btid } = this.props.router.location.params;
+		return  [
+			{ id: 'stats', label: 'Stats', link: `#/backtesting/${id}/${btid}/stats` },
+			{ id: 'orders', label: 'Orders', link: `#/backtesting/${id}/${btid}/orders` },
+			{ id: 'charts', label: 'Charts', link: `#/backtesting/${id}/${btid}/charts` },
+		]
+	}
+
+	getActiveDetailsMenuItem(){
+		let { pathname } = this.props.router.location;
+		if( pathname.includes('orders') ){
+			return 'orders';
+		}
+		if( pathname.includes('charts') ){
+			return 'charts';
+		}
+		return 'stats'
+	}
+
 	getSubscreen() {
-		return this.props.router.location.matches[1] || BtSettingsScreen;
+		const {matches} = this.props.router.location;
+
+		return matches[2] || matches[1] || BtSettingsScreen;
 	}
 
 	getBotId() {

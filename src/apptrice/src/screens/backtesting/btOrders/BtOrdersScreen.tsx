@@ -1,13 +1,10 @@
 import * as React from 'react'
+import { ScreenProps } from '../../../types';
 import BtOrderItem from './BtOrderItem';
 
-interface BtOrdersScreenProps {
-	currentBackTesting?: any
-}
-
-export default class BtOrdersScreen extends React.Component<BtOrdersScreenProps> {
+export default class BtOrdersScreen extends React.Component<ScreenProps> {
 	render() {
-		let {currentBackTesting} = this.props;
+		let {currentBackTesting} = this.props.store;
 		if( !currentBackTesting ){
 			return this.renderNoSelected();
 		}
@@ -44,7 +41,7 @@ export default class BtOrdersScreen extends React.Component<BtOrdersScreenProps>
 		return (
 			<BtOrderItem
 				key={id}
-				order={this.props.currentBackTesting.orders[id]} />
+				order={this.props.store.currentBackTesting.orders[id]} />
 		);
 	}
 }

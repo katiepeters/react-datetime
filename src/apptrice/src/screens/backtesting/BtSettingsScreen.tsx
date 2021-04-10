@@ -25,7 +25,7 @@ export default class BtDetailsScreen extends React.Component<ScreenProps> {
 		};
 
 		let btid = BtRunner.start(botData, config);
-		this.props.router.push(`/backtesting/${botId}/${btid}`);
+		this.props.router.push(`/backtesting/${botId}/${btid}/orders`);
 	}
 
 	_onAbortBt = () => {
