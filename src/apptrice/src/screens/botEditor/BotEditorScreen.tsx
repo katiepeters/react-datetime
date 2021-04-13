@@ -31,7 +31,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		}
 
 		return (
-			<div style={ styles.wrapper }>
+			<div style={styles.wrapper}>
 				<div style={styles.editor}>
 					<Editor
 						height="100vh"

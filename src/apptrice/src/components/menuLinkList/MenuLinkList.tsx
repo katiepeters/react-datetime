@@ -16,7 +16,7 @@ interface MenuLinkListProps {
 export default class MenuLinkList extends Component<MenuLinkListProps> {
 	render() {
 		return (
-			<div className={styles.container}>
+			<div>
 				{ this.props.items.map( this._renderLink ) }
 			</div>
 		)

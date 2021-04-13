@@ -58,7 +58,10 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 	let symbols = getSymbols(options.baseAssets, options.quotedAsset);
 	let candles = await getAllCandles(symbols, options.interval, options.startDate, options.endDate);
 
-	updateBtStore({ status: 'running'});
+	updateBtStore({
+		status: 'running',
+		candles
+	});
 
 	await runIterations(bot, { symbols, candles, options });
 	updateBtStore({ status: 'completed' });

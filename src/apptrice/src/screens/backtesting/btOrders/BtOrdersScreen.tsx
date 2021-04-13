@@ -14,15 +14,6 @@ export default class BtOrdersScreen extends React.Component<ScreenProps> {
 			<div style={styles.wrapper}>
 				<h3>{orders.length} orders</h3>
 				<table>
-					<thead>
-						<tr>
-							<th>1</th>
-							<th>2</th>
-							<th>3</th>
-							<th>4</th>
-
-						</tr>
-					</thead>
 					<tbody>
 						{orders.map(this._renderOrder)}
 					</tbody>
