@@ -1,5 +1,9 @@
 import * as React from 'react';
 import OrderSeries from './OrderSeries';
+import memoize from 'memoize-one';
+import { ArrayCandle, BotCandles, Orders } from '../../../../../lambdas/lambda.types';
+import { Order } from '../../../../../lambdas/model.types';
+import { ExchangeOrder } from '../../../../../lambdas/_common/exchanges/ExchangeAdapter';
 
 const { scaleTime } = require('d3-scale');
 const { utcHour } = require('d3-time');
@@ -101,7 +105,9 @@ interface CanvasChartProps {
 	width: number,
 	height: number,
 	ratio: number,
-	data: any
+	data: any,
+	orders: Orders,
+	candles: BotCandles
 }
 
 let chartIndex = 0;
@@ -114,17 +120,8 @@ class CanvasChart extends React.PureComponent<CanvasChartProps> {
 		// This is the data for the x axis
 		const xAccessor = (d:any) => d.date;
 		// These are the initial limits for the x zoom
-
-		const annotationProps = {
-			fontSize: 20,
-			fill: "#060F8F",
-			opacity: 0.8,
-			text: "^^^",
-			y: ({datum}: any) => datum.close,
-			tooltip: (d:any) => timeFormat("%B")(d.date),
-			// onMouseOver: console.log.bind(console),
-		};
-
+		const candles = this.getAssetCandles('BTC/USD');
+		const orders = this.getAssetOrders('BTC/USD');
 		const xExtents = [
 			xAccessor(last(candles)),
 			xAccessor(candles[0])
@@ -164,8 +161,6 @@ class CanvasChart extends React.PureComponent<CanvasChartProps> {
 				<Chart id={3} yExtents={(d: any) => [d.high, d.low]}>
 					<OrderSeries orders={orders} />
 				</Chart>
-
-				{ this.renderLines(4) }
 
 				<CrossHairCursor strokeDasharray="LongDashDot" />
 			</ChartCanvas>
@@ -218,7 +213,36 @@ class CanvasChart extends React.PureComponent<CanvasChartProps> {
 				orders={orders} />
 		);
 	}
+
+	getAssetCandles( asset:string ){
+		return memoizeCandles( this.props.candles[asset] );
+	}
+
+	getAssetOrders( asset:string ){
+		let {orders: allOrders} = this.props;
+		return memoizeAssetOrders( allOrders, asset );
+	}
 }
+
+const memoizeAssetOrders = memoize( (allOrders: Orders, asset: string ) => {
+	// @ts-ignore
+	let orders = allOrders.flatten ? allOrders.flatten() : allOrders;
+	return Object.values( orders ).filter( (order: any) => order.symbol === asset );
+});
+
+const memoizeCandles = memoize( (proxyCandles: any) => {
+	let candles = proxyCandles.flatten ? proxyCandles.flatten() : proxyCandles;
+	return candles.map( (c: ArrayCandle) => {
+		return {
+			date: new Date(c[0]),
+			open: c[1],
+			close: c[2],
+			high: c[3],
+			low: c[4],
+			volume: c[5]
+		}
+	});
+});
 
 const TradingChart = fitWidth(CanvasChart);
 export default TradingChart;

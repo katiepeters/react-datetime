@@ -6,26 +6,34 @@ import botUtils from '../../../../../lambdas/_common/utils/botUtils';
 console.log("#BOT");
 
 self.onmessage = function (msg: any ){
-	let settings = msg.data;
-	const trader = new Trader( settings.portfolio, settings.orders );
-	let state = {...settings.state};
-	// @ts-ignore
-	bot.onData({
-		candles: settings.candles,
-		config: settings.config,
-		trader,
-		state,
-		utils: botUtils
-	});
+	let {action, input} = msg.data;
+	if (action === 'init') {
+		let state = {};
+		// @ts-ignore
+		initializeState(input, state);
+		// @ts-ignore
+		self.postMessage(state || {});
+	}
+	else {
+		const trader = new Trader(input.portfolio, input.orders, input.candles);
+		let state = { ...input.state };
+		// @ts-ignore
+		onData({
+			candles: input.candles,
+			config: input.config,
+			trader,
+			state,
+			utils: botUtils
+		});
 
-	// @ts-ignore
-	self.postMessage({
-		ordersToCancel: trader.ordersToCancel,
-		ordersToPlace: trader.ordersToPlace,
-		state: state
-	});
+		// @ts-ignore
+		self.postMessage({
+			ordersToCancel: trader.ordersToCancel,
+			ordersToPlace: trader.ordersToPlace,
+			state: state
+		});
+	}
 }
-
 
 export default function mock() {
 	// This is needed just to not have rogue files

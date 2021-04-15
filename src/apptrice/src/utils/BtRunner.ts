@@ -1,4 +1,4 @@
-import { BotCandles, Orders, Portfolio } from "../../../lambdas/lambda.types";
+import { BotCandles, BotState, Orders, Portfolio } from "../../../lambdas/lambda.types";
 import VirtualAdapter from "../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
 import candles from "../../../lambdas/_common/utils/candles";
 import { BotWorker, createBot } from "../screens/botEditor/backtesting/botWorker";
@@ -58,12 +58,17 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 	let symbols = getSymbols(options.baseAssets, options.quotedAsset);
 	let candles = await getAllCandles(symbols, options.interval, options.startDate, options.endDate);
 
+	let state = await bot.initialize({
+		// @ts-ignore
+		symbols, interval: options.interval, exchange: 'bitfinex'
+	})
+	
 	updateBtStore({
 		status: 'running',
 		candles
 	});
 
-	await runIterations(bot, { symbols, candles, options });
+	await runIterations(bot, state, { symbols, candles, options });
 	updateBtStore({ status: 'completed' });
 	runningBot.terminate();
 }
@@ -134,12 +139,11 @@ interface IterationData {
 	options: BacktestConfig
 }
 
-async function runIterations(bot: BotWorker, { symbols, candles, options }: IterationData ) {
+async function runIterations(bot: BotWorker, state: BotState, { symbols, candles, options }: IterationData ) {
 	const totalIterations = getTotalIterations(candles);
 	let portfolio = createPortfolio(options);
 	let orders = {};
 	let openOrderIds: string[] = [];
-	let state = {};
 	let iteration = 0;
 
 	while (isRunning() && iteration < totalIterations) {
@@ -180,7 +184,8 @@ async function runIterations(bot: BotWorker, { symbols, candles, options }: Iter
 		updateBtStore({
 			iteration,
 			orders,
-			balances: [...store.currentBackTesting.balances, {...portfolio}]
+			balances: [...store.currentBackTesting.balances, {...portfolio}],
+			candles: getGraphCandles(candles)
 		});
 
 		console.log(Object.keys(orders).length);
@@ -239,4 +244,13 @@ function getAdapter(iterationCandles: BotCandles, portfolio: Portfolio, orders: 
 	}
 
 	return adapter;
+}
+
+
+function getGraphCandles( candles: BotCandles ){
+	const graphCandles: any = {};
+	for( let asset in candles ){
+		graphCandles[asset] = candles[asset].slice(200);
+	}
+	return graphCandles;
 }

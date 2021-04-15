@@ -26,6 +26,8 @@ interface Trader {
 	getOrder(id: string): Order | void
 	placeOrder(orderInput: LimitOrderInput | MarketOrderInput): Order
 	cancelOrder(orderId: string)
+    getPortfolioValue(): number
+    getPrice(symbol: string): number
 }
 
 interface CandleUtils {

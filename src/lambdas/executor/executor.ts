@@ -12,7 +12,7 @@ export async function executor(event: BotExecutorPayload) {
 	}
 
 	const trader = new Trader(
-		event.portfolio, event.orders
+		event.portfolio, event.orders, event.candles
 	);
 	
 	// Pass a state object that can be updated

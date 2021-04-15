@@ -4,7 +4,7 @@ const { nest: d3Nest } = require("d3-collection");
 const GenericChartComponent = require('react-stockcharts/lib/GenericChartComponent').default;
 const { getAxisCanvas } = require('react-stockcharts/lib/GenericComponent');
 const {hexToRGBA, functor} = require('react-stockcharts/lib/utils');
-const {CircleMarker, TriangleMarker} = require('react-stockcharts/lib/series');
+const {CircleMarker, TriangleMarker, SquareMarker} = require('react-stockcharts/lib/series');
 const { last, timeIntervalBarWidth } = require("react-stockcharts/lib/utils");
 const { utcHour } = require('d3-time');
 
@@ -25,16 +25,22 @@ export default class OrderSeries extends React.Component<OrderSeriesProps> {
 			r: 4
 		};
 
-		Object.values(orders).forEach((order: any) => {
-			if (order.status !== 'completed') return;
-
+		orders.forEach((order: any) => {
 			const point = {
 				x: xScale(order.closedAt),
-				y: yScale(order.executedPrice)
+				y: yScale(order.executedPrice || order.price)
+			}
+
+			const {Marker, props} = getMarker( order );
+
+			const styles = {
+				opacity: .5,
+				strokeWidth: 1,
+				...props
 			}
 
 			console.log('Drawing order!!', point);
-			CircleMarker.drawOnCanvas(markerStyles, point, ctx);
+			Marker.drawOnCanvas(styles, point, ctx);
 		});
 	}
 
@@ -52,14 +58,58 @@ export default class OrderSeries extends React.Component<OrderSeriesProps> {
 	}
 }
 
-function getMarker( order: any, datum: any ){
-	if( !order ) return CircleMarker;
-	let time = datum.date().getTime();
+function getMarker( order: any){
+	let color = getColor( order.status, order.direction );
 
-	if( order.start <= time ){
-		return {
-			marker: CircleMarker
+	switch( order.status ){
+		case 'completed':
+			return {
+				Marker: TriangleMarker,
+				props: {
+					stroke: color,
+					fill: color,
+					direction: order.direction === 'buy' ? 'left' : 'right',
+					width: 8
+				}
+			};
+		case 'cancelled':
+			return {
+				Marker: SquareMarker,
+				props: {
+					stroke: color,
+					fill: color,
+					width: 8
+				}
+			};
+		default: 
+			return {
+				Marker: CircleMarker,
+				props: {
+					stroke: color,
+					fill: color,
+					r: 2
+				}
+			};
+	}
+}
+
+function getColor( status: string, direction: string ){
+	if( direction === 'buy' ){
+		if( status === 'completed' ){
+			return '#00cc00';
 		}
+		else if( status === 'placed' ){
+			return '#00ff00';
+		}
+		return '#66cc66';
 	}
 
+	// sell
+	if (status === 'completed') {
+		return '#cc0000';
+	}
+	else if (status === 'placed') {
+		return '#ff0000';
+	}
+	return '#cc6666';
 }

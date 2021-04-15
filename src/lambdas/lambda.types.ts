@@ -1,4 +1,4 @@
-export interface BotConfigurationExtra {
+export interface BotConfigurationExtra{
 	[key: string]: any
 }
 

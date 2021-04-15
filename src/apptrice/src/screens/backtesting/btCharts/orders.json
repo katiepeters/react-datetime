@@ -7,7 +7,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46592.191349376,
+		"price": 56592.191349376,
 		"executedPrice": null,
 		"placedAt": 1617577200000,
 		"closedAt": 1617580800000
@@ -59,13 +59,13 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46204.8,
+		"price": 56204.8,
 		"executedPrice": null,
 		"placedAt": 1617584400000,
 		"closedAt": 1617588000000
 	},
-	"34aece04-99fe-4614-84f5-dc83a38e9f4a": {
-		"id": "34aece04-99fe-4614-84f5-dc83a38e9f4a",
+	"34aece04-99fe-5614-84f5-dc83a38e9f4a": {
+		"id": "34aece04-99fe-5614-84f5-dc83a38e9f4a",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -90,16 +90,16 @@
 		"placedAt": 1617584400000,
 		"closedAt": 1617584400000
 	},
-	"21bb945e-60a7-4146-804d-4e11b9ba5a81": {
-		"id": "21bb945e-60a7-4146-804d-4e11b9ba5a81",
+	"21bb945e-60a7-4156-804d-4e11b9ba5a81": {
+		"id": "21bb945e-60a7-4156-804d-4e11b9ba5a81",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
 		"errorReason": null,
 		"direction": "sell",
 		"amount": 0.016,
-		"price": 2046,
-		"executedPrice": 2046,
+		"price": 2056,
+		"executedPrice": 2056,
 		"placedAt": 1617588000000,
 		"closedAt": 1617588000000
 	},
@@ -111,7 +111,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46003.200000000004,
+		"price": 56003.200000000004,
 		"executedPrice": null,
 		"placedAt": 1617591600000,
 		"closedAt": 1617595200000
@@ -168,8 +168,8 @@
 		"placedAt": 1617598800000,
 		"closedAt": 1617602400000
 	},
-	"df246506-ba2a-4da6-9bd1-08c35da68168": {
-		"id": "df246506-ba2a-4da6-9bd1-08c35da68168",
+	"df256506-ba2a-4da6-9bd1-08c35da68168": {
+		"id": "df256506-ba2a-4da6-9bd1-08c35da68168",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -285,8 +285,8 @@
 		"placedAt": 1617613200000,
 		"closedAt": 1617616800000
 	},
-	"7b6936cf-6ba6-4644-9502-683adb6b5295": {
-		"id": "7b6936cf-6ba6-4644-9502-683adb6b5295",
+	"7b6936cf-6ba6-5644-9502-683adb6b5295": {
+		"id": "7b6936cf-6ba6-5644-9502-683adb6b5295",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -306,8 +306,8 @@
 		"errorReason": null,
 		"direction": "sell",
 		"amount": 0.016,
-		"price": 2046.7,
-		"executedPrice": 2046.7,
+		"price": 2056.7,
+		"executedPrice": 2056.7,
 		"placedAt": 1617616800000,
 		"closedAt": 1617616800000
 	},
@@ -319,8 +319,8 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46171.200000000004,
-		"executedPrice": 46171.200000000004,
+		"price": 56171.200000000004,
+		"executedPrice": 56171.200000000004,
 		"placedAt": 1617620400000,
 		"closedAt": 1617624000000
 	},
@@ -371,8 +371,8 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46532.8,
-		"executedPrice": 46532.8,
+		"price": 56532.8,
+		"executedPrice": 56532.8,
 		"placedAt": 1617627600000,
 		"closedAt": 1617631200000
 	},
@@ -441,16 +441,16 @@
 		"placedAt": 1617688800000,
 		"closedAt": 1617688800000
 	},
-	"8062a49f-9335-4463-92e7-fbbdbd70d90b": {
-		"id": "8062a49f-9335-4463-92e7-fbbdbd70d90b",
+	"8062a49f-9335-4563-92e7-fbbdbd70d90b": {
+		"id": "8062a49f-9335-4563-92e7-fbbdbd70d90b",
 		"symbol": "BTC/USD",
 		"type": "limit",
 		"status": "completerd",
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46829.600000000006,
-		"executedPrice": 46829.600000000006,
+		"price": 56829.600000000006,
+		"executedPrice": 56829.600000000006,
 		"placedAt": 1617692400000,
 		"closedAt": 1617696000000
 	},
@@ -467,8 +467,8 @@
 		"placedAt": 1617692400000,
 		"closedAt": 1617696000000
 	},
-	"88efb269-937c-4588-b443-2446e80e0b37": {
-		"id": "88efb269-937c-4588-b443-2446e80e0b37",
+	"88efb269-937c-4588-b443-2456e80e0b37": {
+		"id": "88efb269-937c-4588-b443-2456e80e0b37",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -501,7 +501,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46952.546870088,
+		"price": 56952.556870088,
 		"executedPrice": null,
 		"placedAt": 1617699600000,
 		"closedAt": 1617703200000
@@ -553,7 +553,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46835.200000000004,
+		"price": 56835.200000000004,
 		"executedPrice": null,
 		"placedAt": 1617706800000,
 		"closedAt": 1617710400000
@@ -605,7 +605,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46736,
+		"price": 56736,
 		"executedPrice": null,
 		"placedAt": 1617714000000,
 		"closedAt": 1617717600000
@@ -675,8 +675,8 @@
 		"placedAt": 1617883200000,
 		"closedAt": 1617883200000
 	},
-	"bac355aa-d942-469c-b38d-2011bc5f5cd3": {
-		"id": "bac355aa-d942-469c-b38d-2011bc5f5cd3",
+	"bac355aa-d942-569c-b38d-2011bc5f5cd3": {
+		"id": "bac355aa-d942-569c-b38d-2011bc5f5cd3",
 		"symbol": "BTC/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -735,7 +735,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46211.200000000004,
+		"price": 56211.200000000004,
 		"executedPrice": null,
 		"placedAt": 1617894000000,
 		"closedAt": 1617897600000
@@ -748,13 +748,13 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 1646.48,
+		"price": 1656.48,
 		"executedPrice": null,
 		"placedAt": 1617894000000,
 		"closedAt": 1617897600000
 	},
-	"8c08a119-969c-4639-94d4-d122eb90be70": {
-		"id": "8c08a119-969c-4639-94d4-d122eb90be70",
+	"8c08a119-969c-5639-94d4-d122eb90be70": {
+		"id": "8c08a119-969c-5639-94d4-d122eb90be70",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -792,8 +792,8 @@
 		"placedAt": 1617901200000,
 		"closedAt": 1617904800000
 	},
-	"5da1c846-f152-46ec-9c82-fbdc17ac7bc2": {
-		"id": "5da1c846-f152-46ec-9c82-fbdc17ac7bc2",
+	"5da1c856-f152-56ec-9c82-fbdc17ac7bc2": {
+		"id": "5da1c856-f152-56ec-9c82-fbdc17ac7bc2",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -831,15 +831,15 @@
 		"placedAt": 1617904800000,
 		"closedAt": 1617904800000
 	},
-	"737aadc6-1146-415e-91fd-07f81ac08571": {
-		"id": "737aadc6-1146-415e-91fd-07f81ac08571",
+	"737aadc6-1156-415e-91fd-07f81ac08571": {
+		"id": "737aadc6-1156-415e-91fd-07f81ac08571",
 		"symbol": "BTC/USD",
 		"type": "limit",
 		"status": "cancelled",
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46197.820812848004,
+		"price": 56197.820812848004,
 		"executedPrice": null,
 		"placedAt": 1617908400000,
 		"closedAt": 1617912000000
@@ -896,15 +896,15 @@
 		"placedAt": 1617948000000,
 		"closedAt": 1617948000000
 	},
-	"528c651f-9d93-4d7a-b2f4-59ff46ce20dc": {
-		"id": "528c651f-9d93-4d7a-b2f4-59ff46ce20dc",
+	"528c651f-9d93-4d7a-b2f4-59ff56ce20dc": {
+		"id": "528c651f-9d93-4d7a-b2f4-59ff56ce20dc",
 		"symbol": "BTC/USD",
 		"type": "limit",
 		"status": "cancelled",
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46465.600000000006,
+		"price": 56565.600000000006,
 		"executedPrice": null,
 		"placedAt": 1617951600000,
 		"closedAt": 1617955200000
@@ -935,8 +935,8 @@
 		"placedAt": 1617951600000,
 		"closedAt": 1617951600000
 	},
-	"861b1495-ceff-4694-be0a-6fdd54c68ec1": {
-		"id": "861b1495-ceff-4694-be0a-6fdd54c68ec1",
+	"861b1495-ceff-5694-be0a-6fdd54c68ec1": {
+		"id": "861b1495-ceff-5694-be0a-6fdd54c68ec1",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -956,7 +956,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46349.729027432004,
+		"price": 56349.729027432004,
 		"executedPrice": null,
 		"placedAt": 1617958800000,
 		"closedAt": 1617962400000
@@ -1000,15 +1000,15 @@
 		"placedAt": 1617962400000,
 		"closedAt": 1617962400000
 	},
-	"37094ec0-e965-4461-9064-659373f1fcfc": {
-		"id": "37094ec0-e965-4461-9064-659373f1fcfc",
+	"37094ec0-e965-4561-9064-659373f1fcfc": {
+		"id": "37094ec0-e965-4561-9064-659373f1fcfc",
 		"symbol": "BTC/USD",
 		"type": "limit",
 		"status": "cancelled",
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46804.8,
+		"price": 56804.8,
 		"executedPrice": null,
 		"placedAt": 1617966000000,
 		"closedAt": 1617969600000
@@ -1026,8 +1026,8 @@
 		"placedAt": 1617966000000,
 		"closedAt": 1617969600000
 	},
-	"654a81ba-51a9-45a3-924b-890e4606f12e": {
-		"id": "654a81ba-51a9-45a3-924b-890e4606f12e",
+	"654a81ba-51a9-45a3-924b-890e5606f12e": {
+		"id": "654a81ba-51a9-45a3-924b-890e5606f12e",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -1060,7 +1060,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46737.600000000006,
+		"price": 56737.600000000006,
 		"executedPrice": null,
 		"placedAt": 1617973200000,
 		"closedAt": 1617976800000
@@ -1112,7 +1112,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 46605.600000000006,
+		"price": 56605.600000000006,
 		"executedPrice": null,
 		"placedAt": 1617980400000,
 		"closedAt": 1617984000000
@@ -1143,8 +1143,8 @@
 		"placedAt": 1617980400000,
 		"closedAt": 1617980400000
 	},
-	"79347046-8887-4b0a-8194-1e834a322f16": {
-		"id": "79347046-8887-4b0a-8194-1e834a322f16",
+	"79347056-8887-4b0a-8194-1e834a322f16": {
+		"id": "79347056-8887-4b0a-8194-1e834a322f16",
 		"symbol": "BTC/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -1312,8 +1312,8 @@
 		"placedAt": 1618052400000,
 		"closedAt": 1618056000000
 	},
-	"5a7b460d-a38b-4148-8048-40b16867efb3": {
-		"id": "5a7b460d-a38b-4148-8048-40b16867efb3",
+	"5a7b560d-a38b-4148-8048-40b16867efb3": {
+		"id": "5a7b560d-a38b-4148-8048-40b16867efb3",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -1325,8 +1325,8 @@
 		"placedAt": 1618052400000,
 		"closedAt": 1618056000000
 	},
-	"a65588ac-4461-4117-ac63-24feb0580eab": {
-		"id": "a65588ac-4461-4117-ac63-24feb0580eab",
+	"a65588ac-4561-4117-ac63-24feb0580eab": {
+		"id": "a65588ac-4561-4117-ac63-24feb0580eab",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -1364,8 +1364,8 @@
 		"placedAt": 1618059600000,
 		"closedAt": 1618063200000
 	},
-	"c1f7e094-ab6d-4b67-bf29-4967a46173fb": {
-		"id": "c1f7e094-ab6d-4b67-bf29-4967a46173fb",
+	"c1f7e094-ab6d-4b67-bf29-4967a56173fb": {
+		"id": "c1f7e094-ab6d-4b67-bf29-4967a56173fb",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -1416,8 +1416,8 @@
 		"placedAt": 1618066800000,
 		"closedAt": 1618070400000
 	},
-	"e2c08e6a-46c4-4457-9959-138b985c3c7e": {
-		"id": "e2c08e6a-46c4-4457-9959-138b985c3c7e",
+	"e2c08e6a-56c4-4457-9959-138b985c3c7e": {
+		"id": "e2c08e6a-56c4-4457-9959-138b985c3c7e",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -1494,8 +1494,8 @@
 		"placedAt": 1618074000000,
 		"closedAt": 1618074000000
 	},
-	"46e27dfa-ed42-4704-aeca-919d43db097a": {
-		"id": "46e27dfa-ed42-4704-aeca-919d43db097a",
+	"56e27dfa-ed42-4704-aeca-919d43db097a": {
+		"id": "56e27dfa-ed42-4704-aeca-919d43db097a",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -1507,8 +1507,8 @@
 		"placedAt": 1618077600000,
 		"closedAt": 1618077600000
 	},
-	"40a9c1cb-2637-4919-80e6-1e84634b9c03": {
-		"id": "40a9c1cb-2637-4919-80e6-1e84634b9c03",
+	"40a9c1cb-2637-4919-80e6-1e85634b9c03": {
+		"id": "40a9c1cb-2637-4919-80e6-1e85634b9c03",
 		"symbol": "BTC/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -1520,8 +1520,8 @@
 		"placedAt": 1618081200000,
 		"closedAt": 1618084800000
 	},
-	"6a77450e-c7c6-46a7-8366-e8cef97c156c": {
-		"id": "6a77450e-c7c6-46a7-8366-e8cef97c156c",
+	"6a77450e-c7c6-56a7-8366-e8cef97c156c": {
+		"id": "6a77450e-c7c6-56a7-8366-e8cef97c156c",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -1567,7 +1567,7 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.00035,
-		"price": 1722.18784604,
+		"price": 1722.18785604,
 		"executedPrice": null,
 		"placedAt": 1618102800000,
 		"closedAt": 1618106400000
@@ -1632,8 +1632,8 @@
 		"errorReason": null,
 		"direction": "buy",
 		"amount": 0.016,
-		"price": 2146.8,
-		"executedPrice": 2146.8,
+		"price": 2156.8,
+		"executedPrice": 2156.8,
 		"placedAt": 1618110000000,
 		"closedAt": 1618110000000
 	},
@@ -1645,8 +1645,8 @@
 		"errorReason": null,
 		"direction": "sell",
 		"amount": 0.016,
-		"price": 2132.622464,
-		"executedPrice": 2132.622464,
+		"price": 2132.622564,
+		"executedPrice": 2132.622564,
 		"placedAt": 1618113600000,
 		"closedAt": 1618113600000
 	},
@@ -1816,7 +1816,7 @@
 		"amount": 0.00035,
 		"price": 47519.200000000004,
 		"executedPrice": null,
-		"placedAt": 1618146000000,
+		"placedAt": 1618156000000,
 		"closedAt": 1618149600000
 	},
 	"b1f554c2-57a0-4179-98aa-ae5597f974d4": {
@@ -1829,7 +1829,7 @@
 		"amount": 0.00035,
 		"price": 1702.8609549600003,
 		"executedPrice": null,
-		"placedAt": 1618146000000,
+		"placedAt": 1618156000000,
 		"closedAt": 1618149600000
 	},
 	"33a41be5-657d-4e1d-80f2-4945d147d211": {
@@ -1842,8 +1842,8 @@
 		"amount": 0.016,
 		"price": 2128.5761937,
 		"executedPrice": 2128.5761937,
-		"placedAt": 1618146000000,
-		"closedAt": 1618146000000
+		"placedAt": 1618156000000,
+		"closedAt": 1618156000000
 	},
 	"3cec653f-74d0-4edd-b831-80fd3622734c": {
 		"id": "3cec653f-74d0-4edd-b831-80fd3622734c",
@@ -1871,8 +1871,8 @@
 		"placedAt": 1618153200000,
 		"closedAt": 1618156800000
 	},
-	"1e214c17-2146-405e-9c93-2a87dc884ce3": {
-		"id": "1e214c17-2146-405e-9c93-2a87dc884ce3",
+	"1e214c17-2156-405e-9c93-2a87dc884ce3": {
+		"id": "1e214c17-2156-405e-9c93-2a87dc884ce3",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -2061,8 +2061,8 @@
 		"errorReason": null,
 		"direction": "sell",
 		"amount": 0.016,
-		"price": 2146.3,
-		"executedPrice": 2146.3,
+		"price": 2156.3,
+		"executedPrice": 2156.3,
 		"placedAt": 1618178400000,
 		"closedAt": 1618178400000
 	},
@@ -2079,8 +2079,8 @@
 		"placedAt": 1618182000000,
 		"closedAt": 1618185600000
 	},
-	"6fe541d0-f808-4650-ab0f-f42e6e062b34": {
-		"id": "6fe541d0-f808-4650-ab0f-f42e6e062b34",
+	"6fe541d0-f808-5650-ab0f-f42e6e062b34": {
+		"id": "6fe541d0-f808-5650-ab0f-f42e6e062b34",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -2131,8 +2131,8 @@
 		"placedAt": 1618189200000,
 		"closedAt": 1618192800000
 	},
-	"22dd1f1a-1559-4469-a932-35cd370db8a9": {
-		"id": "22dd1f1a-1559-4469-a932-35cd370db8a9",
+	"22dd1f1a-1559-4569-a932-35cd370db8a9": {
+		"id": "22dd1f1a-1559-4569-a932-35cd370db8a9",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
@@ -2157,8 +2157,8 @@
 		"placedAt": 1618189200000,
 		"closedAt": 1618189200000
 	},
-	"39422b71-f6fe-4567-9253-d468b2ae294b": {
-		"id": "39422b71-f6fe-4567-9253-d468b2ae294b",
+	"39422b71-f6fe-4567-9253-d568b2ae294b": {
+		"id": "39422b71-f6fe-4567-9253-d568b2ae294b",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -2375,7 +2375,7 @@
 		"amount": 0.00035,
 		"price": 47828,
 		"executedPrice": null,
-		"placedAt": 1618246800000,
+		"placedAt": 1618256800000,
 		"closedAt": 1618250400000
 	},
 	"be1b22a2-c125-4cf3-80df-1e48e3e0bb87": {
@@ -2388,11 +2388,11 @@
 		"amount": 0.00035,
 		"price": 1696.08,
 		"executedPrice": null,
-		"placedAt": 1618246800000,
+		"placedAt": 1618256800000,
 		"closedAt": 1618250400000
 	},
-	"dc4df3af-b1e7-4ea6-ba25-e8dba4e46145": {
-		"id": "dc4df3af-b1e7-4ea6-ba25-e8dba4e46145",
+	"dc4df3af-b1e7-4ea6-ba25-e8dba4e56145": {
+		"id": "dc4df3af-b1e7-4ea6-ba25-e8dba4e56145",
 		"symbol": "ETH/USD",
 		"type": "market",
 		"status": "completed",
@@ -2401,8 +2401,8 @@
 		"amount": 0.016,
 		"price": 2120.1,
 		"executedPrice": 2120.1,
-		"placedAt": 1618246800000,
-		"closedAt": 1618246800000
+		"placedAt": 1618256800000,
+		"closedAt": 1618256800000
 	},
 	"720fb505-0d72-4b6b-8fbb-a9ea5ade4f47": {
 		"id": "720fb505-0d72-4b6b-8fbb-a9ea5ade4f47",
@@ -2430,8 +2430,8 @@
 		"placedAt": 1618254000000,
 		"closedAt": 1618257600000
 	},
-	"0f625896-d23d-46d6-a848-1554d5091915": {
-		"id": "0f625896-d23d-46d6-a848-1554d5091915",
+	"0f625896-d23d-56d6-a848-1554d5091915": {
+		"id": "0f625896-d23d-56d6-a848-1554d5091915",
 		"symbol": "ETH/USD",
 		"type": "limit",
 		"status": "cancelled",
