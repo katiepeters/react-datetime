@@ -5,10 +5,14 @@ import BotSaver from '../../botEditor/BotSaver';
 import botLoader from '../../botEditor/bot.loader';
 import apiCacher from '../../../state/apiCacher';
 import styles from './BotEditorScreen.module.css';
+import BotEditorBar from './botEditorBar/BotEditorBar';
+import { BacktestConfig } from '../../botEditor/tools/BotTools';
+import BtRunner from '../../../utils/BtRunner';
 
 class BotEditorScreen extends React.Component<ScreenProps> {
 	state = {
-		resources: false
+		resources: false,
+		codeProblems: []
 	}
 
 	botSaver: BotSaver
@@ -31,14 +35,23 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 
 		return (
 			<div className={styles.wrapper}>
-				<Editor
-					height="100vh"
-					defaultLanguage="javascript"
-					defaultValue={data.code}
-					theme="vs-dark"
-					options={{ minimap: { enabled: false }, automaticLayout: true }}
-					onMount={this._initializeEditor}
-					onChange={this._onCodeChange} />
+				<div className={styles.editor}>
+					<Editor
+						height="100%"
+						defaultLanguage="javascript"
+						defaultValue={data.code}
+						theme="vs-dark"
+						options={{ minimap: { enabled: false }, automaticLayout: true }}
+						onMount={this._initializeEditor}
+						onChange={this._onCodeChange} />
+				</div>
+				<div className={styles.bar}>
+					<BotEditorBar
+						codeProblems={this.state.codeProblems}
+						currentBackTesting={this.props.store.currentBackTesting}
+						onRun={ this._onRunBt }
+						onAbort={this._onAbortBt}/>
+				</div>
 			</div>
 		);
 	}
@@ -63,6 +76,16 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		monaco.editor.defineTheme('editorTheme', this.state.resources.theme);
 		monaco.editor.setTheme('editorTheme');
 		editor.updateOptions({ contextmenu: false });
+
+		editor.onDidChangeModelDecorations(() => {
+			const model = editor.getModel();
+			if (model === null || model.getModeId() !== "javascript")
+				return;
+
+			const owner = model.getModeId();
+			const markers = monaco.editor.getModelMarkers({ owner });
+			this.setState({codeProblems: markers});
+		});
 
 		const { data } = botLoader.getData(this, this.getBotId(this.props));
 		this.botSaver.currentCode = data ? data.code : '';
@@ -89,6 +112,21 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 
 	getBotId(props: ScreenProps): string {
 		return props.router.location.params.id;
+	}
+
+	_onRunBt = (config: BacktestConfig) => {
+		const botId = this.getBotId(this.props);
+		let { data } = botLoader.getData(this, botId);
+		let botData = {
+			botId,
+			source: data?.code
+		};
+
+		BtRunner.start(botData, config);
+	}
+
+	_onAbortBt = () => {
+		BtRunner.abort();
 	}
 }
 

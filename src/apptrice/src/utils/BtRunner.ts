@@ -69,7 +69,9 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 	});
 
 	await runIterations(bot, state, { symbols, candles, options });
-	updateBtStore({ status: 'completed' });
+	if (store.currentBackTesting.status !== 'error') {
+		updateBtStore({ status: 'completed' });
+	}
 	runningBot.terminate();
 }
 
@@ -155,17 +157,25 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 		orders = adapter.orders;
 		openOrderIds = adapter.openOrders;
 
-		let results = await bot.execute({
-			portfolio,
-			orders: adapter.orders,
-			state,
-			candles: iterationCandles,
-			config: {
-				symbols,
-				interval: options.interval,
-				exchange: 'bitfinex'
-			}
-		});
+		let results;
+		try {
+			results = await bot.execute({
+				portfolio,
+				orders: adapter.orders,
+				state,
+				candles: iterationCandles,
+				config: {
+					symbols,
+					interval: options.interval,
+					exchange: 'bitfinex'
+				}
+			});
+		}
+		catch( error ) {
+			setBtError(error);
+		}
+
+		if( !results ) return;
 
 		state = results.state;
 		if (results.ordersToCancel.length > 0) {
@@ -253,4 +263,11 @@ function getGraphCandles( candles: BotCandles ){
 		graphCandles[asset] = candles[asset].slice(200);
 	}
 	return graphCandles;
+}
+
+function setBtError( error: any ){
+	updateBtStore({
+		status: 'error',
+		error
+	});
 }

@@ -1,8 +1,22 @@
 .wrapper {
-	display: 'flex';
+	display: flex;
 	flex-grow: 1;
-	flex-direction: 'row';
-	flex-wrap: 'nowrap';
+	flex-direction: column;
+	flex-wrap: nowrap;
 	min-width: 0;
 	overflow: hidden;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.editor {
+	display: flex;
+	flex-grow: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.bar {
+	display: flex;
+	flex-shrink: 0;
 }
