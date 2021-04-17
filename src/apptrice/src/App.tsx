@@ -38,7 +38,7 @@ const styles = {
     flexDirection: 'row',
     flex: 1,
     alignItems: 'stretch',
-    minHeight: '100vh'
+    height: '100vh'
   },
 
   menuWrapper: {

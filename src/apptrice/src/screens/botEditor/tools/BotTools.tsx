@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Button from './Button';
+import Button from '../../../components/button/Button';
 import InputGroup from './InputGroup';
 import ProgressBar from './ProgressBar';
 interface BootToolsProps {

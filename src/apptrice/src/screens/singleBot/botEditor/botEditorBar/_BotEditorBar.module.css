@@ -1,0 +1,37 @@
+.container {
+	height: 300px;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.tabsBar {
+	display: flex;
+	align-items: stretch;
+	height: 50px;
+	justify-content: space-between;
+	padding: 0 10px;
+}
+
+.tabs {
+	display: flex;
+	align-items: stretch;
+}
+
+.panelBar {
+	display: flex;
+	flex: 1;
+	background: #011627;
+	color: #ddd;
+	font-family: 'Fira Code', monospace;
+	font-size: 13px;
+}
+
+.problems {
+	display: flex;
+}
+
+.buttons {
+	display: flex;
+	align-items: center;
+}

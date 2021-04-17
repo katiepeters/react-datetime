@@ -1,24 +1,20 @@
 import * as React from 'react'
+import Button from '../../../../components/button/Button';
 import { BacktestConfig } from '../../../botEditor/tools/BotTools';
-import Button from '../../../botEditor/tools/Button';
 import ProgressBar from '../../../botEditor/tools/ProgressBar';
-import styles from './BotEditorBar.module.css';
+import styles from './_BotEditorBar.module.css';
 import BotEditorConsolePanel from './console/BotEditorConsolePanel';
 import BotEditorConsoleTab from './console/BotEditorConsoleTab';
 import ProblemsPanel from './problems/ProblemsPanel';
-import ProblemsTab from './problems/ProblemsTab';
+import ProblemsTab, { CodeProblem } from './problems/ProblemsTab';
 
-interface CodeProblem {
-	startLineNumber: number,
-	startColumn: number,
-	message: string,
-	severity: number
-}
+
 interface BotEditorBarProps {
 	codeProblems: CodeProblem[],
 	currentBackTesting?: any,
 	onRun: (config: BacktestConfig) => void,
 	onAbort: () => void
+	onHighlightLine: (line:number) => void
 }
 
 const tabComponents: {[any:string]: any} = {
@@ -59,8 +55,9 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 			let Tab: any = tabComponents[key];
 			return (
 				<Tab key={key}
-					isActive={ key === this.state.currentTab }
-					onPress={ this._onTabPress }
+					id={key}
+					active={ key === this.state.currentTab }
+					onClick={ this._onTabPress }
 					problems={this.props.codeProblems }
 					backtesting={ this.props.currentBackTesting } />
 			);
@@ -72,47 +69,8 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 		return (
 			<Panel
 				problems={this.props.codeProblems}
-				backtesting={this.props.currentBackTesting} />
-		);
-	}
-
-	renderProblems() {
-		let errors: CodeProblem[] = [];
-		let warnings: CodeProblem[] = [];
-		this.props.codeProblems.forEach( problem => {
-			if( problem.severity > 5 ){
-				errors.push( problem );
-			}
-			else if( problem.severity > 2 ){
-				warnings.push( problem );
-			}
-		});
-
-		return (
-			<>
-				{ this.renderErrors(errors) }
-				{ this.renderWarnings(warnings) }
-			</>
-		);
-	}
-
-	renderErrors( errors: CodeProblem[] ){
-		if( !errors.length ) return;
-		return (
-			<div className={styles.errorCount}>
-				<i className={`fas fa-exclamation-triangle ${styles.error}`}></i>
-				<span> {errors.length}</span>
-			</div>
-		);
-	}
-
-	renderWarnings(warnings: CodeProblem[]) {
-		if (!warnings.length) return;
-		return (
-			<div className={styles.warningCount}>
-				<i className={`fas fa-exclamation-triangle ${styles.warning}`}></i>
-				<span> {warnings.length}</span>
-			</div>
+				backtesting={this.props.currentBackTesting}
+				onHighlightLine={ this.props.onHighlightLine } />
 		);
 	}
 
@@ -133,13 +91,13 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 	renderButton() {
 		if (this.isBtRunning()) {
 			return (
-				<Button onClick={this._onAbortBT}>
+				<Button size="s" onClick={this._onAbortBT}>
 					Abort
 				</Button>
 			);
 		}
 		return (
-			<Button onClick={this._onStartPressed}>
+			<Button size="s" onClick={this._onStartPressed}>
 				Start backtesting
 			</Button>
 		)
@@ -215,7 +173,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 		return date.toISOString().split('T')[0];
 	}
 
-	_onTabPress( currentTab:string ){
+	_onTabPress = ( currentTab:string ) => {
 		this.setState({currentTab});
 	}
 }

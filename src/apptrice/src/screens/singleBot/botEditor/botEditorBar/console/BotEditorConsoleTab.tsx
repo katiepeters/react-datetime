@@ -1,16 +1,19 @@
 import * as React from 'react'
+import EditorTab from '../../components/EditorTab';
 import styles from './_BotEditorConsoleTab.module.css';
 
 interface BotEditorConsoleTabProps {
-	menu: React.ReactElement
+	id: string
+	active: boolean,
+	onClick: (id:string) => void
 }
 
 export default class BotEditorConsoleTab extends React.Component<BotEditorConsoleTabProps> {
 	render() {
 		return (
-			<div className={styles.container}>
+			<EditorTab active={this.props.active} onClick={ this.props.onClick } id={this.props.id}>
 				Console
-			</div>
+			</EditorTab>
 		)
 	}
 }

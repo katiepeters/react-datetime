@@ -1,0 +1,20 @@
+.container {
+		cursor: pointer;
+		border: 2px solid rgba(0,0,0,.1);
+		border-radius: 5px;
+		height: 42px;
+		font-family: "Sarabun", sans-serif;
+		font-size: 17px;
+		text-shadow: 2px 2px rgba(0,0,0,.1);
+		padding-bottom: 4px;
+}
+
+.size_s {
+	height: 32px;
+	font-size: 15px;
+}
+
+.color_green {
+	background: #3dc9b0;
+	color: #fff;
+}

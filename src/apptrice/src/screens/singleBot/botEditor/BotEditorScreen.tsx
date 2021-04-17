@@ -4,7 +4,7 @@ import { ScreenProps } from '../../../types';
 import BotSaver from '../../botEditor/BotSaver';
 import botLoader from '../../botEditor/bot.loader';
 import apiCacher from '../../../state/apiCacher';
-import styles from './BotEditorScreen.module.css';
+import styles from './_BotEditorScreen.module.css';
 import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../botEditor/tools/BotTools';
 import BtRunner from '../../../utils/BtRunner';
@@ -41,7 +41,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 						defaultLanguage="javascript"
 						defaultValue={data.code}
 						theme="vs-dark"
-						options={{ minimap: { enabled: false }, automaticLayout: true }}
+						options={ this.getEditorOptions() }
 						onMount={this._initializeEditor}
 						onChange={this._onCodeChange} />
 				</div>
@@ -50,10 +50,20 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 						codeProblems={this.state.codeProblems}
 						currentBackTesting={this.props.store.currentBackTesting}
 						onRun={ this._onRunBt }
-						onAbort={this._onAbortBt}/>
+						onAbort={this._onAbortBt}
+						onHighlightLine={ this._highlightLine }/>
 				</div>
 			</div>
 		);
+	}
+
+	getEditorOptions() {
+		return {
+			minimap: { enabled: false },
+			automaticLayout: true,
+			fontFamily: 'Fira Code',
+			fontLigatures: true
+		};
 	}
 
 	_initializeEditor = (editor: any, monaco: any) => {
@@ -127,6 +137,11 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 
 	_onAbortBt = () => {
 		BtRunner.abort();
+	}
+
+	_highlightLine = (line:number) => {
+		// TODO: Move editor and highlight line
+		// https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
 	}
 }
 

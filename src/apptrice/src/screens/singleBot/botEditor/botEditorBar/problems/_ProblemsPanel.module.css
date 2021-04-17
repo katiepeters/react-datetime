@@ -1,0 +1,30 @@
+.container {
+	font-size: 12px;
+	padding: 10px;
+}
+
+.row {
+	line-height: 1.1em;
+	margin-bottom: 4px;
+}
+
+.lineNumber {
+	text-align: right;
+}
+
+.lineNumberButton {
+	cursor: pointer;
+	background: none;
+	border: 0;
+	color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+}
+
+.warn {
+	color: yellow
+}
+
+.error {
+	color: red
+}
