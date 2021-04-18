@@ -172,7 +172,7 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 	}
 
 	function openBuyOrder(symbol, price) {
-		trader.placeOrder({
+		return trader.placeOrder({
 			type: 'limit',
 			direction: 'sell',
 			price,

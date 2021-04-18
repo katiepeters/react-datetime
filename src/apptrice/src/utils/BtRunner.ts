@@ -58,13 +58,14 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 	let symbols = getSymbols(options.baseAssets, options.quotedAsset);
 	let candles = await getAllCandles(symbols, options.interval, options.startDate, options.endDate);
 
-	let state = await bot.initialize({
+	let {state, logs} = await bot.initialize({
 		// @ts-ignore
 		symbols, interval: options.interval, exchange: 'bitfinex'
 	})
 	
 	updateBtStore({
 		status: 'running',
+		logs,
 		candles
 	});
 
@@ -195,7 +196,8 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 			iteration,
 			orders,
 			balances: [...store.currentBackTesting.balances, {...portfolio}],
-			candles: getGraphCandles(candles)
+			candles: getGraphCandles(candles),
+			logs: [ ...store.currentBackTesting.logs, ...results.logs]
 		});
 
 		console.log(Object.keys(orders).length);

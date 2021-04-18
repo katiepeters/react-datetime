@@ -42,6 +42,17 @@ interface CandleUtils {
 	getAmplitude(candle: ArrayCandle): number
 }
 
+interface Console {
+    /** Outputs info message to the console */
+    log(...messages: any[]): void
+    /** Outputs warning message to the console */
+    warn(...messages: any[]): void
+    /** Outputs error message to the console */
+    error(...messages: any[]): void
+}
+
+declare var console: Console;
+
 interface SymbolsUtils {
 	getBase(symbol: string): string
 	getQuoted(symbol: string): string

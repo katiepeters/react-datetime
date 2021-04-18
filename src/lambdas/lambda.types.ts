@@ -1,3 +1,5 @@
+import { ConsoleEntry } from "./executor/Consoler"
+
 export interface BotConfigurationExtra{
 	[key: string]: any
 }
@@ -113,5 +115,6 @@ export interface BotExecutorPayload {
 export interface BotExecutorResult {
 	ordersToCancel: string[]
 	ordersToPlace: Order[]
-	state: BotState
+	state: BotState,
+	logs: ConsoleEntry[]
 }

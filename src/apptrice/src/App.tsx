@@ -51,6 +51,7 @@ const styles = {
     display: 'flex',
     flex: 1,
     alignItems: 'stretch',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    minWidth: 0
   }
 }

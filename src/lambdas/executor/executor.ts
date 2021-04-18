@@ -2,9 +2,15 @@ import { BotCandles, BotConfiguration, TradeBot, BotExecutorPayload, BotExecutor
 import * as ts from "typescript";
 import Trader from "./Trader";
 import botUtils from '../_common/utils/botUtils';
+import cons from './Consoler';
 
 export async function executor(event: BotExecutorPayload) {
-	console.log('Executor called');
+	// Tweak consoles
+	let originalConsole = console;
+	// @ts-ignore
+	console = cons;
+
+	originalConsole.log('Executor called');
 
 	const Bot = getBot(event.botSource)
 	if( !Bot ){
@@ -25,10 +31,13 @@ export async function executor(event: BotExecutorPayload) {
 		utils: botUtils
 	});
 
+	const logs = cons.getEntries();
+	cons.clear();
 	return {
 		ordersToCancel: trader.ordersToCancel,
 		ordersToPlace: trader.ordersToPlace,
-		state: state
+		state: state,
+		logs
 	};
 }
 

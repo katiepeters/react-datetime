@@ -17,4 +17,5 @@
 	background-color: #324350;
 	display: flex;
 	flex: 1;
+	min-width: 0;
 }

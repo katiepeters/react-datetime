@@ -27,14 +27,21 @@ export default class ProblemsTab extends React.Component<ProblemsTabProps> {
 	renderProblems() {
 		let errors: CodeProblem[] = [];
 		let warnings: CodeProblem[] = [];
+		let count = 0;
 		this.props.problems.forEach(problem => {
 			if (problem.severity > 5) {
 				errors.push(problem);
+				count++;
 			}
 			else if (problem.severity > 2) {
 				warnings.push(problem);
+				count++;
 			}
 		});
+
+		if( count === 0 ){
+			return this.renderOk();
+		}
 
 		return (
 			<>
@@ -42,6 +49,15 @@ export default class ProblemsTab extends React.Component<ProblemsTabProps> {
 				{ this.renderWarnings(warnings)}
 			</>
 		);
+	}
+
+	renderOk(){
+		return (
+			<div className={styles.ok}>
+				<i className="far fa-check-circle"></i>
+				<span> 0</span>
+			</div>
+		)
 	}
 
 	renderErrors(errors: CodeProblem[]) {
