@@ -1,0 +1,25 @@
+.container {
+	font-size: 12px;
+	padding: 0 10px;
+}
+
+.content {
+	padding: 10px;
+}
+
+.row {
+
+}
+
+.date {
+	width: 150px;
+	padding-right: 10px;
+}
+
+.error {
+	color: red
+}
+
+.warn {
+	color: yellow
+}

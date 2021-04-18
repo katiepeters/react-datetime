@@ -268,8 +268,13 @@ function getGraphCandles( candles: BotCandles ){
 }
 
 function setBtError( error: any ){
+	store.currentBackTesting.logs.push({
+		type: 'error',
+		date: Date.now(),
+		message: error.message || error.toString()
+	});
+
 	updateBtStore({
-		status: 'error',
-		error
+		status: 'error'
 	});
 }

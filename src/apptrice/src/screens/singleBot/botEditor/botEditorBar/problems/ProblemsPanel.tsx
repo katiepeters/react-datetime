@@ -21,11 +21,13 @@ export default class ProblemsPanel extends React.Component<ProblemsPanelProps> {
 
 		return (
 			<div className={styles.container}>
-				<table>
-					<tbody>
-						{ problems }
-					</tbody>
-				</table>
+				<div className={styles.content}>
+					<table>
+						<tbody>
+							{ problems }
+						</tbody>
+					</table>
+				</div>
 			</div>
 		);
 	}
@@ -33,7 +35,9 @@ export default class ProblemsPanel extends React.Component<ProblemsPanelProps> {
 	renderNoProblem() {
 		return (
 			<div className={styles.container}>
-				Everything ok!
+				<div className={styles.content}>
+					Everything ok!
+				</div>
 			</div>
 		);
 	}

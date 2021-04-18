@@ -1,6 +1,10 @@
 .container {
 	font-size: 12px;
-	padding: 10px;
+	padding: 0 10px;
+}
+
+.content {
+	padding: 10px 0;
 }
 
 .row {

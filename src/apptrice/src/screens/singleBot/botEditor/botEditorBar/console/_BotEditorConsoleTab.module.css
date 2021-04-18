@@ -1,0 +1,15 @@
+.container {
+	transition: color 2s;
+}
+
+.containerActive {
+	transition: none;
+	color: #fff;
+}
+
+.activityDot {
+	font-size: 8px;
+	display: inline-block;
+	transform: translateY(-1px);
+	margin-left: 2px;
+}

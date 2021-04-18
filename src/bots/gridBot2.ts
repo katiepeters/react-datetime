@@ -5,6 +5,8 @@ function initializeState(config, state) {
 	let activeSymbols = {};
 	let openBuyOrders = {};
 
+	console.log('Initializing');
+
 	config.symbols.forEach(symbol => {
 		activeSymbols[symbol] = false;
 		openBuyOrders[symbol] = {};
@@ -17,6 +19,9 @@ function initializeState(config, state) {
 function onData({ config, state, trader, candles, utils }: BotInput) {
 	const volatilities = getVolatilities();
 	state.activeSymbols = selectSymbols(volatilities);
+
+	console.log('Data received');
+
 	config.symbols.forEach((symbol: string) => {
 		const currentPrice = getCurrentPrice(symbol);
 
@@ -276,12 +281,12 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 	function getLevelId(price) {
 		let parts = price.toString().split('.');
 		let id = price;
-		if (parts[0].length() > 3) {
+		if (parts[0].length > 3) {
 			id = parts[0].slice(0, 4) + pad(parts[0].length - 4);
 		}
 		else if (parts.length > 1) {
 			if (price >= 1) {
-				let decimals = parts[1].slice(0, 4 - parts[0].length());
+				let decimals = parts[1].slice(0, 4 - parts[0].length);
 				id = parts[0] + '.' + decimals;
 			}
 			else {

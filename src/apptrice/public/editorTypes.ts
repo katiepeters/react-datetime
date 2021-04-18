@@ -24,7 +24,7 @@ interface BotConfiguration {
 interface Trader {
 	getPortfolio(): Portfolio
 	getOrder(id: string): Order | void
-	placeOrder(orderInput: LimitOrderInput | MarketOrderInput): Order
+	placeOrder(orderInput: OrderInput): Order
 	cancelOrder(orderId: string)
     getPortfolioValue(): number
     getPrice(symbol: string): number
@@ -81,10 +81,11 @@ interface Portfolio {
 }
 
 interface OrderInput {
-	symbol: string
-	type: 'limit' | 'market'
-	direction: 'buy' | 'sell'
-	amount: number
+    symbol: string
+    type: 'limit' | 'market'
+    direction: 'buy' | 'sell'
+    amount: number
+    price: number | null
 }
 
 interface Order extends OrderInput {
@@ -97,15 +98,6 @@ interface Order extends OrderInput {
 	createdAt: number
 	placedAt: number | null
 	closedAt: number | null
-}
-
-interface LimitOrderInput extends OrderInput {
-	type: 'limit'
-	price: number
-}
-
-interface MarketOrderInput extends OrderInput {
-	type: 'market'
 }
 
 interface Orders {
