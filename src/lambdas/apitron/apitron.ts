@@ -1,10 +1,11 @@
-import AccountModel from '../_common/dynamo/AccountModel';
+ import AccountModel from '../_common/dynamo/AccountModel';
 import ExchangeAccountModel from '../_common/dynamo/ExchangeAccountModel';
 import BotDeploymentModel from '../_common/dynamo/BotDeploymentModel';
 import BotModel from '../_common/dynamo/BotModel';
 import lambdaUtil from '../_common/utils/lambda';
 import BitfinexAdapter from '../_common/exchanges/adapters/BitfinexAdapter';
 import exchangeUtils from '../_common/exchanges/exchangeUtils';
+import deploymentAPI from './deployments/deploymentsAPI';
 
 const fs = require('fs');
 const path = require('path');
@@ -70,6 +71,8 @@ app.patch('/bots', function(req, res) {
 		})
 	;
 });
+
+deploymentAPI.initialize( app, {deployment: BotDeploymentModel} );
 
 app.get('/deployments', function (req, res) {
 	res.send('/deployments not implemented yet');

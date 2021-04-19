@@ -4,6 +4,15 @@ import { DBModel } from './db';
 const Db = new DBModel<DBBotDeploymentRaw>();
 
 export default {
+	async getAccountDeployments( accountId: string ): Promise<DBBotDeployment[]> {
+		let deployments = await Db.getMultiple(accountId, 'DEPLOYMENT#');
+		return deployments.map( (d: any) => ({
+			...d,
+			orders: JSON.parse(d.orders),
+			state: JSON.parse(d.state)
+		}));
+	},
+
 	async getSingle(accountId: string, deploymentId: string): Promise<DBBotDeployment | void> {
 		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
 		if( !entry ) return entry;
