@@ -1,0 +1,23 @@
+
+
+.appContainer {
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+	align-items: stretch;
+	height: '100vh'
+}
+
+.menuWrapper {
+	display: flex;
+	align-items: stretch;
+	width: 200;
+}
+
+.screen {
+	display: flex;
+	flex: 1;
+	align-items: stretch;
+	flex-direction: column;
+	min-width: 0;
+}

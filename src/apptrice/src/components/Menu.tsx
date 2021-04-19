@@ -20,7 +20,7 @@ const styles = {
 	menu: {
 		display: 'flex',
 		flexGrow: 1,
-		backgroundColor: '#102433',
+		backgroundColor: '#122e44',
 		width: 200
 	},
 	menuItem: {

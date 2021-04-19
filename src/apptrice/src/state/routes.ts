@@ -9,9 +9,11 @@ import BtStatsScreen from "../screens/backtesting/btStats/BtStatsScreen";
 import BtOrdersScreen from "../screens/backtesting/btOrders/BtOrdersScreen";
 import BtChartsScreen from "../screens/backtesting/btCharts/BtChartsScreen";
 import BtScreen from "../screens/backtesting/BtScreen";
+import DeploymentsScreen from "../screens/deployments/DeploymentsScreen";
 
 const routes = [
 	{path: '/', cb: HomeScreen},
+	{path: '/deployments', cb: DeploymentsScreen},
 	{path: '/bots', cb: BotListScreen, children: [
 		{path: '/:id', cb: BotScreen, children: [
 			{ path: '/details', cb: BotDetailsScreen },

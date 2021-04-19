@@ -52,7 +52,16 @@ const apiCacher = {
 	},
 
 	loadDeploymentList(accountId: string) {
-		return apiClient.loadDeploymentList(accountId);
+		return apiClient.loadDeploymentList(accountId)
+			.then( res => {
+				let deploymentIds = res.data.map( (d:any) => d.id );
+				store.accounts[accountId].deployments = deploymentIds;
+				store.deployments = {
+					...store.deployments,
+					...res.data
+				};
+			})
+		;
 	},
 
 	getCandles( options: CandleOptions ) {

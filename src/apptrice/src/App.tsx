@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Menu from './components/Menu';
+import { MenuLinkList, SidebarLayout } from './components';
 import router from './state/router';
 import store from './state/store';
 
@@ -8,17 +8,44 @@ class App extends React.Component {
     let CurrentScreen = router.location.matches[0];
 
     return (
-      <div style={styles.appContainer as React.CSSProperties}>
-        <div style={styles.menuWrapper as React.CSSProperties}>
-          <Menu />
-        </div>
-        <div style={styles.screen as React.CSSProperties}>
-          <CurrentScreen
-            store={store}
-            router={router} />
-        </div>
+      <SidebarLayout sidebar={ this.renderMenu() } >
+        <CurrentScreen
+          store={store}
+          router={router} />
+      </SidebarLayout>
+    );
+  }
+
+  renderMenu() {
+    return (
+      <div>
+        <h2>Trading bots</h2>
+        <MenuLinkList
+          backgroundColor="#122e44"
+          active={this.getActiveItem()}
+          items={this.getMenuItems()} />
       </div>
     );
+  }
+
+  getMenuItems() {
+    return [
+      { id: 'deployments', label: 'Deployments', link: `#/deployments` },
+      { id: 'bots', label: 'Bots', link: `#/bots` }
+    ]
+  }
+
+  getActiveItem() {
+    const {pathname} = router.location;
+
+    if( pathname.startsWith('/deployments') ){
+      return 'deployments';
+    }
+    if( pathname.startsWith('/bots')) {
+      return 'bots';
+    }
+
+    return '';
   }
 
   componentDidMount() {
@@ -30,28 +57,3 @@ class App extends React.Component {
 }
 
 export default App;
-
-
-const styles = {
-  appContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    flex: 1,
-    alignItems: 'stretch',
-    height: '100vh'
-  },
-
-  menuWrapper: {
-    display: 'flex',
-    alignItems: 'stretch',
-    width: 200,
-  },
-
-  screen: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'stretch',
-    flexDirection: 'column',
-    minWidth: 0
-  }
-}

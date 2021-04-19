@@ -10,13 +10,15 @@ interface MenuLink  {
 
 interface MenuLinkListProps {
 	active: string
-	items: MenuLink[]
+	items: MenuLink[],
+	backgroundColor?: string
+	foregroundColor?: string
 }
 
 export default class MenuLinkList extends Component<MenuLinkListProps> {
 	render() {
 		return (
-			<div>
+			<div style={{ backgroundColor: this.props.backgroundColor || '#082238'}}>
 				{ this.props.items.map( this._renderLink ) }
 			</div>
 		)
