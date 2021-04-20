@@ -62,6 +62,13 @@ export interface DBBotDeploymentState {
 	[attribute: string]: any
 }
 
+export interface SimpleBotDeployment {
+	id: string
+	accountId: string
+	botId: string
+	config: string
+}
+
 export interface DBBotDeployment extends TableItem {
 	id: string
 	botId: string

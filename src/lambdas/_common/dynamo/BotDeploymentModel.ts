@@ -1,15 +1,16 @@
-import { DBBotDeploymentRaw, DBBotDeployment, DBBotDeploymentInput, DBBotDeploymentUpdate } from '../../model.types';
+import { DBBotDeploymentRaw, DBBotDeployment, DBBotDeploymentInput, DBBotDeploymentUpdate, SimpleBotDeployment } from '../../model.types';
 import { DBModel } from './db';
 
 const Db = new DBModel<DBBotDeploymentRaw>();
 
 export default {
-	async getAccountDeployments( accountId: string ): Promise<DBBotDeployment[]> {
+	async getAccountDeployments( accountId: string ): Promise<SimpleBotDeployment[]> {
 		let deployments = await Db.getMultiple(accountId, 'DEPLOYMENT#');
 		return deployments.map( (d: any) => ({
-			...d,
-			orders: JSON.parse(d.orders),
-			state: JSON.parse(d.state)
+			id: d.id,
+			accountId,
+			config: d.config,
+			botId: d.botId
 		}));
 	},
 

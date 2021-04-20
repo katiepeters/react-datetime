@@ -6,6 +6,7 @@ import lambdaUtil from '../_common/utils/lambda';
 import BitfinexAdapter from '../_common/exchanges/adapters/BitfinexAdapter';
 import exchangeUtils from '../_common/exchanges/exchangeUtils';
 import deploymentAPI from './deployments/deploymentsAPI';
+import allModels from '../_common/dynamo/allModels';
 
 const fs = require('fs');
 const path = require('path');
@@ -33,7 +34,7 @@ app.get('/bots', function (req, res) {
 	if( !accountId ){
 		return res
 			.status(400)
-			.json({error: 'invalid_payload', message: 'accountId not given'})
+			.json({ error: 'invalid_payload', message: 'accountId not provided'})
 		;
 	}
 
@@ -72,7 +73,7 @@ app.patch('/bots', function(req, res) {
 	;
 });
 
-deploymentAPI.initialize( app, {deployment: BotDeploymentModel} );
+deploymentAPI.initialize(app, allModels);
 
 app.get('/deployments', function (req, res) {
 	res.send('/deployments not implemented yet');
