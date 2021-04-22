@@ -1,5 +1,5 @@
 import allModels from "../../_common/dynamo/allModels";
-import { Mutation, MutationHandler } from "../apitron.types";
+import { Mutation, MutationHandler, QueryHandler } from "../apitron.types";
 
 export async function mutationHandler(req, res, handler: MutationHandler){
 	return await safeHandler( req, res, mutationController, handler);
@@ -9,7 +9,7 @@ export async function queryHandler(req, res, handler: QueryHandler ){
 	return await safeHandler( req, res, queryController, handler);
 }
 
-async function safeHandler(req, res, controller, handler: MutationHandler ){
+async function safeHandler(req, res, controller, handler ){
 	let response:any = {};
  
 	try {
@@ -39,7 +39,7 @@ async function safeHandler(req, res, controller, handler: MutationHandler ){
 }
 
 async function mutationController( req, handler: MutationHandler){
-	const {context = {}, error} = await handler.getRequestContext({
+	const {context = {}, error} = await handler.getContext({
 		body: req.body,
 		params: req.params,
 		models: allModels
@@ -64,6 +64,24 @@ async function mutationController( req, handler: MutationHandler){
 			context,
 			mutations,
 			mutationResults
+		})
+	};
+}
+
+async function queryController( req, handler: QueryHandler ){
+	const { context = {}, error } = await handler.getContext({
+		params: req.query,
+		models: allModels
+	});
+
+	if (error) {
+		return error;
+	}
+
+	return {
+		data: handler.getResponse({
+			params: req.query,
+			context
 		})
 	};
 }
