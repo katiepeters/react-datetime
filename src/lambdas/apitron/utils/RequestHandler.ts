@@ -46,7 +46,7 @@ async function mutationController( req, handler: MutationHandler){
 	});
 
 	if( error ){
-		return error;
+		return {error};
 	}
 
 	const mutations = handler.getMutations({
@@ -57,33 +57,31 @@ async function mutationController( req, handler: MutationHandler){
 
 	const mutationResults = await applyMutations( mutations );
 
-	return {
-		data: handler.getResponse({
-			body: req.body,
-			params: req.params,
-			context,
-			mutations,
-			mutationResults
-		})
-	};
+	return handler.getResponse({
+		body: req.body,
+		params: req.params,
+		context,
+		mutations,
+		mutationResults
+	});
 }
 
-async function queryController( req, handler: QueryHandler ){
-	const { context = {}, error } = await handler.getContext({
+function queryController( req, handler: QueryHandler ){
+	const input = {
 		params: req.query,
 		models: allModels
-	});
+	};
 
-	if (error) {
-		return error;
-	}
+	return handler.getContext(input).then(({context={}, error}) => {
+		if (error) {
+			return {error};
+		}
 
-	return {
-		data: handler.getResponse({
+		return handler.getResponse({
 			params: req.query,
 			context
-		})
-	};
+		});
+	});
 }
 
 async function applyMutations( mutations: Mutation[] ): Promise<any[]>{

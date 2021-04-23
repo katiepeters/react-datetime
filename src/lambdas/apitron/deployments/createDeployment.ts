@@ -16,7 +16,13 @@ const createDeploymentHandler: MutationHandler = {
 				symbols: 'symbols'
 			}
 		});
-		if( error ) return {error: {...error, code: 'invalid_payload'}};
+
+		if( error ) {
+			return {error: {
+				code: 'invalid_payload',
+				reason: error.message.replace('{field}', error.field || '')
+			}};
+		}
 
 		// Validate entities
 		let [account, bot, exchange] = await Promise.all([
@@ -39,7 +45,7 @@ const createDeploymentHandler: MutationHandler = {
 			model: 'deployment',
 			action: 'create',
 			data: {
-				...input,
+				...input.body,
 				id,
 				orders: [],
 				state: {}
@@ -50,7 +56,7 @@ const createDeploymentHandler: MutationHandler = {
 	getResponse(input: MutationResponseInput): ResponseResult {
 		return {
 			status: 201,
-			data: {}
+			data: {id: input.mutations[0].data.id }
 		};
 	}
 }

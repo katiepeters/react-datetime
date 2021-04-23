@@ -59,18 +59,18 @@ export interface MutationHandler {
 	name?: string
 }
 
-export interface ContextHandlerInput {
+export interface QueryContextInput {
 	params: any
 	models: DynamoModels
 }
 
-export interface ContextResponseInput {
+export interface QueryResponseInput {
 	params: any
 	context: any
 }
 
 export interface QueryHandler {
-	getContext(input: ContextHandlerInput): Promise<ContextResult>
-	getResponse(input: ContextResponseInput): ResponseResult
+	getContext(input: QueryContextInput): Promise<ContextResult>
+	getResponse(input: QueryResponseInput): ResponseResult
 	name?: string
 }

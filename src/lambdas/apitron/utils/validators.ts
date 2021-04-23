@@ -84,8 +84,9 @@ function validateSymbols( symb ){
 	const quotedAsset = symbols.getQuoted( symb[0] );
 	if( !quotedAsset ) return false;
 	
-	for( let symbol in symb ){
-		if (!validateSymbol(symbol) || symbols.getQuoted(symbol) !== quotedAsset){
+	for( let i in symb ){
+		const symbol = symb[i];
+		if (!validateSymbol(symbol) || symbols.getQuoted(symbol) !== quotedAsset) {
 			return false;
 		}
 	}

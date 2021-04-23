@@ -263,7 +263,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 
 	checkOrderCompleted( order: ExchangeOrder ): boolean {
 		let lastCandle = this.lastCandles[order.symbol];
-		if( !lastCandle ) return;
+		if( !lastCandle ) return false;
 
 		let updatedOrder: ExchangeOrder | undefined;
 		if( order.type === 'market' ){
