@@ -54,10 +54,12 @@ function validateArray(arr: any[], type: string): ShapeValidatorResult {
 }
 
 function validateFinalType( value: any, type: string ){
-	if (value === undefined && !type.endsWith('?')) {
-		return { error: { code: 'required_field', message: '{field} is missing' } };
+	if( type.endsWith('?') ){
+		if( value === undefined ) return true;
+		type = type.slice(0, type.length - 1);
 	}
-	else if (!isValid(value, type)) {
+
+	if (!isValid(value, type)) {
 		return { error: { code: 'invalid_value', message: '{field} is not valid' } };
 	}
 	return {};
@@ -75,7 +77,8 @@ const validIntervals = {
 const validators = {
 	string: value => typeof value === 'string',
 	interval: value => validIntervals[value] === true,
-	symbols: value => validateSymbols(value)
+	symbols: value => validateSymbols(value),
+	boolean: value => typeof value === 'boolean'
 }
 
 function validateSymbols( symb ){

@@ -10,7 +10,8 @@ export default {
 			id: d.id,
 			accountId,
 			config: d.config,
-			botId: d.botId
+			botId: d.botId,
+			active: d.active || false
 		}));
 	},
 
@@ -33,7 +34,8 @@ export default {
 			resourceId: `DEPLOYMENT#${deployment.id}`,
 			config: deployment.config,
 			orders: JSON.stringify(deployment.orders),
-			state: JSON.stringify(deployment.state)
+			state: JSON.stringify(deployment.state),
+			active: deployment.active
 		};
 		
 		return await Db.put(toStore);

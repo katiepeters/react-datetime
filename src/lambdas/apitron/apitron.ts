@@ -177,7 +177,8 @@ async function setTestData(event) {
 				interval: '1h',
 				symbols: ['BTC/USD', 'ETH/USD']
 			},
-			state: {}
+			state: {},
+			active: true
 		});
 
 		await BotModel.create({

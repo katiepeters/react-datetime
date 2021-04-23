@@ -75,6 +75,7 @@ export interface DBBotDeployment extends TableItem {
 	orders: DeploymentOrders
 	config: DBBotDeploymentConfig
 	state: DBBotDeploymentState
+	active: boolean
 }
 
 export interface DBBotDeploymentRaw extends TableItem {
@@ -83,6 +84,7 @@ export interface DBBotDeploymentRaw extends TableItem {
 	config: DBBotDeploymentConfig
 	orders: string
 	state: string
+	active: boolean
 }
 
 export interface DBBotDeploymentInput {
@@ -92,6 +94,7 @@ export interface DBBotDeploymentInput {
 	config: DBBotDeploymentConfig
 	orders: DeploymentOrders
 	state: DBBotDeploymentState
+	active: boolean
 }
 
 export interface DBBotDeploymentUpdate {
@@ -99,6 +102,7 @@ export interface DBBotDeploymentUpdate {
 	config?: DBBotDeploymentConfig
 	orders?: DeploymentOrders
 	state?: DBBotDeploymentState
+	active?: boolean
 }
 
 export interface OrderInput {

@@ -21,8 +21,8 @@ export interface ContextResult {
 	error?: HandlerError
 }
 
-export interface MutationContextInput {
-	body: any,
+export interface MutationContextInput<T> {
+	body: T,
 	params: any,
 	models: DynamoModels
 }
@@ -53,7 +53,7 @@ export interface ResponseResult {
 }
 
 export interface MutationHandler {
-	getContext( input: MutationContextInput ): Promise<ContextResult>,
+	getContext( input: MutationContextInput<any> ): Promise<ContextResult>,
 	getMutations( input: MutationGetterInput ): Mutation[],
 	getResponse( input: MutationResponseInput ): ResponseResult
 	name?: string
