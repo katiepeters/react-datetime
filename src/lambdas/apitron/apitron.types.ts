@@ -24,6 +24,7 @@ export interface ContextResult {
 export interface MutationContextInput<T> {
 	body: T,
 	params: any,
+	query: any,
 	models: DynamoModels
 }
 
@@ -60,7 +61,8 @@ export interface MutationHandler {
 }
 
 export interface QueryContextInput {
-	params: any
+	params: any,
+	query: any,
 	models: DynamoModels
 }
 
