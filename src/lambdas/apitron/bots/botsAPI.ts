@@ -1,4 +1,5 @@
 import { mutationHandler, queryHandler } from "../utils/RequestHandler"
+import createBotHandler from "./createBot";
 import deleteBotHandler from "./deleteBot";
 import getBotListHandler from "./getBotList"
 import getSingleBotHandler from "./getSingleBot";
@@ -13,6 +14,10 @@ const botsAPI = {
 		app.get('/bots/:botId', function( req, res) {
 			return queryHandler( req, res, getSingleBotHandler );
 		});
+
+		app.post('/bots', function (req,res) {
+			return mutationHandler( req, res, createBotHandler );
+		})
 
 		app.patch('/bots/:botId', function( req, res) {
 			return mutationHandler( req, res, updateBotHandler );

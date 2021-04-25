@@ -13,7 +13,7 @@ const getSingleBotHandler: QueryHandler = {
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const bot = models.bot.getSingle(accountId, botId);
+		const bot = await models.bot.getSingle(accountId, botId);
 		if (!bot) return { error: { code: 'not_found', status: 404 } };
 
 		return { context: { bot } };
