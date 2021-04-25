@@ -39,7 +39,7 @@ const createExchangeAccountHandler: MutationHandler = {
 	getResponse(input: MutationResponseInput): ResponseResult {
 		return {
 			status: 201,
-			data: {}
+			data: {id: input.mutations[0].data.id}
 		};
 	}
 }

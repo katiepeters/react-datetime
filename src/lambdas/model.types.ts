@@ -73,9 +73,11 @@ export interface DBBotDeployment extends TableItem {
 	id: string
 	botId: string
 	orders: DeploymentOrders
-	config: DBBotDeploymentConfig
+	exchangeAccountId: string
+	interval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	symbols: string[]
 	state: DBBotDeploymentState
-	active: boolean
+	active: string
 }
 
 export interface DBBotDeploymentRaw extends TableItem {

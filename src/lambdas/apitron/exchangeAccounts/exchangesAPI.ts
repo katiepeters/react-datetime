@@ -14,11 +14,11 @@ const exchangesAPI = {
 			return queryHandler( req, res, getExchangeAccountListHandler );
 		});
 
-		app.get('/exchangeAccounr/:deploymentId', function(req,res) {
+		app.get('/exchangeAccount/:exchangeAccountId', function(req,res) {
 			return queryHandler( req, res, getSingleExchangeAccountHandler );
 		});
 
-		app.delete('/exchangeAccount/:deploymentId', function(req,res) {
+		app.delete('/exchangeAccount/:exchangeAccountId', function(req,res) {
 			return  mutationHandler( req, res, deleteExchangeAccountHandler );
 		});
 	}

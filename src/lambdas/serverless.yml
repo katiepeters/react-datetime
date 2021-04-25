@@ -91,6 +91,12 @@ resources:
           -
             AttributeName: "resourceId"
             AttributeType: "S"
+          -
+            AttributeName: "active"
+            AttributeType: "S"
+          -
+            AttributeName: "interval"
+            AttributeType: "S"
         KeySchema:
           -
             AttributeName: "accountId"
@@ -98,9 +104,22 @@ resources:
           -
             AttributeName: "resourceId"
             KeyType: "RANGE"
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          -
+            IndexName: ActiveDeployments
+            KeySchema:
+              -
+                AttributeName: "interval"
+                KeyType: "HASH"
+              - AttributeName: "active"
+                KeyType: "RANGE"
+            Projection: 
+              ProjectionType: INCLUDE
+              NonKeyAttributes:
+                - accountId
+                - resourceId
+                
+        BillingMode: PAY_PER_REQUEST
         StreamSpecification:
           StreamViewType: "NEW_IMAGE"
         TableName: ${self:provider.environment.ACCOUNTS_TABLE}
