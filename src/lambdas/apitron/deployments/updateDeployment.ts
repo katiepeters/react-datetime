@@ -38,7 +38,7 @@ const updateDeploymentHandler: MutationHandler = {
 			data: {
 				accountId,
 				deploymentId: input.params.deploymentId,
-				active
+				update: {active}
 			}
 		}];
 	},

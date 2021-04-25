@@ -1,6 +1,16 @@
 import { DbBot, DbBotInput } from '../../model.types';
 import { DBModel } from './db';
 
+interface DeleteBotInput {
+	accountId: string
+	botId: string
+}
+
+interface UpdateBotInput {
+	accountId: string
+	botId: string
+	update: any
+}
 
 const Db = new DBModel<DbBot>();
 
@@ -20,7 +30,11 @@ export default {
 		return await Db.put(bot);
 	},
 
-	async update(accountId: string, botId: string, updateData: any ): Promise<void> {
-		return await Db.update(accountId, `BOT#${botId}`, updateData);
+	async update({accountId, botId, update}: UpdateBotInput ): Promise<void> {
+		return await Db.update(accountId, `BOT#${botId}`, update);
+	},
+
+	async delete({accountId, botId}: DeleteBotInput): Promise<void> {
+		return await Db.del( accountId, `BOT#${botId}` );
 	}
 }

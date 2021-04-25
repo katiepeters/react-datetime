@@ -1,9 +1,7 @@
 import { BotConfiguration } from "../../lambda.types";
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
-
-const uuid = require('uuid/dist/v4').default;
-
+import { v4 as uuid } from 'uuid';
 interface CreateDeploymentInput {
 	accountId: string
 	botId: string

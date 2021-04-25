@@ -28,7 +28,7 @@ const apiClient = {
 	},
 
 	loadSingleBot(accountId: string, botId: string): Promise<AxiosResponse> {
-		return axios.get(`${API_URL}/bots?accountId=${accountId}&botId=${botId}`)
+		return axios.get(`${API_URL}/bots/${botId}?accountId=${accountId}`)
 			.then(res => {
 				console.log(res);
 				return res;
@@ -37,7 +37,7 @@ const apiClient = {
 	},
 
 	updateBot(accountId: string, botId: string, code: string): Promise<AxiosResponse> {
-		return axios.patch(`${API_URL}/bots?accountId=${accountId}&botId=${botId}`, {code})
+		return axios.patch(`${API_URL}/bots/${botId}?accountId=${accountId}`, {code})
 			.then(res => {
 				console.log(res);
 				return res;

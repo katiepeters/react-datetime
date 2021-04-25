@@ -55,7 +55,7 @@ function validateArray(arr: any[], type: string): ShapeValidatorResult {
 
 function validateFinalType( value: any, type: string ){
 	if( type.endsWith('?') ){
-		if( value === undefined ) return true;
+		if( value === undefined ) return {};
 		type = type.slice(0, type.length - 1);
 	}
 
@@ -78,7 +78,9 @@ const validators = {
 	string: value => typeof value === 'string',
 	interval: value => validIntervals[value] === true,
 	symbols: value => validateSymbols(value),
-	boolean: value => typeof value === 'boolean'
+	boolean: value => typeof value === 'boolean',
+	provider: value => value === 'bitfinex',
+	providerType: value => value === 'real' || value === 'virtual'
 }
 
 function validateSymbols( symb ){

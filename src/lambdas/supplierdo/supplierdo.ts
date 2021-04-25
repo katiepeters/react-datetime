@@ -29,7 +29,11 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 
 	// Store any updated order from the last run
 	const orders = mergeOrders( deployment.orders, exchangeOrders );
-	BotDeploymentModel.update(accountId, deployment.id, {orders});
+	BotDeploymentModel.update({
+		accountId: accountId, 
+		deploymentId: deployment.id, 
+		update: {orders}
+	});
 
 	// Run the bot
 	const botInput: BotExecutorPayload = {
@@ -61,7 +65,11 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	}
 
 	// Store bot results
-	BotDeploymentModel.update(accountId, deployment.id, {orders, state: result.state});
+	BotDeploymentModel.update({
+		accountId, 
+		deploymentId: deployment.id,
+		update: {orders, state: result.state}
+	});
 }
 interface ExchangeData {
 	portfolio: Portfolio

@@ -1,4 +1,4 @@
- import AccountModel from '../_common/dynamo/AccountModel';
+import AccountModel from '../_common/dynamo/AccountModel';
 import ExchangeAccountModel from '../_common/dynamo/ExchangeAccountModel';
 import BotDeploymentModel from '../_common/dynamo/BotDeploymentModel';
 import BotModel from '../_common/dynamo/BotModel';
@@ -7,6 +7,8 @@ import BitfinexAdapter from '../_common/exchanges/adapters/BitfinexAdapter';
 import exchangeUtils from '../_common/exchanges/exchangeUtils';
 import deploymentAPI from './deployments/deploymentsAPI';
 import allModels from '../_common/dynamo/allModels';
+import exchangesAPI from './exchangeAccounts/exchangesAPI';
+import botsAPI from './bots/botsAPI';
 
 const fs = require('fs');
 const path = require('path');
@@ -26,62 +28,9 @@ app.get('/accounts/:id', function(req, res){
 	res.send('/account/:id not implemented yet');
 });
 
-app.get('/bots', function (req, res) {
-	const { accountId, botId } = req.query;
-
-	setTestData({accountId: 'testAccount'});
-
-	if( !accountId ){
-		return res
-			.status(400)
-			.json({ error: 'invalid_payload', message: 'accountId not provided'})
-		;
-	}
-
-	if( botId ){
-		return BotModel.getSingle(accountId, botId).then( bot => {
-			if( !bot ){
-				return res.status(404)
-					.json({error: 'not_found'})
-				;
-			}
-			
-			return res.json(bot);
-		});
-	}
-
-	BotModel.getAccountBots(accountId)
-		.then( bots => {
-			res.json(bots);
-		})
-	;
-});
-
-app.patch('/bots', function(req, res) {
-	const { accountId, botId } = req.query;
-	if (!accountId) return returnMissingAttr(res, 'accountId');
-	if (!botId) return returnMissingAttr(res, 'botId');
-	
-	const {code} = req.body;
-	if (!code) return returnMissingAttr(res, 'code');
-
-	console.log('Patching bot!')
-	BotModel.update(accountId, botId, {code})
-		.then( () => {
-			res.status(204).end();
-		})
-	;
-});
-
-deploymentAPI.initialize(app, allModels);
-
-app.get('/deployments', function (req, res) {
-	res.send('/deployments not implemented yet');
-});
-
-app.get('/exchanges', function (req, res) {
-	res.send('/exchanges not implemented yet');
-});
+botsAPI.initialize(app);
+deploymentAPI.initialize(app);
+exchangesAPI.initialize(app);
 
 app.post('/runnow', function(req, res) {
 	const { accountId, deploymentId } = req.body;
@@ -192,6 +141,8 @@ async function setTestData(event) {
 		console.log('Test data was already there');
 	}
 }
+
+setTestData({accountId: 'testAccount'});
 
 
 function returnMissingAttr( res, attrName ){

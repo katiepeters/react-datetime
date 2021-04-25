@@ -6,7 +6,7 @@ import getSingleDeploymentHandler from "./getSingleDeployment";
 import updateDeploymentHandler from "./updateDeployment";
 
 const deploymentAPI = {
-	initialize( app: any, models: any ){
+	initialize( app: any ){
 		app.get('/deployments', function( req, res ) {
 			return queryHandler( req, res, getDeploymentListHandler );
 		});

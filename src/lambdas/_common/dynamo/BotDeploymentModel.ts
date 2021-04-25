@@ -3,6 +3,17 @@ import { DBModel } from './db';
 
 const Db = new DBModel<DBBotDeploymentRaw>();
 
+interface DeleteDeploymentInput {
+	accountId: string
+	deploymentId: string
+}
+
+interface UpdateDeploymentInput {
+	accountId: string
+	deploymentId: string
+	update: DBBotDeploymentUpdate
+}
+
 export default {
 	async getAccountDeployments( accountId: string ): Promise<SimpleBotDeployment[]> {
 		let deployments = await Db.getMultiple(accountId, 'DEPLOYMENT#');
@@ -41,8 +52,7 @@ export default {
 		return await Db.put(toStore);
 	},
 
-	async update(accountId: string, deploymentId: string, update: DBBotDeploymentUpdate ){
-
+	async update({ accountId, deploymentId, update }: UpdateDeploymentInput ){
 		let rawUpdate:any = {...update};
 		if( rawUpdate.state ){
 			rawUpdate.state = JSON.stringify(rawUpdate.state);
@@ -51,5 +61,9 @@ export default {
 			rawUpdate.orders = JSON.stringify(rawUpdate.orders);
 		}
 		return await Db.update(accountId, `DEPLOYMENT#${deploymentId}`, rawUpdate);
+	},
+
+	async delete({accountId, deploymentId}: DeleteDeploymentInput) {
+		return await Db.del(accountId, `DEPLOYMENT#${deploymentId}`);
 	}
 }

@@ -42,6 +42,7 @@ async function mutationController( req, handler: MutationHandler){
 	const {context = {}, error} = await handler.getContext({
 		body: req.body,
 		params: req.params,
+		query: req.query,
 		models: allModels
 	});
 
@@ -68,7 +69,8 @@ async function mutationController( req, handler: MutationHandler){
 
 function queryController( req, handler: QueryHandler ){
 	const input = {
-		params: req.query,
+		params: req.params,
+		query: req.query,
 		models: allModels
 	};
 
