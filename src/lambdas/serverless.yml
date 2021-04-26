@@ -95,7 +95,7 @@ resources:
             AttributeName: "active"
             AttributeType: "S"
           -
-            AttributeName: "interval"
+            AttributeName: "runInterval"
             AttributeType: "S"
         KeySchema:
           -
@@ -109,7 +109,7 @@ resources:
             IndexName: ActiveDeployments
             KeySchema:
               -
-                AttributeName: "interval"
+                AttributeName: "runInterval"
                 KeyType: "HASH"
               - AttributeName: "active"
                 KeyType: "RANGE"

@@ -1,4 +1,4 @@
-const intervalTime = {
+const runIntervalTime = {
 	'5m': 5 * 60 * 1000,
 	'10m': 10 * 60 * 1000,
 	'30m': 30 * 60 * 1000,
@@ -7,9 +7,9 @@ const intervalTime = {
 	'1d': 24 * 60 * 60 * 1000
 };
 const exchangeUtils = {
-	intervalTime,
-	getLastCandleAt(interval: string, ts: number) {
-		let rest = ts % intervalTime[interval];
+	runIntervalTime,
+	getLastCandleAt(runInterval: string, ts: number) {
+		let rest = ts % runIntervalTime[runInterval];
 		return ts - rest;
 	}
 }

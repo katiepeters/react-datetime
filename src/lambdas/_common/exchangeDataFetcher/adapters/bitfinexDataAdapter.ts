@@ -14,7 +14,7 @@ const dataAdapter: DataFetcher = {
 			return candles;
 		}
 		const exchangeSegment = getExchangeSegment(input.market);
-		const pathParams = `candles/trade:${input.interval}:${exchangeSegment}/hist`;
+		const pathParams = `candles/trade:${input.runInterval}:${exchangeSegment}/hist`;
 		const queryParams = `limit=${input.candleCount}&end=${input.lastCandleAt}`;
 		
 		console.log(`Request ${baseUrl}/${pathParams}?${queryParams}`);
@@ -29,7 +29,7 @@ const dataAdapter: DataFetcher = {
 }
 
 function getKey( input: DataFetcherInput ): string {
-	return `${input.market}:${input.interval}:${input.lastCandleAt}:${input.candleCount}`;
+	return `${input.market}:${input.runInterval}:${input.lastCandleAt}:${input.candleCount}`;
 }
 
 

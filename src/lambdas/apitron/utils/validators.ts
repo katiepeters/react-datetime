@@ -76,7 +76,7 @@ const validIntervals = {
 
 const validators = {
 	string: value => typeof value === 'string',
-	interval: value => validIntervals[value] === true,
+	runInterval: value => validIntervals[value] === true,
 	symbols: value => validateSymbols(value),
 	boolean: value => typeof value === 'boolean',
 	provider: value => value === 'bitfinex',

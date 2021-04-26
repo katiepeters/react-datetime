@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 
 export interface CandleOptions {
 	symbol: string
-	interval: string
+	runInterval: string
 	startDate: number
 	endDate: number
 }
@@ -54,8 +54,8 @@ const apiClient = {
 		;
 	},
 
-	loadCandles( {symbol, interval, startDate, endDate}: CandleOptions): Promise<AxiosResponse>{
-		let query = `symbol=${symbol}&interval=${interval}&startDate=${startDate}&endDate=${endDate}`;
+	loadCandles( {symbol, runInterval, startDate, endDate}: CandleOptions): Promise<AxiosResponse>{
+		let query = `symbol=${symbol}&runInterval=${runInterval}&startDate=${startDate}&endDate=${endDate}`;
 		return axios.get(`${API_URL}/candles?${query}`)
 			.then(res => {
 				console.log(res);

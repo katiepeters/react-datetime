@@ -2,7 +2,7 @@ import { ArrayCandle, OrderInput, Portfolio } from "../../lambda.types";
 
 export interface CandleQuery {
 	market: string
-	interval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	lastCandleAt: number
 	candleCount: number
 }

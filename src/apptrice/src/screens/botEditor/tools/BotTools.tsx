@@ -11,7 +11,7 @@ interface BootToolsProps {
 export interface BacktestConfig {
 	baseAssets: string[],
 	quotedAsset: string,
-	interval: string
+	runInterval: string
 	initialBalances: {[asset: string]: number}
 	startDate: number
 	endDate: number
@@ -25,7 +25,7 @@ export default class BootTools extends React.Component<BootToolsProps> {
 	state = {
 		baseAssets: 'BTC,ETH',
 		quotedAsset: 'USD',
-		interval: '1h',
+		runInterval: '1h',
 		initialBalances: {
 			USD: 1000
 		},
@@ -75,10 +75,10 @@ export default class BootTools extends React.Component<BootToolsProps> {
 							onChange={e => this.setState({ quotedAsset: e.target.value })} />
 					</InputGroup>
 				</div>
-				<InputGroup name="interval" label="Execution interval">
-					<select name="interval"
-						value={this.state.interval}
-						onChange={e => this.setState({ interval: e.target.value })}>
+				<InputGroup name="runInterval" label="Execution runInterval">
+					<select name="runInterval"
+						value={this.state.runInterval}
+						onChange={e => this.setState({ runInterval: e.target.value })}>
 						<option>5m</option>
 						<option>10m</option>
 						<option>30m</option>
@@ -98,7 +98,7 @@ export default class BootTools extends React.Component<BootToolsProps> {
 					Testing time frame
 				</div>
 				<div style={styles.field}>
-					<InputGroup name="interval" label="Data from">
+					<InputGroup name="runInterval" label="Data from">
 						<select value={ this.state.testingTimeframe } onChange={ this._changeTimeframe }>
 							<option value="1">Last day</option>
 							<option value="3">Last 3 days</option>
@@ -248,7 +248,7 @@ export default class BootTools extends React.Component<BootToolsProps> {
 
 	getConfig(): BacktestConfig {
 		let { 
-			quotedAsset, interval, initialBalances,
+			quotedAsset, runInterval, initialBalances,
 			startDate, endDate, fees, slippage
 		} = this.state;
 
@@ -258,7 +258,7 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		return {
 			baseAssets: this.getSymbols().slice(1),
 			quotedAsset,
-			interval,
+			runInterval,
 			initialBalances,
 			startDate: start.getTime(),
 			endDate: end.getTime(),

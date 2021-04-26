@@ -66,8 +66,8 @@ const apiCacher = {
 
 	getCandles( options: CandleOptions ) {
 		return apiClient.loadCandles(options).then( res => {
-			let {symbol, interval, startDate, endDate} = options;
-			let key = `${symbol}:${interval}:${startDate}:${endDate}`;
+			let {symbol, runInterval, startDate, endDate} = options;
+			let key = `${symbol}:${runInterval}:${startDate}:${endDate}`;
 			store.candles[key] = res.data;
 			return res;
 		})

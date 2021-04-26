@@ -9,6 +9,7 @@
     "offline": "serverless offline",
     "debug": "node --inspect node_modules/serverless/bin/serverless offline --config serverless.yml",
     "invoke": "aws lambda invoke /dev/null --endpoint-url http://localhost:3002 --function-name awstrader-dev-hello --payload '{\"isTest\": true, \"accountId\":\"testAccount\", \"deploymentId\":\"testDeployment\"}' --cli-binary-format raw-in-base64-out",
+    "schedulator": "aws lambda invoke /dev/null --endpoint-url http://localhost:3032 --function-name awstrader-dev-schedulator",
     "dynamo:browse": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin"
   },
   "author": "",

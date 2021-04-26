@@ -8,7 +8,7 @@ import {createBot} from './botWorker';
 export async function runBacktest( botSource: string, options: BacktestConfig, store: any ){
 	const symbols = getSymbols( options.baseAssets, options.quotedAsset );
 	const [candles, botWorkerSource] = await Promise.all([
-		getBTCandles(symbols, options.interval, options.startDate, options.endDate),
+		getBTCandles(symbols, options.runInterval, options.startDate, options.endDate),
 		getWorkerSource()
 	]);
 
@@ -45,7 +45,7 @@ export async function runBacktest( botSource: string, options: BacktestConfig, s
 			candles: iterationCandles,
 			config: {
 				symbols,
-				interval: options.interval,
+				runInterval: options.runInterval,
 				exchange: 'bitfinex'
 			}
 		});
@@ -76,12 +76,12 @@ function getSymbols( baseAssets: string[], quotedAsset: string ): string[] {
 	return baseAssets.map(base => `${base}/${quotedAsset}`);
 }
 
-async function getBTCandles( symbols: string[], interval: string, startDate: number, endDate: number ){
-	let start = add200Candles(startDate, interval);
+async function getBTCandles( symbols: string[], runInterval: string, startDate: number, endDate: number ){
+	let start = add200Candles(startDate, runInterval);
 
 	let promises = symbols.map( symbol => apiCacher.getCandles({
 		symbol,
-		interval,
+		runInterval,
 		startDate: start,
 		endDate
 	}));
@@ -92,7 +92,7 @@ async function getBTCandles( symbols: string[], interval: string, startDate: num
 	return candles;
 }
 
-const intervalTime = {
+const runIntervalTime = {
 	'5m': 5 * 60 * 1000,
 	'10m': 10 * 60 * 1000,
 	'30m': 30 * 60 * 1000,
@@ -100,9 +100,9 @@ const intervalTime = {
 	'4h': 4 * 60 * 60 * 1000,
 	'1d': 24 * 60 * 60 * 1000
 };
-function add200Candles(start: number, interval: string) {
+function add200Candles(start: number, runInterval: string) {
 	// @ts-ignore
-	return start - (intervalTime[interval] * 200);
+	return start - (runIntervalTime[runInterval] * 200);
 }
 
 function getTotalIterations(candles: BotCandles) {

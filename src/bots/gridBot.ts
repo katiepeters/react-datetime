@@ -104,17 +104,17 @@ function getEmptyCurrentSymbols() {
 }
 
 function getVolatilities(candles, {getAmplitude}) {
-	const interval = 5;
+	const runInterval = 5;
 	let volatilities = [];
 
 	for (let symbol in candles) {
-		let sum = candles[symbol].slice(-interval).reduce((acc, candle) => (
+		let sum = candles[symbol].slice(-runInterval).reduce((acc, candle) => (
 			acc + getAmplitude(candle)
 		), 0);
 
 		volatilities.push({
 			symbol,
-			volatility: sum / interval
+			volatility: sum / runInterval
 		});
 	}
 
@@ -140,16 +140,16 @@ function getPriceLevels(price, data, getAmplitude) {
 	}
 
 	let priceIndex = findPriceLevelIndex(levelizedPrice);
-	let interval = getGridInterval(data, getAmplitude);
+	let runInterval = getGridInterval(data, getAmplitude);
 	let buyIndices: number[] = [];
 	while (buyIndices.length < CONCURRENT_BUYS) {
-		if (priceIndex % interval === 0) {
+		if (priceIndex % runInterval === 0) {
 			buyIndices.push(priceIndex);
 		}
 		priceIndex--;
 	}
 
-	return getLevelsByIndices(factor, buyIndices, interval);
+	return getLevelsByIndices(factor, buyIndices, runInterval);
 }
 
 function findPriceLevelIndex(price) {
@@ -175,22 +175,22 @@ function findPriceLevelIndex(price) {
 
 function getGridInterval(data, getAmplitude) {
 	let amplitude = getAmplitude(data) * 100;
-	let interval = Math.round(amplitude / CONCURRENT_BUYS);
-	return Math.min(1, interval);
+	let runInterval = Math.round(amplitude / CONCURRENT_BUYS);
+	return Math.min(1, runInterval);
 }
 
-function getLevelsByIndices(factor, indices, interval) {
+function getLevelsByIndices(factor, indices, runInterval) {
 	let levels = [];
 	for (let i of indices) {
 		levels.push([
-			getLevelByIndex(factor, i, interval),
-			getLevelByIndex(factor, i + interval, interval)
+			getLevelByIndex(factor, i, runInterval),
+			getLevelByIndex(factor, i + runInterval, runInterval)
 		]);
 	}
 	return levels;
 }
 
-function getLevelByIndex(initialFactor, index, interval) {
+function getLevelByIndex(initialFactor, index, runInterval) {
 	let factor = initialFactor;
 	let parsedIndex = index;
 	let levelsLength = baseLevels.length();
@@ -198,12 +198,12 @@ function getLevelByIndex(initialFactor, index, interval) {
 	if (index < 0) {
 		factor *= 10;
 		parsedIndex += levelsLength;
-		parsedIndex -= parsedIndex % interval;
+		parsedIndex -= parsedIndex % runInterval;
 	}
 	if (index > levelsLength - 1) {
 		factor /= 10;
 		parsedIndex -= levelsLength;
-		parsedIndex -= parsedIndex % interval;
+		parsedIndex -= parsedIndex % runInterval;
 	}
 
 	return baseLevels[parsedIndex] / factor;

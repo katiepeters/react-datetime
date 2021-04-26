@@ -19,7 +19,7 @@ const createDeploymentHandler: MutationHandler = {
 			active: 'boolean?',
 			config: {
 				exchangeAccountId: 'string',
-				interval: 'interval',
+				runInterval: 'runInterval',
 				symbols: 'symbols'
 			}
 		});

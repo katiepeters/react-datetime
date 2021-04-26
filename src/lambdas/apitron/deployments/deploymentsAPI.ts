@@ -26,7 +26,6 @@ const deploymentAPI = {
 		app.delete('/deployments/:deploymentId', function(req, res) {
 			return mutationHandler(req, res, deleteDeploymentHandler);
 		});
-
 	}
 }
 

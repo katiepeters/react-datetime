@@ -28,12 +28,12 @@ const BtRunner = {
 export default BtRunner;
 
 
-async function getAllCandles(symbols: string[], interval: string, startDate: number, endDate: number) {
-	let start = add200Candles(startDate, interval);
+async function getAllCandles(symbols: string[], runInterval: string, startDate: number, endDate: number) {
+	let start = add200Candles(startDate, runInterval);
 
 	let promises = symbols.map(symbol => apiCacher.getCandles({
 		symbol,
-		interval,
+		runInterval,
 		startDate: start,
 		endDate
 	}));
@@ -56,11 +56,11 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 	runningBot = bot;
 
 	let symbols = getSymbols(options.baseAssets, options.quotedAsset);
-	let candles = await getAllCandles(symbols, options.interval, options.startDate, options.endDate);
+	let candles = await getAllCandles(symbols, options.runInterval, options.startDate, options.endDate);
 
 	let {state, logs} = await bot.initialize({
 		// @ts-ignore
-		symbols, interval: options.interval, exchange: 'bitfinex'
+		symbols, runInterval: options.runInterval, exchange: 'bitfinex'
 	})
 	
 	updateBtStore({
@@ -77,7 +77,7 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 }
 
 
-const intervalTime = {
+const runIntervalTime = {
 	'5m': 5 * 60 * 1000,
 	'10m': 10 * 60 * 1000,
 	'30m': 30 * 60 * 1000,
@@ -85,9 +85,9 @@ const intervalTime = {
 	'4h': 4 * 60 * 60 * 1000,
 	'1d': 24 * 60 * 60 * 1000
 };
-function add200Candles(start: number, interval: string) {
+function add200Candles(start: number, runInterval: string) {
 	// @ts-ignore
-	return start - (intervalTime[interval] * 200);
+	return start - (runIntervalTime[runInterval] * 200);
 }
 
 async function prepareBot( botSource: string ): Promise<BotWorker|null> {
@@ -167,7 +167,7 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 				candles: iterationCandles,
 				config: {
 					symbols,
-					interval: options.interval,
+					runInterval: options.runInterval,
 					exchange: 'bitfinex'
 				}
 			});

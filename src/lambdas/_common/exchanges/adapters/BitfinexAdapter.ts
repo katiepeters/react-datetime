@@ -40,7 +40,7 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 			return candles;
 		}
 		const exchangeSegment = getSymbol(options.market);
-		const pathParams = `candles/trade:${options.interval}:${exchangeSegment}/hist`;
+		const pathParams = `candles/trade:${options.runInterval}:${exchangeSegment}/hist`;
 		const queryParams = `limit=${options.candleCount}&end=${options.lastCandleAt}`;
 
 		console.log(`Request ${baseUrl}/${pathParams}?${queryParams}`);
@@ -108,7 +108,7 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 }
 
 function getKey(options: CandleQuery): string {
-	return `${options.market}:${options.interval}:${options.lastCandleAt}:${options.candleCount}`;
+	return `${options.market}:${options.runInterval}:${options.lastCandleAt}:${options.candleCount}`;
 }
 
 function getSymbol(market) {

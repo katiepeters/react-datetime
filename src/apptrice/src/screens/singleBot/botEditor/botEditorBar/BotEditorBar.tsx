@@ -157,7 +157,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 		return {
 			baseAssets: ['ETH', 'BTC'],
 			quotedAsset: 'USD',
-			interval: '1h',
+			runInterval: '1h',
 			initialBalances: {
 				USD: 1000
 			}, 

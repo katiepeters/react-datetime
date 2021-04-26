@@ -25,7 +25,7 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	// Get data
 	const {bot, exchangeAccount, deployment} = await getModels(accountId, deploymentId);
 	const exchangeAdapter = getAdapter(accountId, exchangeAccount);
-	const { portfolio, orders: exchangeOrders, candles} = await getExchangeData( exchangeAdapter, deployment );
+	const { portfolio, orders: exchangeOrders, candles } = await getExchangeData( exchangeAdapter, deployment );
 
 	// Store any updated order from the last run
 	const orders = mergeOrders( deployment.orders, exchangeOrders );
@@ -40,9 +40,10 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 		botSource: bot?.code,
 		candles: candles,
 		config: {
-			symbols: deployment.config.symbols,
-			interval: deployment.config.interval,
-			exchange: deployment.config.exchangeType
+			symbols: deployment.symbols,
+			runInterval: deployment.runInterval,
+			exchange: exchangeAccount.provider,
+			exchangeType: exchangeAccount.type
 		},
 		state: deployment.state,
 		orders: orders.items,
@@ -50,7 +51,7 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	}
 
 	const result = await lambdaUtil.invokeExecutor(botInput);
-	const ordersToPlace = filterOrderToPlaceSymbols( result.ordersToPlace, deployment.config.symbols );
+	const ordersToPlace = filterOrderToPlaceSymbols( result.ordersToPlace, deployment.symbols );
 
 	// Update orders
 	await cancelOrders( exchangeAdapter, result.ordersToCancel, orders );
@@ -80,7 +81,7 @@ async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeplo
 	// First get candles (virtual exchanges will refresh its data)
 	const [ portfolio, candles ] = await Promise.all([
 		adapter.getPortfolio(),
-		getCandles( adapter, deployment.config )
+		getCandles( adapter, deployment )
 	]);
 
 	// Then get updated orders (virtual exchanges will use previously fetched candles)
@@ -96,17 +97,17 @@ async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeplo
 	return { portfolio, orders, candles };
 }
 
-async function getCandles( adapter: ExchangeAdapter, config: any ) {
-	let promises = config.symbols.map( (symbol:string) => adapter.getCandles({
+async function getCandles( adapter: ExchangeAdapter, deployment: any ) {
+	let promises = deployment.symbols.map( (symbol:string) => adapter.getCandles({
 		market: symbol,
-		interval: config.interval,
-		lastCandleAt: exchangeUtils.getLastCandleAt(config.interval, Date.now()),
+		runInterval: deployment.runInterval,
+		lastCandleAt: exchangeUtils.getLastCandleAt(deployment.runInterval, Date.now()),
 		candleCount: 200
 	}));
 
 	let results = await Promise.all(promises);
 	let candles = {};
-	config.symbols.forEach( (symbol,i) => candles[symbol] = results[i] );
+	deployment.symbols.forEach( (symbol,i) => candles[symbol] = results[i] );
 	return candles;
 }
 
@@ -183,7 +184,7 @@ async function getModels( accountId: string, deploymentId: string ): Promise<Bot
 
 	const [bot, exchangeAccount] = await Promise.all([
 		BotModel.getSingle(accountId, deployment.botId),
-		ExchangeAccountModel.getSingle(accountId, deployment.config.exchangeAccountId)
+		ExchangeAccountModel.getSingle(accountId, deployment.exchangeAccountId)
 	]);
 
 	if (!bot) {

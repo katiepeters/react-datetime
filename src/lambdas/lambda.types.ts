@@ -20,7 +20,7 @@ export type ExchangeProvider = 'bitfinex' | 'virtual'
 
 export interface BotConfiguration {
 	symbols: string[]
-	interval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	exchange: ExchangeProvider
 	[key: string]: any
 }

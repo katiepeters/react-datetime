@@ -43,7 +43,9 @@ export default {
 			accountId: deployment.accountId,
 			botId: deployment.botId,
 			resourceId: `DEPLOYMENT#${deployment.id}`,
-			config: deployment.config,
+			exchangeAccountId: deployment.exchangeAccountId,
+			runInterval: deployment.runInterval,
+			symbols: deployment.symbols,
 			orders: JSON.stringify(deployment.orders),
 			state: JSON.stringify(deployment.state),
 			active: deployment.active
@@ -65,5 +67,12 @@ export default {
 
 	async delete({accountId, deploymentId}: DeleteDeploymentInput) {
 		return await Db.del(accountId, `DEPLOYMENT#${deploymentId}`);
+	},
+
+	async getActiveDeployments( runInterval: string ) {
+		return await Db.getIndex('ActiveDeployments').getMultiple({
+			pk: {name: 'runInterval', value: runInterval},
+			sk: {name: 'active', value: 'true'}
+		});
 	}
 }

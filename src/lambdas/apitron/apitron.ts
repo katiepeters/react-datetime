@@ -59,14 +59,14 @@ app.post('/runnow', function(req, res) {
 })
 
 app.get('/candles', async function(req,res) {
-	const { symbol, interval, startDate, endDate, exchange = 'bitfinex' } = req.query;
+	const { symbol, runInterval, startDate, endDate, exchange = 'bitfinex' } = req.query;
 	const adapter = new BitfinexAdapter({key: 'candles', secret: 'candles'});
 
-	const lastCandleAt = exchangeUtils.getLastCandleAt(interval, endDate);
-	const candleCount = getCandleCount(startDate, endDate, interval );
+	const lastCandleAt = exchangeUtils.getLastCandleAt(runInterval, endDate);
+	const candleCount = getCandleCount(startDate, endDate, runInterval );
 	const options = {
 		market: symbol,
-		interval,
+		runInterval,
 		candleCount,
 		lastCandleAt
 	};
@@ -80,9 +80,9 @@ app.get('/candles', async function(req,res) {
 
 export const apitron = serverless(app);
 
-function getCandleCount( startDate, endDate, interval ){
+function getCandleCount( startDate, endDate, runInterval ){
 	let length = endDate - startDate;
-	return Math.ceil( length / exchangeUtils.intervalTime[interval] );
+	return Math.ceil( length / exchangeUtils.runIntervalTime[runInterval] );
 }
 
 async function setTestData(event) {
@@ -120,14 +120,11 @@ async function setTestData(event) {
 				foreignIdIndex: {},
 				items: {}
 			},
-			config: {
-				exchangeAccountId: 'virtualExchange',
-				exchangeType: 'bitfinex',
-				interval: '1h',
-				symbols: ['BTC/USD', 'ETH/USD']
-			},
+			exchangeAccountId: 'virtualExchange',
+			runInterval: '1h',
+			symbols: ['BTC/USD', 'ETH/USD'],
 			state: {},
-			active: true
+			active: 'true'
 		});
 
 		await BotModel.create({
