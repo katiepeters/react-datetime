@@ -97,12 +97,11 @@ export interface Orders {
 	[orderId: string]: Order
 }
 
-export abstract class TradeBot {
-	extraConfiguration(): BotConfigurationExtra {
-		return {}
-	}
-	abstract onData(input: BotInput): void
+export interface TradeBot {
+	initializeState?(config: BotConfigurationExtra, state: BotState): void
+	onData(input: BotInput): void
 }
+
 export interface BotExecutorPayload {
 	botSource: string,
 	candles: BotCandles,
@@ -116,5 +115,6 @@ export interface BotExecutorResult {
 	ordersToCancel: string[]
 	ordersToPlace: Order[]
 	state: BotState,
-	logs: ConsoleEntry[]
+	logs: ConsoleEntry[],
+	error?: string
 }

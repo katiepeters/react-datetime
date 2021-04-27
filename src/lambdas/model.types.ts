@@ -99,7 +99,7 @@ export interface DBBotDeploymentInput {
 	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	symbols: string[]
 	orders: DeploymentOrders
-	state: DBBotDeploymentState
+	state?: DBBotDeploymentState
 	active: string
 }
 

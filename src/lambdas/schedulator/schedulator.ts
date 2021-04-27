@@ -14,7 +14,6 @@ export async function schedulator(event) {
 		});
 	});
 
-
 	return {
 		statusCode: 200,
 		body: JSON.stringify(

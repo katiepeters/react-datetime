@@ -51,6 +51,14 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	}
 
 	const result = await lambdaUtil.invokeExecutor(botInput);
+	if( result.error ){
+		// When the bot finishes in an error we probably want to log the error
+		// for the user and then deactivate the deployment
+		console.log('The execution ended in an error', result.error);
+		
+		return;
+	}
+
 	const ordersToPlace = filterOrderToPlaceSymbols( result.ordersToPlace, deployment.symbols );
 
 	// Update orders

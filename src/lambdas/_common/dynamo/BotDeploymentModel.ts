@@ -47,7 +47,7 @@ export default {
 			runInterval: deployment.runInterval,
 			symbols: deployment.symbols,
 			orders: JSON.stringify(deployment.orders),
-			state: JSON.stringify(deployment.state),
+			state: JSON.stringify(deployment.state || { newState: 'stateNew' }),
 			active: deployment.active
 		};
 		

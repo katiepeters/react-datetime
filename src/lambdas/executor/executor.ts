@@ -12,9 +12,14 @@ export async function executor(event: BotExecutorPayload) {
 
 	originalConsole.log('Executor called');
 
-	const Bot = getBot(event.botSource)
-	if( !Bot ){
+	const bot = getBot(event.botSource);
+	if( !bot ){
 		return {error: 'bot_unparseable'};
+	}
+
+	let {state, error} = getBotState( event, bot );
+	if( error ){
+		return {error};
 	}
 
 	const trader = new Trader(
@@ -22,14 +27,29 @@ export async function executor(event: BotExecutorPayload) {
 	);
 	
 	// Pass a state object that can be updated
-	let state = {...event.state};
-	Bot.onData({
-		candles: event.candles,
-		config: event.config,
-		trader,
-		state: state,
-		utils: botUtils
-	});
+	try {
+		bot.onData({
+			candles: event.candles,
+			config: event.config,
+			trader,
+			state: state,
+			utils: botUtils
+		});
+	}
+	catch (err) {
+		if (err.stack) {
+			error = translateStack(err.stack);
+		}
+		else {
+			console.error( error );
+			error = 'unknown_bot_error';
+		}
+	}
+
+	if( error ){
+		console.log('Bot error!', error);
+		return {error};
+	}
 
 	const logs = cons.getEntries();
 	cons.clear();
@@ -43,16 +63,59 @@ export async function executor(event: BotExecutorPayload) {
 
 
 function getBot( botCode: string ): TradeBot | void {
-	let code = `class Bot ${botCode.split(/extends\s+TradeBot/)[1]}; Bot;`;
-	let Bot;
+	let code = `${botCode}; bot = {initializeState: initializeState, onData: onData};`
+	let bot;
 	try {
 		let jsCode = ts.transpile(code);
-		Bot = eval(jsCode);
+		eval(jsCode);
 	}
 	catch( err ) {
 		console.error('Bot code not valid: ', err);
 	}
-	if( Bot ){
-		return new Bot();
+	return bot;
+}
+
+function isNewDeployment(event){
+	return event.state.newState === 'stateNew';
+}
+
+
+function getBotState( event, bot ){
+	let state = { ...event.state };
+	let error;
+	if (isNewDeployment(event)) {
+		state = {};
+		if (bot.initializeState) {
+			try {
+				bot.initializeState(event.config, state);
+			}
+			catch (err) {
+				if (err.stack) {
+					error = { error: translateStack(err.stack) };
+				}
+				else {
+					console.error(err);
+					error = { error: 'unknown_bot_error' };
+				}
+			}
+		}
 	}
+	return {state, error};
+}
+
+function translateStack( stack: string ): string{
+	let parts = stack.split('\n');
+	let botErrorParts = [ parts[0] ];
+	let i = 1;
+	while( i < parts.length ){
+		let translated = parts[i].replace(/eval at getBot \([^)]*\), /, '');
+		if (translated.includes('<anonymous>') ){
+			botErrorParts.push( translated );
+			i++;
+		}
+		else {
+			i = parts.length;
+		}
+	}
+	return botErrorParts.join('\n');
 }
