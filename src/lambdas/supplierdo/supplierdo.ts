@@ -55,7 +55,9 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 		// When the bot finishes in an error we probably want to log the error
 		// for the user and then deactivate the deployment
 		console.log('The execution ended in an error', result.error);
-		
+		await BotDeploymentModel.deactivate({ accountId, deploymentId });
+		// this is just for testing
+		// await BotDeploymentModel.activate({ accountId, deploymentId });
 		return;
 	}
 

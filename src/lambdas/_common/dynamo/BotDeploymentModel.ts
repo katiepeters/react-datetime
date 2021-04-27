@@ -22,7 +22,7 @@ export default {
 			accountId,
 			config: d.config,
 			botId: d.botId,
-			active: d.active || false
+			active: d.active === 'true' ? true : false
 		}));
 	},
 
@@ -32,6 +32,7 @@ export default {
 
 		return {
 			...entry,
+			active: entry.active ? true : false,
 			orders: JSON.parse(entry.orders),
 			state: JSON.parse(entry.state)
 		};
@@ -74,5 +75,13 @@ export default {
 			pk: {name: 'runInterval', value: runInterval},
 			sk: {name: 'active', value: 'true'}
 		});
-	}
+	},
+
+	async deactivate({ accountId, deploymentId }: DeleteDeploymentInput ) {
+		return await Db.removeAttributes(accountId, `DEPLOYMENT#${deploymentId}`, ['active']);
+	},
+
+	async activate({ accountId, deploymentId }: DeleteDeploymentInput) {
+		return await Db.update(accountId, `DEPLOYMENT#${deploymentId}`, {active: 'true'});
+	},
 }

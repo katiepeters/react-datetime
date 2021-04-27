@@ -67,6 +67,7 @@ export interface SimpleBotDeployment {
 	accountId: string
 	botId: string
 	config: string
+	active: boolean
 }
 
 export interface DBBotDeployment extends TableItem {
@@ -77,7 +78,7 @@ export interface DBBotDeployment extends TableItem {
 	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	symbols: string[]
 	state: DBBotDeploymentState
-	active: string
+	active: boolean
 }
 
 export interface DBBotDeploymentRaw extends TableItem {
@@ -88,7 +89,7 @@ export interface DBBotDeploymentRaw extends TableItem {
 	symbols: string[]
 	orders: string
 	state: string
-	active:string
+	active: boolean
 }
 
 export interface DBBotDeploymentInput {
@@ -100,7 +101,7 @@ export interface DBBotDeploymentInput {
 	symbols: string[]
 	orders: DeploymentOrders
 	state?: DBBotDeploymentState
-	active: string
+	active: boolean
 }
 
 export interface DBBotDeploymentUpdate {
@@ -109,7 +110,6 @@ export interface DBBotDeploymentUpdate {
 	symbols?: string[]
 	orders?: DeploymentOrders
 	state?: DBBotDeploymentState
-	active?: string
 }
 
 export interface OrderInput {

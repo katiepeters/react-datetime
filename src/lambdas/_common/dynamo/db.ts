@@ -51,6 +51,19 @@ export class DBModel<T> {
 		}).promise();
 	}
 
+	async removeAttributes(accountId: string, resourceId: string, attributes: string[]): Promise<void> {
+		let AttributeUpdates = {};
+		attributes.forEach( key => {
+			AttributeUpdates[key] = { Action: 'DELETE' };
+		});
+		
+		await dynamoDb.update({
+			TableName: process.env.ACCOUNTS_TABLE,
+			Key: { accountId, resourceId },
+			AttributeUpdates
+		}).promise();
+	}
+
 	async del( accountId: string, resourceId:string ): Promise<void> {
 		await dynamoDb.delete({
 			TableName: process.env.ACCOUNTS_TABLE,

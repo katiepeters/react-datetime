@@ -123,8 +123,8 @@ async function setTestData(event) {
 			exchangeAccountId: 'virtualExchange',
 			runInterval: '1h',
 			symbols: ['BTC/USD', 'ETH/USD'],
-			state: {},
-			active: 'true'
+			state: {newState: 'stateNew'},
+			active: true
 		});
 
 		await BotModel.create({
