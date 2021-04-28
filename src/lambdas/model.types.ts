@@ -89,7 +89,7 @@ export interface DBBotDeploymentRaw extends TableItem {
 	symbols: string[]
 	orders: string
 	state: string
-	active: boolean
+	active?: string
 }
 
 export interface DBBotDeploymentInput {

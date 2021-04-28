@@ -21,7 +21,7 @@ export default class BotEditorConsolePanel extends React.Component<BotEditorCons
 		return (
 			<div className={styles.container}>
 				<div className={styles.content}>
-					{ logs.length ? logs.map( this._renderLogLine ) : 'No logs yet'}
+					{ logs.length ? this.renderLogs(logs) : 'No logs yet'}
 				</div>
 			</div>
 		);
@@ -37,9 +37,19 @@ export default class BotEditorConsolePanel extends React.Component<BotEditorCons
 		);
 	}
 
+	renderLogs(logs: ConsoleEntry[]) {
+		return (
+			<table>
+				<tbody>
+					{logs.map(this._renderLogLine)}
+				</tbody>
+			</table>
+		);
+	}
+
 	_renderLogLine = (log: ConsoleEntry) => {
 		return (
-			<tr key={log.date} className={styles.line}>
+			<tr key={log.id + log.date} className={styles.line}>
 				<td className={mergeStyles(styles.date, styles[log.type])}>{ this.formatDate(log.date) }</td>
 				<td>{ log.message }</td> 
 			</tr>

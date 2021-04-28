@@ -7,6 +7,7 @@ export interface RunConsole {
 }
 
 export interface ConsoleEntry {
+	id: number,
 	date: number,
 	type: 'error' | 'warn' | 'log',
 	message: string
@@ -43,6 +44,7 @@ export default cons;
 
 function addEntry( type: string, messages: any[] ){
 	entries.push({
+		id: Math.round(Math.random() * 1000),
 		date: Date.now(),
 		type: 'log',
 		message: messages.map( m => stringify(m) ).join(' ')

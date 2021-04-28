@@ -39,7 +39,7 @@ export default {
 	},
 
 	async create( deployment: DBBotDeploymentInput ){
-		let toStore = {
+		let toStore: DBBotDeploymentRaw = {
 			id: deployment.id,
 			accountId: deployment.accountId,
 			botId: deployment.botId,
@@ -48,9 +48,12 @@ export default {
 			runInterval: deployment.runInterval,
 			symbols: deployment.symbols,
 			orders: JSON.stringify(deployment.orders),
-			state: JSON.stringify(deployment.state || { newState: 'stateNew' }),
-			active: deployment.active
+			state: JSON.stringify(deployment.state || { newState: 'stateNew' })
 		};
+
+		if( deployment.active ){
+			toStore.active = 'true';
+		}
 		
 		return await Db.put(toStore);
 	},

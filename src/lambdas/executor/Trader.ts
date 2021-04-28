@@ -57,8 +57,10 @@ export default class Trader {
 	}
 
 	getPortfolioValue(){
-		let total = 0;
 		let quotedAsset = symbols.getQuoted(Object.keys(this.prices)[0]);
+		let quotedBalance = this.getBalance(quotedAsset);
+
+		let total = quotedBalance.total;
 		Object.keys( this.prices ).forEach( symbol => {
 			let asset = symbols.getBase( symbol );
 			let balance = this.getBalance(asset);

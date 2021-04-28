@@ -31,6 +31,7 @@ export default {
 	},
 
 	async update({accountId, botId, update}: UpdateBotInput ): Promise<void> {
+		console.log( {accountId, botId, update });
 		return await Db.update(accountId, `BOT#${botId}`, update);
 	},
 

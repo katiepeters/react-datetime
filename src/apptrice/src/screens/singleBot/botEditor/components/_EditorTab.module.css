@@ -4,8 +4,8 @@
 	background: transparent;
 	border: 0;
 	cursor: pointer;
-	border-top: 5px solid transparent;
-	border-bottom: 5px solid transparent;
+	border-top: 2px solid transparent;
+	border-bottom: 2px solid transparent;
 	text-align: center;
 }
 
@@ -17,4 +17,6 @@
 
 .active {
 	border-bottom-color: #011627;
+	background-color: #ffffff11;
+	color: #eee;
 }

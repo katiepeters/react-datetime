@@ -23,11 +23,12 @@ const updateBotHandler: MutationHandler = {
 		const bot = await models.bot.getSingle(accountId, botId);
 		if( !bot ) return {error: {code: 'not_found', status: 404}};
 
-		return {context: {}};
+		return {context: {accountId, botId}};
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {
 		const update:any = {};
+		const {accountId, botId} = input.context;
 		if( input.body.code ){
 			update.code = input.body.code;
 		}
@@ -37,7 +38,9 @@ const updateBotHandler: MutationHandler = {
 		return [{
 			model: 'bot',
 			action: 'update',
-			data: update
+			data: {
+				accountId, botId, update
+			}
 		}];
 	},
 
