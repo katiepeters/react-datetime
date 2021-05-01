@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ScreenProps } from '../../../types'
-import TradingChart from '../../backtesting/btCharts/CanvasChart'
+import TradingChart from '../../backtesting/btCharts/TradingChart'
 
 export default class BotDetailsScreen extends React.Component<ScreenProps> {
 	render() {

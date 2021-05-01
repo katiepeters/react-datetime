@@ -2,23 +2,17 @@ import * as React from 'react';
 import OrderSeries from './OrderSeries';
 import memoize from 'memoize-one';
 import { ArrayCandle, BotCandles, Orders } from '../../../../../lambdas/lambda.types';
-import { Order } from '../../../../../lambdas/model.types';
-import { ExchangeOrder } from '../../../../../lambdas/_common/exchanges/ExchangeAdapter';
 
 const { scaleTime } = require('d3-scale');
 const { utcHour } = require('d3-time');
 const { format } = require('d3-format');
-const { timeFormat } = require('d3-time-format');
 
 const { ChartCanvas, Chart } = require('react-stockcharts');
-const { CandlestickSeries, BarSeries, ScatterSeries, LineSeries, SquareMarker, CircleMarker} = require('react-stockcharts/lib/series');
+const { CandlestickSeries, BarSeries, ScatterSeries, LineSeries, CircleMarker} = require('react-stockcharts/lib/series');
 const { XAxis, YAxis } = require('react-stockcharts/lib/axes');
 const { fitWidth } = require('react-stockcharts/lib/helper');
 const { last, timeIntervalBarWidth } = require("react-stockcharts/lib/utils");
 const { CrossHairCursor } = require('react-stockcharts/lib/coordinates');
-
-
-const { LabelAnnotation, Label, Annotate } = require('react-stockcharts/lib/annotation');
 
 const rawCandles = require('./candlesData.json');
 const rawOrders = require('./orders.json');
@@ -101,7 +95,7 @@ rawCandles.forEach( (c:any) => {
 });
 
 
-interface CanvasChartProps {
+interface TradingChartProps {
 	width: number,
 	height: number,
 	ratio: number,
@@ -111,7 +105,7 @@ interface CanvasChartProps {
 }
 
 let chartIndex = 0;
-class CanvasChart extends React.PureComponent<CanvasChartProps> {
+class TradingChart extends React.PureComponent<TradingChartProps> {
 	chart?: any
 	id: string = `chart${chartIndex++}`
 
@@ -146,14 +140,16 @@ class CanvasChart extends React.PureComponent<CanvasChartProps> {
 
 
 				<Chart id={1} yExtents={(d:any) => [d.high, d.low]}>
-					<XAxis axisAt="bottom" orient="bottom" ticks={6} />
-					<YAxis axisAt="right" orient="right" ticks={5} />
-					<CandlestickSeries width={timeIntervalBarWidth(utcHour)} />
+					<XAxis axisAt="bottom" orient="bottom" ticks={6} fill="#ffffff" strokeOpacity={1} stroke="#ffffff" tickStroke="#ffffff" />
+					<YAxis axisAt="right" orient="right" ticks={5} fill="#ffffff" strokeOpacity={1} stroke="#ffffff" tickStroke="#ffffff" />
+					<CandlestickSeries
+						width={timeIntervalBarWidth(utcHour)}
+						{...candleStyles }/>
 				</Chart>
 				<Chart id={2}
 					origin={(w:number, h:number) => [0, h - 100]}
 					height={100} yExtents={volumeAccessor}>
-						<YAxis axisAt="left" orient="left" ticks={3} tickFormat={format(".2s")} />
+					<YAxis axisAt="left" orient="left" ticks={3} tickFormat={format(".2s")} stroke="#ffffff" tickStroke="#ffffff" />
 						<BarSeries yAccessor={volumeAccessor}
 							fill={(d:any) => d.close > d.open ? "#6BA583" : "red"} />
 				</Chart>
@@ -162,7 +158,7 @@ class CanvasChart extends React.PureComponent<CanvasChartProps> {
 					<OrderSeries orders={orders} />
 				</Chart>
 
-				<CrossHairCursor strokeDasharray="LongDashDot" />
+				<CrossHairCursor stroke="rgba(255,255,255,.5)" strokeDasharray="LongDashDot" />
 			</ChartCanvas>
 		);
 	}
@@ -244,5 +240,15 @@ const memoizeCandles = memoize( (proxyCandles: any) => {
 	});
 });
 
-const TradingChart = fitWidth(CanvasChart);
-export default TradingChart;
+const TradingChartWidth = fitWidth(TradingChart);
+export default TradingChartWidth;
+
+
+function strokeColor(d: any) {
+	return d.close < d.open ? "#f00" : "#0f0";
+}
+
+const candleStyles = {
+	wickStroke: strokeColor,
+	stroke: strokeColor
+}

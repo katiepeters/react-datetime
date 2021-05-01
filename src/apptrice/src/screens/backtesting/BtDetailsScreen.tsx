@@ -1,22 +1,21 @@
 import * as React from 'react'
 import { ScreenProps } from '../../types'
-import TradingChart from './btCharts/CanvasChart'
+import TradingChart from './btCharts/TradingChart'
 
 export default class BtDetailsScreen extends React.Component<ScreenProps> {
 	render() {
-		let {currentBackTesting} = this.props.store;
-		if( !currentBackTesting ) {
-			return <div>Please run backtesting</div>;
-		}
-		let {orders, candles} = currentBackTesting;
-		if( !candles ){
+		let {store, quickStore} = this.props;
+
+		if ( !store.currentBackTesting?.candles ) {
 			return <div>Please run backtesting</div>;
 		}
 
 		return (
 			<div style={{width: '100%'}}>
-				<TradingChart orders={orders} candles={candles} />
+				<TradingChart 
+					orders={ quickStore.getOrders() }
+					candles={store.currentBackTesting?.candles} />
 			</div>
-		)
+		);
 	}
 }

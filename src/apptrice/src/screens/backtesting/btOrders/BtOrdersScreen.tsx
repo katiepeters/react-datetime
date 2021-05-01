@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { DynamicList } from '../../../components';
 import { ScreenProps } from '../../../types';
 import BtOrderItem from './BtOrderItem';
 
@@ -9,15 +10,14 @@ export default class BtOrdersScreen extends React.Component<ScreenProps> {
 			return this.renderNoSelected();
 		}
 
-		let orders = Object.keys(currentBackTesting.orders);
+		let orders = Object.keys(this.props.quickStore.getOrders());
 		return (
 			<div style={styles.wrapper}>
 				<h3>{orders.length} orders</h3>
-				<table>
-					<tbody>
-						{orders.map(this._renderOrder)}
-					</tbody>
-				</table>
+				<DynamicList
+					items={ orders }
+					defaultSize={47}
+					renderItem={ this._renderOrder } />
 			</div>
 		);
 	}
@@ -32,7 +32,7 @@ export default class BtOrdersScreen extends React.Component<ScreenProps> {
 		return (
 			<BtOrderItem
 				key={id}
-				order={this.props.store.currentBackTesting.orders[id]} />
+				order={this.props.quickStore.getOrders()[id]} />
 		);
 	}
 }

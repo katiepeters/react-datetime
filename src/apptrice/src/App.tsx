@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { MenuLinkList, SidebarLayout } from './components';
+import quickStore from './state/quickStore';
 import router from './state/router';
 import store from './state/store';
 
@@ -10,6 +11,7 @@ class App extends React.Component {
     return (
       <SidebarLayout sidebar={ this.renderMenu() } >
         <CurrentScreen
+          quickStore={quickStore}
           store={store}
           router={router} />
       </SidebarLayout>
@@ -52,6 +54,7 @@ class App extends React.Component {
     const refresh = () => this.forceUpdate();
 
     store.addChangeListener( refresh );
+    quickStore.addChangeListener( refresh );
     router.onChange( refresh );
   }
 }

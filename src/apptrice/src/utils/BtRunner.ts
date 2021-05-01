@@ -6,6 +6,7 @@ import { BacktestConfig } from "../screens/botEditor/tools/BotTools";
 import apiCacher from "../state/apiCacher";
 import store from "../state/store"
 import {v4 as uuid} from 'uuid';
+import quickStore from "../state/quickStore";
 
 let runningBot: BotWorker;
 const BtRunner = {
@@ -149,6 +150,10 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 	let openOrderIds: string[] = [];
 	let iteration = 0;
 
+	// Orders and logs live in the quickstore for performance
+	quickStore.setOrders({});
+	quickStore.setLogs([]);
+
 	while (isRunning() && iteration < totalIterations) {
 		console.log(`Iteration ${iteration} out of ${totalIterations}`);
 		let iterationCandles = getIterationCandles(candles, iteration);
@@ -191,13 +196,14 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 		openOrderIds = adapter.openOrders;
 
 		iteration++;
+
+		quickStore.setOrders(orders);
+		quickStore.appendLogs(results.logs);
 		
 		updateBtStore({
 			iteration,
-			orders,
 			balances: [...store.currentBackTesting.balances, {...portfolio}],
-			candles: getGraphCandles(candles),
-			logs: [ ...store.currentBackTesting.logs, ...results.logs]
+			candles: getGraphCandles(candles)
 		});
 
 		console.log(Object.keys(orders).length);

@@ -1,12 +1,12 @@
 import * as React from 'react'
-const { nest: d3Nest } = require("d3-collection");
+import { Order } from '../../../../../lambdas/lambda.types';
+import BuyMarker from './markers/BuyMarker';
+import ErrorMarker from './markers/ErrorMarker';
+import SellMarker from './markers/SellMarker';
 
 const GenericChartComponent = require('react-stockcharts/lib/GenericChartComponent').default;
 const { getAxisCanvas } = require('react-stockcharts/lib/GenericComponent');
-const {hexToRGBA, functor} = require('react-stockcharts/lib/utils');
-const {CircleMarker, TriangleMarker, SquareMarker} = require('react-stockcharts/lib/series');
-const { last, timeIntervalBarWidth } = require("react-stockcharts/lib/utils");
-const { utcHour } = require('d3-time');
+const {CircleMarker, SquareMarker} = require('react-stockcharts/lib/series');
 
 interface OrderSeriesProps {
 	orders: any
@@ -17,30 +17,10 @@ export default class OrderSeries extends React.Component<OrderSeriesProps> {
 		const { xScale, chartConfig: { yScale }} = moreProps;
 		const { orders } = this.props;
 
-		const markerStyles = {
-			stroke: "9999ff",
-			strokeWidth: 1,
-			opacity: 0.5,
-			fill: "#ccccff",
-			r: 4
-		};
-
 		orders.forEach((order: any) => {
-			const point = {
-				x: xScale(order.closedAt),
-				y: yScale(order.executedPrice || order.price)
-			}
-
-			const {Marker, props} = getMarker( order );
-
-			const styles = {
-				opacity: .5,
-				strokeWidth: 1,
-				...props
-			}
-
-			console.log('Drawing order!!', point);
-			Marker.drawOnCanvas(styles, point, ctx);
+			renderOpening( ctx, xScale, yScale, order );
+			renderLine( ctx, xScale, yScale, order );
+			renderClosing( ctx, xScale, yScale, order );
 		});
 	}
 
@@ -58,38 +38,77 @@ export default class OrderSeries extends React.Component<OrderSeriesProps> {
 	}
 }
 
-function getMarker( order: any){
-	let color = getColor( order.status, order.direction );
+function renderOpening( ctx: any, xScale: any, yScale: any, order: Order ){
+	if( order.closedAt === order.placedAt ) return;
 
+	const color = getColor(order.status, order.direction);
+	const point = {
+		x: xScale(order.placedAt),
+		y: yScale(order.price)
+	}
+
+	const styles = {
+			stroke: color,
+			fill: color,
+			r: 2,
+			opacity: .5,
+			strokeWidth: 1,
+	}
+
+	CircleMarker.drawOnCanvas( styles, point, ctx );
+}
+
+function renderLine( ctx: any, xScale: any, yScale: any, order: Order ){
+	if( order.closedAt === order.placedAt ) return;
+
+	const color = getColor(order.status, order.direction);
+	ctx.strokeStyle = color;
+	ctx.lineWidth = 1;
+	ctx.setLineDash([1, 2]);
+	const p1 = {
+		x: xScale(order.placedAt),
+		y: yScale(order.price),
+	};
+	const p2 = {
+		x: xScale(order.closedAt),
+		y: yScale(order.price),
+	};
+
+	ctx.beginPath();
+	ctx.moveTo(p1.x, p1.y);
+	ctx.lineTo(p2.x, p2.y);
+	ctx.stroke();
+}
+
+function renderClosing( ctx: any, xScale: any, yScale: any, order: Order ){
+	const Marker = getMarker(order);
+	const color = getColor(order.status, order.direction);
+	const styles = {
+		stroke: color,
+		fill: color,
+		width: 8,
+		opacity: .5,
+		strokeWidth: 1,
+	};
+	const point = {
+		x: xScale(order.closedAt),
+		y: yScale(order.executedPrice || order.price)
+	}
+
+	Marker.drawOnCanvas(styles, point, ctx);
+}
+
+
+function getMarker( order: any){
 	switch( order.status ){
 		case 'completed':
-			return {
-				Marker: TriangleMarker,
-				props: {
-					stroke: color,
-					fill: color,
-					direction: order.direction === 'buy' ? 'left' : 'right',
-					width: 8
-				}
-			};
+			return order.direction === 'buy' ? BuyMarker : SellMarker;
 		case 'cancelled':
-			return {
-				Marker: SquareMarker,
-				props: {
-					stroke: color,
-					fill: color,
-					width: 8
-				}
-			};
-		default: 
-			return {
-				Marker: CircleMarker,
-				props: {
-					stroke: color,
-					fill: color,
-					r: 2
-				}
-			};
+			return SquareMarker;
+		case 'error':
+			return ErrorMarker;
+		default:
+			return CircleMarker;
 	}
 }
 

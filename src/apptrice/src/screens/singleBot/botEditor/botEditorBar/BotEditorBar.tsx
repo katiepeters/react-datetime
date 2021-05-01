@@ -7,10 +7,12 @@ import BotEditorConsolePanel from './console/BotEditorConsolePanel';
 import BotEditorConsoleTab from './console/BotEditorConsoleTab';
 import ProblemsPanel from './problems/ProblemsPanel';
 import ProblemsTab, { CodeProblem } from './problems/ProblemsTab';
+import quickStore from '../../../../state/quickStore';
 
 
 interface BotEditorBarProps {
 	codeProblems: CodeProblem[],
+	quickStore: typeof quickStore,
 	currentBackTesting?: any,
 	onRun: (config: BacktestConfig) => void,
 	onAbort: () => void
@@ -59,7 +61,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 					active={ key === this.state.currentTab }
 					onClick={ this._onTabPress }
 					problems={this.props.codeProblems }
-					backtesting={ this.props.currentBackTesting } />
+					quickStore={ this.props.quickStore } />
 			);
 		})
 	}
@@ -69,7 +71,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 		return (
 			<Panel
 				problems={this.props.codeProblems}
-				backtesting={this.props.currentBackTesting}
+				quickStore={this.props.quickStore}
 				onHighlightLine={ this.props.onHighlightLine } />
 		);
 	}

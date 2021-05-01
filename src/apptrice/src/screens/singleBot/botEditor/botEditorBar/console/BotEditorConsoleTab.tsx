@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { ConsoleEntry } from '../../../../../../../lambdas/executor/Consoler';
+import * as React from 'react';
+import quickStore from '../../../../../state/quickStore';
 import EditorTab from '../../components/EditorTab';
 import styles from './_BotEditorConsoleTab.module.css';
 
@@ -7,7 +7,7 @@ interface BotEditorConsoleTabProps {
 	id: string
 	active: boolean,
 	onClick: (id:string) => void
-	backtesting: any
+	quickStore: typeof quickStore
 }
 
 export default class BotEditorConsoleTab extends React.Component<BotEditorConsoleTabProps> {
@@ -29,8 +29,11 @@ export default class BotEditorConsoleTab extends React.Component<BotEditorConsol
 		}
 	}
 
+	lastLogsCount: number = 0;
 	componentDidUpdate(prevProps: BotEditorConsoleTabProps) {
-		if (prevProps.backtesting?.logs !== this.props.backtesting?.logs && !this.props.active ) {
+		const count = this.props.quickStore.getLogs().length;
+		if ( count !== this.lastLogsCount && !this.props.active  ){
+			this.lastLogsCount = count;
 			this.setState({ activity: true });
 		}
 		else if( this.state.activity && this.props.active ){

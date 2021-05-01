@@ -1,65 +1,22 @@
 import * as React from 'react'
 import { ScreenProps } from '../../../types'
-import btStatsLoader from '../btStats.loader'
-import Chart from 'react-apexcharts'
 import styles from './BtChartsScreen.module.css';
-import CanvasChart from './CanvasChart';
-
+import TradingChart from './TradingChart';
 
 export default class BtChartsScreen extends React.Component<ScreenProps> {
 	render() {
-		let {data: stats, isLoading} = btStatsLoader.getData(this, 'bt');
+		let {store, quickStore} = this.props;
 
-		if( isLoading ){
-			return 'Loading...';
+		if ( !store.currentBackTesting?.candles ) {
+			return <div>Please run backtesting</div>;
 		}
-
-		const data = [
-			{ type: 'candlestick', dataPoints: stats.candles['ETH/USD']}
-		]
 
 		return (
 			<div className={styles.container}>
-				<CanvasChart title={{}} data={data} />
+				<TradingChart 
+					orders={ quickStore.getOrders() }
+					candles={store.currentBackTesting?.candles} />
 			</div>
-		)
-	}
-
-
-	renderApexChart(stats: any) {
-
-		const options = {
-					chart: {
-					animations: {enabled: false},
-				foreColor: '#111'
-			},
-			xaxis: {
-					type: 'datetime',
-				labels: {
-					style: { colors: ['#eee'] }
-				}
-			},
-			yaxis: {
-					opposite: true,
-				tooltip: {
-					enabled: true
-				},
-				labels:{
-					align: 'left',
-					style: {colors: ['#eee']}
-				},
-				axisBorder: {
-					show: true,
-					color: '#eee'
-				}
-			}
-		}
-		return (
-			<Chart type="candlestick"
-				options={options}
-				series={[{
-					data: stats.candles['ETH/USD']
-				}]} />
-		)
+		);
 	}
 }

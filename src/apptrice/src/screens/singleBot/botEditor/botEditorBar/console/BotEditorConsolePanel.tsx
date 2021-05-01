@@ -2,9 +2,11 @@ import * as React from 'react'
 import { ConsoleEntry } from '../../../../../../../lambdas/executor/Consoler';
 import mergeStyles from '../../../../../utils/mergeStyles';
 import styles from './_BotEditorConsolePanel.module.css';
+import { DynamicList } from '../../../../../components';
+import quickStore from '../../../../../state/quickStore';
 
 interface BotEditorConsolePanelProps {
-	backtesting: any
+	quickStore: typeof quickStore
 }
 
 export default class BotEditorConsolePanel extends React.Component<BotEditorConsolePanelProps> {
@@ -13,7 +15,8 @@ export default class BotEditorConsolePanel extends React.Component<BotEditorCons
 	}
 
 	render() {
-		const logs: ConsoleEntry[] = this.props.backtesting?.logs || [];
+		const logs: ConsoleEntry[] = this.props.quickStore.getLogs();
+		
 		if( !logs.length ){
 			return this.renderNoLogs();
 		} 
@@ -39,25 +42,28 @@ export default class BotEditorConsolePanel extends React.Component<BotEditorCons
 
 	renderLogs(logs: ConsoleEntry[]) {
 		return (
-			<table>
-				<tbody>
-					{logs.map(this._renderLogLine)}
-				</tbody>
-			</table>
+			<DynamicList
+				items={ logs }
+				defaultSize={ 18 }
+				renderItem={ this._renderLogLine } />
 		);
 	}
 
 	_renderLogLine = (log: ConsoleEntry) => {
 		return (
-			<tr key={log.id + log.date} className={styles.line}>
-				<td className={mergeStyles(styles.date, styles[log.type])}>{ this.formatDate(log.date) }</td>
-				<td>{ log.message }</td> 
-			</tr>
+			<div className={styles.row}>
+				<div className={mergeStyles(styles.date, styles[log.type])}>
+					{ this.formatDate(log.date) }
+				</div>
+				<div id={`log${log.id}`} className={styles.message}>
+					{ log.message }
+				</div> 
+			</div>
 		);
 	}
 
 	formatDate( ts: number ){
 		let d = (new Date(ts)).toISOString();
-		return d.replace('T', ' ').split('.')[0];
+		return d.replace('T', ' ').split('.')[0].split(' ')[1];
 	}
 }

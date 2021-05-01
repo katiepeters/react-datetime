@@ -1,6 +1,7 @@
 import DataLoader from "../../utils/DataLoader";
 import store from "../../state/store";
 import { ArrayCandle, BotCandles, Orders } from "../../../../lambdas/lambda.types";
+import quickStore from "../../state/quickStore";
 const WorkerFunction = require('worker-function');
 
 let cache: {[id:string]: any} = {};
@@ -12,7 +13,7 @@ const btStatsLoader = new DataLoader({
 			return Promise.reject({error: 'bt_not_ready'});
 		}
 
-		return calculateStats(bt.orders.flatten(), bt.candles.flatten())
+		return calculateStats(quickStore.getOrders(), bt.candles.flatten())
 			.then( (stats:any) => {
 				cache[id] = stats;
 			})

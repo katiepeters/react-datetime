@@ -43,9 +43,10 @@ const cons: RunConsole = {
 export default cons;
 
 function addEntry( type: string, messages: any[] ){
+	const date = Date.now();
 	entries.push({
-		id: Math.round(Math.random() * 1000),
-		date: Date.now(),
+		id: Math.round(Math.random() * 1000) + date,
+		date: date,
 		type: 'log',
 		message: messages.map( m => stringify(m) ).join(' ')
 	})
