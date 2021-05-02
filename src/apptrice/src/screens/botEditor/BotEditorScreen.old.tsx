@@ -6,10 +6,12 @@ import BotSaver from './BotSaver';
 import apiCacher from '../../state/apiCacher';
 import BootTools, {BacktestConfig} from './tools/BotTools';
 import BtRunner from '../../utils/BtRunner';
+import { Modal } from '../../components';
 
 class BotEditorScreen extends React.Component<ScreenProps> {
 	state = {
-		resources: false
+		resources: false,
+		showModal: false
 	}
 
 	botSaver: BotSaver
@@ -48,6 +50,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 						onAbort={this._onAbortBt}
 						currentBackTesting={ this.props.store.currentBackTesting } />
 				</div>
+				{ this.renderModal() }
 			</div>
 		);
 	}
@@ -106,6 +109,14 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 				resources: { theme, types }
 			})
 		});
+
+		setInterval(
+			() => this.setState({showModal: !this.state.showModal}),
+			5000
+		);
+	}
+
+	renderModal() {
 	}
 
 	getBotId( props: ScreenProps ): string {

@@ -9,17 +9,18 @@ const { getAxisCanvas } = require('react-stockcharts/lib/GenericComponent');
 const {CircleMarker, SquareMarker} = require('react-stockcharts/lib/series');
 
 interface OrderSeriesProps {
-	orders: any
+	orders: any,
+	candles: any[]
 }
 
 export default class OrderSeries extends React.Component<OrderSeriesProps> {
 	drawOnCanvas = (ctx: any, moreProps: any) => {
 		const { xScale, chartConfig: { yScale }} = moreProps;
-		const { orders } = this.props;
+		const { orders, candles } = this.props;
 
 		orders.forEach((order: any) => {
 			renderOpening( ctx, xScale, yScale, order );
-			renderLine( ctx, xScale, yScale, order );
+			renderLine(ctx, xScale, yScale, order, candles );
 			renderClosing( ctx, xScale, yScale, order );
 		});
 	}
@@ -58,8 +59,12 @@ function renderOpening( ctx: any, xScale: any, yScale: any, order: Order ){
 	CircleMarker.drawOnCanvas( styles, point, ctx );
 }
 
-function renderLine( ctx: any, xScale: any, yScale: any, order: Order ){
+function renderLine( ctx: any, xScale: any, yScale: any, order: Order, candles: any[] ){
 	if( order.closedAt === order.placedAt ) return;
+
+	let closedAt = order.closedAt || getLastCandleTime(candles);
+
+	ctx.save();
 
 	const color = getColor(order.status, order.direction);
 	ctx.strokeStyle = color;
@@ -70,7 +75,7 @@ function renderLine( ctx: any, xScale: any, yScale: any, order: Order ){
 		y: yScale(order.price),
 	};
 	const p2 = {
-		x: xScale(order.closedAt),
+		x: xScale(closedAt),
 		y: yScale(order.price),
 	};
 
@@ -78,9 +83,13 @@ function renderLine( ctx: any, xScale: any, yScale: any, order: Order ){
 	ctx.moveTo(p1.x, p1.y);
 	ctx.lineTo(p2.x, p2.y);
 	ctx.stroke();
+
+	ctx.restore();
 }
 
 function renderClosing( ctx: any, xScale: any, yScale: any, order: Order ){
+	if(!order.closedAt) return;
+
 	const Marker = getMarker(order);
 	const color = getColor(order.status, order.direction);
 	const styles = {
@@ -131,4 +140,8 @@ function getColor( status: string, direction: string ){
 		return '#ff0000';
 	}
 	return '#cc6666';
+}
+
+function getLastCandleTime( c: any[] ){
+	return c[c.length -1].date.getTime();
 }

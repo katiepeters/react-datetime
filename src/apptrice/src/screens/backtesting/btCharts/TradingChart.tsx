@@ -145,6 +145,7 @@ class TradingChart extends React.PureComponent<TradingChartProps> {
 					<CandlestickSeries
 						width={timeIntervalBarWidth(utcHour)}
 						{...candleStyles }/>
+					<OrderSeries orders={orders} candles={candles} />
 				</Chart>
 				<Chart id={2}
 					origin={(w:number, h:number) => [0, h - 100]}
@@ -152,10 +153,6 @@ class TradingChart extends React.PureComponent<TradingChartProps> {
 					<YAxis axisAt="left" orient="left" ticks={3} tickFormat={format(".2s")} stroke="#ffffff" tickStroke="#ffffff" />
 						<BarSeries yAccessor={volumeAccessor}
 							fill={(d:any) => d.close > d.open ? "#6BA583" : "red"} />
-				</Chart>
-
-				<Chart id={3} yExtents={(d: any) => [d.high, d.low]}>
-					<OrderSeries orders={orders} />
 				</Chart>
 
 				<CrossHairCursor stroke="rgba(255,255,255,.5)" strokeDasharray="LongDashDot" />
@@ -201,13 +198,6 @@ class TradingChart extends React.PureComponent<TradingChartProps> {
 
 	componentDidUpdate(){
 		this.chart?.render();
-	}
-
-	renderOrderSeries() {
-		return (
-			<OrderSeries
-				orders={orders} />
-		);
 	}
 
 	getAssetCandles( asset:string ){

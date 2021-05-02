@@ -1,5 +1,5 @@
-const CONCURRENT_SYMBOLS = 2;
-const CONCURRENT_BUYS = 3;
+const CONCURRENT_SYMBOLS = 1;
+const CONCURRENT_BUYS = 2;
 
 function initializeState(config, state) {
 	let activeSymbols = {};
@@ -34,7 +34,7 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 			for (let id in state.openBuyOrders[symbol]) {
 				let order = trader.getOrder(id);
 				let orderMeta = state.openBuyOrders[symbol][id];
-				if (!order || !levelIds[orderMeta.levelId]) {
+				if (!order) {
 					// Order doesn't exist or we are out of range
 					delete state.openBuyOrders[symbol][id];
 				}
@@ -47,8 +47,16 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 					// If there was an error, delete it from the open buy orders
 					delete state.openBuyOrders[symbol][id];
 				}
-				// else, do nothing leave that order open and mark it
-				orderLevels[orderMeta.levelId] = 1;
+				else if ( !levelIds[orderMeta.levelId] ){
+					// If the order got out of range,
+					// cancel it and unblock the money for placing other orders
+					trader.cancelOrder( order.id );
+					delete state.openBuyOrders[symbol][id];
+				}
+				else {
+					// leave that order open and mark it
+					orderLevels[orderMeta.levelId] = 1;
+				}
 			}
 		}
 
@@ -57,7 +65,6 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 			priceLevels.forEach(level => {
 				let levelId = getLevelId(level[0]);
 				if (orderLevels[levelId]) return;
-
 				let order = openBuyOrder(symbol, level[0]);
 				state.openBuyOrders[symbol][order.id] = {
 					levelId,
@@ -179,7 +186,7 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 	function openBuyOrder(symbol, price) {
 		return trader.placeOrder({
 			type: 'limit',
-			direction: 'sell',
+			direction: 'buy',
 			price,
 			symbol: symbol,
 			amount: getBuyAmount(price)

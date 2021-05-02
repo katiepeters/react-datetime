@@ -8,11 +8,13 @@ import styles from './_BotEditorScreen.module.css';
 import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../botEditor/tools/BotTools';
 import BtRunner from '../../../utils/BtRunner';
+import { Modal } from '../../../components';
 
 class BotEditorScreen extends React.Component<ScreenProps> {
 	state = {
 		resources: false,
-		codeProblems: []
+		codeProblems: [],
+		showModal: false
 	}
 
 	botSaver: BotSaver
@@ -54,6 +56,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 						onAbort={this._onAbortBt}
 						onHighlightLine={ this._highlightLine }/>
 				</div>
+				{ this.renderModal() }
 			</div>
 		);
 	}
@@ -119,6 +122,11 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 				resources: { theme, types }
 			})
 		});
+
+		setInterval(
+			() => this.setState({ showModal: !this.state.showModal }),
+			5000
+		);
 	}
 
 	getBotId(props: ScreenProps): string {
@@ -143,6 +151,17 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	_highlightLine = (line:number) => {
 		// TODO: Move editor and highlight line
 		// https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
+	}
+
+
+	renderModal() {
+		return (
+			<Modal open={ this.state.showModal }>
+				{ () => (
+					<div>ModalContent</div>
+				)}
+			</Modal>
+		);
 	}
 }
 
