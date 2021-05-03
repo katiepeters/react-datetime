@@ -8,6 +8,7 @@ import BotEditorConsoleTab from './console/BotEditorConsoleTab';
 import ProblemsPanel from './problems/ProblemsPanel';
 import ProblemsTab, { CodeProblem } from './problems/ProblemsTab';
 import quickStore from '../../../../state/quickStore';
+import { Modal, ModalBox } from '../../../../components';
 
 
 interface BotEditorBarProps {
@@ -31,7 +32,8 @@ const panelComponents: { [any: string]: any } = {
 
 export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 	state = {
-		currentTab: 'problems'
+		currentTab: 'problems',
+		btModalOpen: false
 	}
 
 	render() {
@@ -48,6 +50,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 				<div className={styles.panelBar}>
 					{ this.renderPanel() }
 				</div>
+				{ this.renderBtModal() }
 			</div>
 		)
 	}
@@ -99,7 +102,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 			);
 		}
 		return (
-			<Button size="s" onClick={this._onStartPressed}>
+			<Button size="s" onClick={this._showBtModal}>
 				Start backtesting
 			</Button>
 		)
@@ -115,6 +118,18 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 		);
 	}
 
+	renderBtModal() {
+		return (
+			<Modal open={this.state.btModalOpen} onClose={this._hideBtModal}>
+				{ () => (
+					<ModalBox>
+						This is the BTModal
+					</ModalBox>
+				)}
+			</Modal>
+		)
+	}
+
 
 	updatePercentage(field: string, value: string) {
 		if (value[value.length - 1] !== '%') {
@@ -128,6 +143,14 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 
 	isBtRunning(): boolean {
 		return this.props.currentBackTesting?.status === 'running' || false;
+	}
+
+	_showBtModal = () => {
+		this.setState({btModalOpen: true});
+	}
+
+	_hideBtModal = () => {
+		this.setState({btModalOpen: false});
 	}
 
 	_onStartPressed = () => {

@@ -7,15 +7,23 @@ const classNames = {
 	enter: styles.containerEnter,
 	enterActive: styles.containerEnterActive,
 	exit: styles.containerLeave,
-	exitActive: styles.containerLeaveActive
+	exitActive: styles.containerLeaveActive,
 }
 
 interface ModalProps {
 	open: boolean,
 	children: () => JSX.Element
+	closeable?: boolean
+	onClose?: () => any
 }
 
 export default class Modal extends React.Component<ModalProps> {
+	container = React.createRef<HTMLDivElement>();
+
+	static defaultProps = {
+		closeable: true,
+		onClose: (event: any) => console.warn('onClose not defined for modalBox')
+	}
 
 	render() {
 		return createPortal(this.renderPortalContent(), getElement())	
@@ -35,16 +43,30 @@ export default class Modal extends React.Component<ModalProps> {
 
 	renderContent() {
 		return (
-			<div className={styles.container}>
+			<div className={styles.container}
+				onClick={ this._checkClose }
+				ref={ this.container }>
 				<div className={styles.content}>
-					{this.props.children()}
+					{ this.renderChildrenWithProps() }
 				</div>
 			</div>
 		)
 	}
 
+	renderChildrenWithProps() {
+		const { closeable, onClose, open, children } = this.props;
+		return React.cloneElement( children(), {closeable, onClose, open} );
+	}
+
 	renderEmpty() {
 		return <span style={{ display: 'none' }} />;
+	}
+
+	_checkClose = (e: React.MouseEvent<HTMLDivElement> ) => {
+		if( this.props.closeable && e.target === this.container.current ){
+			// @ts-ignore
+			this.props.onClose();
+		}
 	}
 }
 
