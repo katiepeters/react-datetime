@@ -9,9 +9,10 @@ import ProblemsPanel from './problems/ProblemsPanel';
 import ProblemsTab, { CodeProblem } from './problems/ProblemsTab';
 import quickStore from '../../../../state/quickStore';
 import { Modal, ModalBox } from '../../../../components';
-
+import BtSettings from '../../../../common/btSettings/BtSettings';
 
 interface BotEditorBarProps {
+	botId: string,
 	codeProblems: CodeProblem[],
 	quickStore: typeof quickStore,
 	currentBackTesting?: any,
@@ -92,7 +93,6 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 		)
 	}
 
-
 	renderButton() {
 		if (this.isBtRunning()) {
 			return (
@@ -123,7 +123,11 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 			<Modal open={this.state.btModalOpen} onClose={this._hideBtModal}>
 				{ () => (
 					<ModalBox>
-						This is the BTModal
+						<BtSettings
+							botId={ this.props.botId}
+							isRunning={ this.isBtRunning() }
+							onRun={ this._onStartPressed }
+							onAbort={ this._onAbortBT } />
 					</ModalBox>
 				)}
 			</Modal>
@@ -153,49 +157,13 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 		this.setState({btModalOpen: false});
 	}
 
-	_onStartPressed = () => {
-		let errors = this.getValidationErrors();
-		if (errors) {
-			this.setState({ errors });
-		}
-
-		this.props.onRun(this.getDefaultConfig());
+	_onStartPressed = (config: BacktestConfig) => {
+		this._hideBtModal();
+		this.props.onRun( config );
 	}
 
 	_onAbortBT = () => {
 		this.props.onAbort();
-	}
-
-	getValidationErrors() {
-		return false;
-	}
-
-
-	getDefaultConfig(): BacktestConfig {
-		const DAY = 24 * 60 * 60 * 1000;
-		let startDate = this.getInputDate(Date.now() - 8 * DAY);
-		let endDate = this.getInputDate(Date.now() - DAY);
-
-		let start = new Date(startDate + 'T00:00:00.000Z');
-		let end = new Date(endDate + 'T23:59:59.999Z');
-
-		return {
-			baseAssets: ['ETH', 'BTC'],
-			quotedAsset: 'USD',
-			runInterval: '1h',
-			initialBalances: {
-				USD: 1000
-			}, 
-			startDate: start.getTime(),
-			endDate: end.getTime(),
-			fees: 0.1,
-			slippage: 0.2
-		};
-	}
-
-	getInputDate(time: number) {
-		let date = new Date(time);
-		return date.toISOString().split('T')[0];
 	}
 
 	_onTabPress = ( currentTab:string ) => {

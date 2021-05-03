@@ -1,64 +1,51 @@
-import * as React from 'react';
-import {Button, InputGroup} from '../../../components';
-import ProgressBar from './ProgressBar';
-interface BootToolsProps {
-	onRun: (config: BacktestConfig) => void,
-	onAbort: () => void,
-	currentBackTesting?: any
+import * as React from 'react'
+import { InputGroup, Button } from '../../components';
+import { BacktestConfig } from '../../screens/botEditor/tools/BotTools';
+import { getBtConfig, BtSettingsConfig, saveBtConfig } from './BtConfigStore';
+import styles from './_BtSettings.module.css';
+
+interface BtSettingsProps {
+	botId: string
+	isRunning: boolean
+	onRun: (config: BacktestConfig) => any
+	onAbort: () => any
 }
 
-export interface BacktestConfig {
-	baseAssets: string[],
-	quotedAsset: string,
-	runInterval: string
-	initialBalances: {[asset: string]: number}
-	startDate: number
-	endDate: number
-	fees: number,
-	slippage: number
+interface BtSettingsState extends BtSettingsConfig {
+	errors: {[key: string]: string}
 }
 
 const DAY = 24 * 60 * 60 * 1000;
 
-export default class BootTools extends React.Component<BootToolsProps> {
+export default class BtSettings extends React.Component<BtSettingsProps, BtSettingsState> {
 	state = {
-		baseAssets: 'BTC,ETH',
-		quotedAsset: 'USD',
-		runInterval: '1h',
-		initialBalances: {
-			USD: 1000
-		},
-		testingTimeframe : '7',
-		startDate: this.getInputDate(Date.now() - 8 * DAY),
-		endDate: this.getInputDate(Date.now() - DAY ),
-		fees: '0.1%',
-		slippage: '0.2%'
+		...this.getLastBotConfig(),
+		errors: {}
 	}
 
 	render() {
 		return (
-			<div style={ styles.wrapper }>
+			<div className={styles.wrapper}>
 				{this.renderBotConfig()}
-				{this.renderTestingTimeframe() }
-				{this.renderInitialBalances() }
-				{this.renderExtraConfig() }
-				<div style={styles.fieldGroup}>
-					<div style={styles.control}>
-						{ this.renderButton() }
+				{this.renderTestingTimeframe()}
+				{this.renderInitialBalances()}
+				{this.renderExtraConfig()}
+				<div className={styles.fieldGroup}>
+					<div className={styles.control}>
+						{this.renderButton()}
 					</div>
 				</div>
-				{ this.renderProgress() }
 			</div>
 		);
 	}
 
 	renderBotConfig() {
 		return (
-			<div style={styles.fieldGroup}>
-				<div style={styles.groupHeader}>
+			<div className={styles.fieldGroup}>
+				<div className={styles.groupHeader}>
 					Bot config
 					</div>
-				<div style={styles.field}>
+				<div className={styles.field}>
 					<InputGroup
 						name="baseAssets"
 						label="Base assets">
@@ -67,7 +54,7 @@ export default class BootTools extends React.Component<BootToolsProps> {
 							onChange={e => this.setState({ baseAssets: e.target.value })} />
 					</InputGroup>
 				</div>
-				<div style={styles.field}>
+				<div className={styles.field}>
 					<InputGroup name="quotedAsset" label="Quoted asset">
 						<input name="quotedAsset"
 							value={this.state.quotedAsset}
@@ -92,13 +79,13 @@ export default class BootTools extends React.Component<BootToolsProps> {
 
 	renderTestingTimeframe() {
 		return (
-			<div style={styles.fieldGroup}>
-				<div style={styles.groupHeader}>
+			<div className={styles.fieldGroup}>
+				<div className={styles.groupHeader}>
 					Testing time frame
 				</div>
-				<div style={styles.field}>
+				<div className={styles.field}>
 					<InputGroup name="runInterval" label="Data from">
-						<select value={ this.state.testingTimeframe } onChange={ this._changeTimeframe }>
+						<select value={this.state.testingTimeframe} onChange={this._changeTimeframe}>
 							<option value="1">Last day</option>
 							<option value="3">Last 3 days</option>
 							<option value="7">Last week</option>
@@ -110,19 +97,19 @@ export default class BootTools extends React.Component<BootToolsProps> {
 						</select>
 					</InputGroup>
 				</div>
-				<div style={styles.field}>
+				<div className={styles.field}>
 					<InputGroup name="startDate" label="From">
 						<input name="startDate"
 							placeholder="yyyy-mm-dd"
-							value={ this.state.startDate }
-							onChange={ e => this.setState({startDate: e.target.value})} />
+							value={this.state.startDate}
+							onChange={e => this.setState({ startDate: e.target.value })} />
 					</InputGroup>
 				</div>
-				<div style={styles.field}>
+				<div className={styles.field}>
 					<InputGroup name="endDate" label="To">
 						<input name="endDate"
 							placeholder="yyyy-mm-dd"
-							value={ this.state.endDate }
+							value={this.state.endDate}
 							onChange={e => this.setState({ endDate: e.target.value })} />
 					</InputGroup>
 				</div>
@@ -130,20 +117,20 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		);
 	}
 
-	renderExtraConfig(){
+	renderExtraConfig() {
 		return (
-			<div style={styles.fieldGroup}>
-				<div style={styles.groupHeader}>
+			<div className={styles.fieldGroup}>
+				<div className={styles.groupHeader}>
 					Extra configuration
 				</div>
-				<div style={styles.field}>
+				<div className={styles.field}>
 					<InputGroup name="fees" label="Fees">
 						<input name="fees"
-							value={ this.state.fees }
-							onChange={ e => this.updatePercentage('fees', e.target.value) } />
+							value={this.state.fees}
+							onChange={e => this.updatePercentage('fees', e.target.value)} />
 					</InputGroup>
 				</div>
-				<div style={styles.field}>
+				<div className={styles.field}>
 					<InputGroup name="slippage" label="Slippage">
 						<input name="slippage"
 							value={this.state.slippage}
@@ -154,8 +141,8 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		)
 	}
 
-	renderButton(){
-		if( this.isBtRunning() ){
+	renderButton() {
+		if ( this.props.isRunning ) {
 			return (
 				<Button onClick={this._onAbortBT}>
 					Abort
@@ -169,53 +156,45 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		)
 	}
 
-	renderProgress() {
-		if( !this.isBtRunning() ) return ;
-
-		const {currentBackTesting} = this.props;
-		const progress = currentBackTesting.iteration / currentBackTesting.totalIterations * 100;
-		return (
-			<ProgressBar progress={ progress } />
-		);
-	}
-
-	updatePercentage( field: string, value: string){
-		if( value[value.length - 1] !== '%'){
-			this.setState({[field]: value + '%'});
+	updatePercentage(field: 'fees' | 'slippage', value: string) {
+		if (value[value.length - 1] !== '%') {
+			// @ts-ignore
+			this.setState({ [field]: value + '%' });
 		}
 		else {
-			this.setState({ [field]: value});
+			// @ts-ignore
+			this.setState({ [field]: value });
 		}
 	}
 
-	_changeTimeframe = (e:any) => {
+	_changeTimeframe = (e: any) => {
 		let selected = e.target.value;
-		if( selected === 'custom' ){
-			this.setState({testingTimeframe: selected});
+		if (selected === 'custom') {
+			this.setState({ testingTimeframe: selected });
 			return;
 		}
 
 		this.setState({
 			testingTimeframe: selected,
-			endDate: this.getInputDate( Date.now() - DAY ),
-			startDate: this.getInputDate( Date.now() - (parseInt(selected) +1) * DAY )
+			endDate: this.getInputDate(Date.now() - DAY),
+			startDate: this.getInputDate(Date.now() - (parseInt(selected) + 1) * DAY)
 		});
 	}
 
 	renderInitialBalances() {
 		return (
-			<div style={styles.fieldGroup}>
-				<div style={styles.groupHeader}>
+			<div className={styles.fieldGroup}>
+				<div className={styles.groupHeader}>
 					Initial balances
 				</div>
-				{ this.getSymbols().map( this._renderBalanceInput ) }
+				{ this.getSymbols().map(this._renderBalanceInput)}
 			</div>
 		);
 	}
 
-	_renderBalanceInput = (symbol:string) => {
+	_renderBalanceInput = (symbol: string) => {
 		return (
-			<div style={styles.field}>
+			<div className={styles.field}>
 				<InputGroup
 					name={`${symbol}_balance`}
 					label={symbol}>
@@ -230,11 +209,14 @@ export default class BootTools extends React.Component<BootToolsProps> {
 
 	_onStartPressed = () => {
 		let errors = this.getValidationErrors();
-		if( errors ){
-			this.setState({errors});
+		if (errors) {
+			this.setState({ errors });
 		}
 
-		this.props.onRun( this.getConfig() );
+		let state: any = { ...this.state };
+		delete state.errors;
+		saveBtConfig(this.props.botId, state);
+		this.props.onRun(this.getConfig());
 	}
 
 	_onAbortBT = () => {
@@ -242,23 +224,27 @@ export default class BootTools extends React.Component<BootToolsProps> {
 	}
 
 	getValidationErrors() {
-		return false;
+		return {};
 	}
 
 	getConfig(): BacktestConfig {
-		let { 
+		let {
 			quotedAsset, runInterval, initialBalances,
 			startDate, endDate, fees, slippage
 		} = this.state;
 
 		let start = new Date(startDate + 'T00:00:00.000Z');
 		let end = new Date(endDate + 'T23:59:59.999Z');
+		let balances:{[asset:string]: number} = {};
+		for( let asset in initialBalances ){
+			balances[asset] = parseFloat(initialBalances[asset]);
+		}
 
 		return {
 			baseAssets: this.getSymbols().slice(1),
 			quotedAsset,
 			runInterval,
-			initialBalances,
+			initialBalances: balances,
 			startDate: start.getTime(),
 			endDate: end.getTime(),
 			fees: parseFloat(fees),
@@ -266,7 +252,7 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		};
 	}
 
-	updateInitialBalance( symbol:string, value: string ){
+	updateInitialBalance(symbol: string, value: string) {
 		this.setState({
 			initialBalances: {
 				...this.state.initialBalances,
@@ -275,51 +261,51 @@ export default class BootTools extends React.Component<BootToolsProps> {
 		});
 	}
 
-	getQuotedSymbol(){
+	getQuotedSymbol() {
 		return this.state.quotedAsset;
 	}
 
 	getSymbols() {
 		let symbols = [this.state.quotedAsset];
-		this.state.baseAssets.split(/\s*,\s*/).forEach( symbol => {
-			if( symbol.trim() ){
-				symbols.push( symbol.trim() );
+		this.state.baseAssets.split(/\s*,\s*/).forEach(symbol => {
+			if (symbol.trim()) {
+				symbols.push(symbol.trim());
 			}
 		});
 		return symbols;
 	}
 
-	getInputDate( time: number ){
+	getInputDate(time: number) {
 		let date = new Date(time);
 		return date.toISOString().split('T')[0];
 	}
 
-	isBtRunning(): boolean {
-		return this.props.currentBackTesting?.status === 'running' || false;
-	}
-}
+	getLastBotConfig(): BtSettingsConfig {
+		let config = getBtConfig( this.props.botId ) || this.getDefaultConfig();
 
-const styles: { [id: string]: React.CSSProperties } = {
-	wrapper: {
-		width: '100%',
-		height: '100vh',
-		overflow: 'auto'
-	},
-	fieldGroup: {
-		padding: '0 8px',
-		marginBottom: 24
-	},
-	groupHeader: {
-		borderBottom: '1px solid rgba(255,255,255,.1)',
-		marginBottom: 8
-	},
-	field: {
-		marginBottom: 8
-	},
-	control: {
-		display: 'flex',
-		flexGrow: 1,
-		flexDirection: 'column',
-		alignItems: 'stretch'
+		if( config.testingTimeframe !== 'custom' ){
+			config.startDate = this.getInputDate( Date.now() - parseInt(config.testingTimeframe) * DAY);
+			config.endDate = this.getInputDate(Date.now() - DAY);
+		}
+
+		return config;
+	}
+
+	getDefaultConfig(): BtSettingsConfig {
+		const DAY = 24 * 60 * 60 * 1000;
+
+		return {
+			baseAssets: 'BTC,ETH',
+			quotedAsset: 'USD',
+			runInterval: '1h',
+			initialBalances: {
+				USD: '1000'
+			},
+			testingTimeframe: '7',
+			startDate: this.getInputDate(Date.now() - 8 * DAY),
+			endDate: this.getInputDate(Date.now() - DAY),
+			fees: '0.1%',
+			slippage: '0.2%'
+		};
 	}
 }

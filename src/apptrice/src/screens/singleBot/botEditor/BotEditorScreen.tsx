@@ -47,6 +47,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 				</div>
 				<div className={styles.bar}>
 					<BotEditorBar
+						botId={ botId }
 						codeProblems={this.state.codeProblems}
 						quickStore={this.props.quickStore}
 						currentBackTesting={this.props.store.currentBackTesting}

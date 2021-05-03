@@ -1,0 +1,24 @@
+
+.wrapper {
+}
+
+.fieldGroup {
+	padding: 0 8px;
+	margin-bottom: 24px
+}
+
+.groupHeader {
+	border-bottom: 1px solid rgba(255,255,255,.1);
+	margin-bottom: 8px
+}
+
+.field {
+	margin-bottom: 8px
+}
+
+.control {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+	align-items: stretch;
+}

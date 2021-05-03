@@ -68,6 +68,37 @@ export default class Modal extends React.Component<ModalProps> {
 			this.props.onClose();
 		}
 	}
+
+	scrollLocked = false;
+	lockScroll() {
+		this.scrollLocked = true;
+		document.body.style.setProperty('overflow', 'hidden');
+	}
+	unlockScroll() {
+		this.scrollLocked = false;
+		setTimeout(() => {
+			document.body.style.setProperty('overflow', 'auto');
+		}, 300);
+	}
+	componentDidMount() {
+		if( this.props.open ){
+			this.lockScroll();
+		}
+	}
+	componentDidUpdate() {
+		this.checkScrollLock();
+	}
+	checkScrollLock(){
+		if( this.props.open && !this.scrollLocked ){
+			this.lockScroll();
+		}
+		else if( !this.props.open && this.scrollLocked ){
+			this.unlockScroll();
+		}
+	}
+	componentWillUnmount() {
+		this.scrollLocked && this.unlockScroll();
+	}
 }
 
 
