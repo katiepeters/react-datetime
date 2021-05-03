@@ -4,17 +4,18 @@ import TradingChart from './btCharts/TradingChart'
 
 export default class BtDetailsScreen extends React.Component<ScreenProps> {
 	render() {
-		let {store, quickStore} = this.props;
+		let { quickStore } = this.props;
+		let candles = quickStore.getCandles();
 
-		if ( !store.currentBackTesting?.candles ) {
+		if (!Object.keys(candles).length) {
 			return <div>Please run backtesting</div>;
 		}
 
 		return (
 			<div style={{width: '100%'}}>
-				<TradingChart 
+				<TradingChart
 					orders={ quickStore.getOrders() }
-					candles={store.currentBackTesting?.candles} />
+					candles={candles} />
 			</div>
 		);
 	}

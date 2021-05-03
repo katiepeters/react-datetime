@@ -24,6 +24,7 @@ interface BotConfiguration {
 interface Trader {
 	getPortfolio(): Portfolio
 	getOrder(id: string): Order | void
+    getOpenOrders(): Order[]
 	placeOrder(orderInput: OrderInput): Order
 	cancelOrder(orderId: string)
     getPortfolioValue(): number

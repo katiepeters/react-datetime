@@ -1,11 +1,12 @@
 import Emitter from 'eventemitter3';
 import { ConsoleEntry } from '../../../lambdas/executor/Consoler';
-import { Orders } from '../../../lambdas/lambda.types';
+import { BotCandles, Orders } from '../../../lambdas/lambda.types';
 
 let emitter = new Emitter();
 let orders: Orders = {};
 let logs: ConsoleEntry[] = [];
 let changeTimer:any = false;
+let candles: BotCandles = {};
 
 const quickStore = {
 	addChangeListener( clbk: () => void ){
@@ -51,6 +52,15 @@ const quickStore = {
 	appendLogs( nextLogs: ConsoleEntry[]){
 		logs = [...logs, ...nextLogs];
 		this.emitChange();
+	},
+
+	setCandles( btCandles: BotCandles ){
+		candles = btCandles;
+		this.emitChange();
+	},
+
+	getCandles(){
+		return candles;
 	}
 }
 

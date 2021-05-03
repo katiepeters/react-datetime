@@ -14,6 +14,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	orders: {[id: string]: ExchangeOrder}
 	openOrders: string[]
 	lastDate: number
+	placeDate: number
 	lastCandles: {[symbol: string]: ArrayCandle}
 
 	constructor(credentials: ExchangeCredentials) {
@@ -46,12 +47,14 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	async placeOrders(orders: OrderInput[]): Promise<ExchangeOrder[]> {
 		const placed = orders.map( this._placeOrder );
 		// Now we can complete any market order
-		this.updateOpenOrders();
+		// this.updateOpenOrders();
 		// But return the placed orders to simulate real exchanges
 		return placed;
 	}
 
 	_placeOrder = (order: OrderInput): ExchangeOrder => {
+		let date = this.placeDate;
+
 		if( !this.hasEnoughFunds(order) ){
 			let errorOrder: ExchangeOrder = {
 				id: order.id,
@@ -63,8 +66,8 @@ export default class VirtualAdapter implements ExchangeAdapter {
 				amount: order.amount,
 				price: order.price,
 				executedPrice: null,
-				placedAt: this.lastDate,
-				closedAt: this.lastDate
+				placedAt: date,
+				closedAt: date
 			};
 
 			this.orders[order.id] = errorOrder;
@@ -80,7 +83,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 			amount: order.amount,
 			price: order.price,
 			executedPrice: null,
-			placedAt: this.lastDate,
+			placedAt: date,
 			closedAt: null
 		}
 		this.updateBalance( exchangeOrder );
@@ -272,7 +275,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 				status: 'completed',
 				price: candles.getClose(lastCandle),
 				executedPrice: candles.getClose(lastCandle),
-				closedAt: this.lastDate
+				closedAt: order.placedAt
 			};
 		}
 		else if( order.direction === 'buy' && order.price ){
@@ -310,5 +313,10 @@ export default class VirtualAdapter implements ExchangeAdapter {
 			orders: JSON.stringify(this.orders),
 			portfolio: JSON.stringify(this.portfolio)
 		};
+	}
+
+	getPlaceDate(asset: string) {
+		let midCandle = (candles.getTime(this.lastCandles[asset][1]) - candles.getTime(this.lastCandles[asset][0])) / 2;
+		return this.lastDate + midCandle;
 	}
 }

@@ -62,12 +62,13 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 	let {state, logs} = await bot.initialize({
 		// @ts-ignore
 		symbols, runInterval: options.runInterval, exchange: 'bitfinex'
-	})
+	});
+
+	quickStore.setCandles(candles);
 	
 	updateBtStore({
 		status: 'running',
-		logs,
-		candles
+		logs
 	});
 
 	await runIterations(bot, state, { symbols, candles, options });
@@ -168,6 +169,7 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 			results = await bot.execute({
 				portfolio,
 				orders: adapter.orders,
+				openOrders: openOrderIds,
 				state,
 				candles: iterationCandles,
 				config: {
@@ -202,8 +204,7 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 		
 		updateBtStore({
 			iteration,
-			balances: [...store.currentBackTesting.balances, {...portfolio}],
-			candles: getGraphCandles(candles)
+			balances: [...store.currentBackTesting.balances, {...portfolio}]
 		});
 
 		console.log(Object.keys(orders).length);
@@ -258,19 +259,15 @@ function getAdapter(iterationCandles: BotCandles, portfolio: Portfolio, orders: 
 		adapter.lastCandles[asset] = candles.getLast(iterationCandles[asset]);
 		if (adapter.lastDate === -1) {
 			adapter.lastDate = candles.getTime(candles.getLast(iterationCandles[asset]));
+
+			// The orders will be placed a bit later than the candle date,
+			// to see how the limit orders are placed and executed
+			let previousDate = candles.getTime(iterationCandles[asset].slice(-2)[0]);
+			adapter.placeDate = adapter.lastDate + ((adapter.lastDate - previousDate) / 2);
 		}
 	}
 
 	return adapter;
-}
-
-
-function getGraphCandles( candles: BotCandles ){
-	const graphCandles: any = {};
-	for( let asset in candles ){
-		graphCandles[asset] = candles[asset].slice(200);
-	}
-	return graphCandles;
 }
 
 function setBtError( error: any ){

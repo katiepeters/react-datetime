@@ -9,12 +9,14 @@ export default class Trader {
 	ordersToPlace: Order[]
 	ordersToCancel: string[]
 	prices: {[asset: string]: number}
+	openOrderIds: string[]
 
 	constructor( portfolio: Portfolio, orders: Orders, candles: BotCandles )  {
 		this.portfolio = portfolio
 		this.orders = orders
 		this.ordersToPlace = [];
 		this.ordersToCancel = [];
+		this.openOrderIds = [];
 		this.prices = getPrices( candles );
 	}
 
@@ -32,6 +34,13 @@ export default class Trader {
 
 	getOrder(id: string): Order | void {
 		return this.orders[id];
+	}
+
+	getOpenOrders() {
+		return this.openOrderIds
+			.map( id => ({ ...this.orders[id]}) )
+			.concat( this.ordersToPlace.map( order => ({...order})) )
+		;
 	}
 
 	placeOrder(orderInput: OrderInput): Order {

@@ -29,6 +29,7 @@ self.onmessage = function (msg: any ){
 	}
 	else {
 		const trader = new Trader(input.portfolio, input.orders, input.candles);
+		trader.openOrderIds = input.openOrders;
 
 		const originalConsole = console;
 		// @ts-ignore

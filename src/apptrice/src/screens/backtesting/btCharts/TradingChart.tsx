@@ -101,7 +101,8 @@ interface TradingChartProps {
 	ratio: number,
 	data: any,
 	orders: Orders,
-	candles: BotCandles
+	candles: BotCandles,
+	includePreviousCandles: boolean
 }
 
 let chartIndex = 0;
@@ -201,7 +202,7 @@ class TradingChart extends React.PureComponent<TradingChartProps> {
 	}
 
 	getAssetCandles( asset:string ){
-		return memoizeCandles( this.props.candles[asset] );
+		return memoizeCandles(this.props.candles[asset], this.props.includePreviousCandles );
 	}
 
 	getAssetOrders( asset:string ){
@@ -216,8 +217,12 @@ const memoizeAssetOrders = memoize( (allOrders: Orders, asset: string ) => {
 	return Object.values( orders ).filter( (order: any) => order.symbol === asset );
 });
 
-const memoizeCandles = memoize( (proxyCandles: any) => {
-	let candles = proxyCandles.flatten ? proxyCandles.flatten() : proxyCandles;
+const memoizeCandles = memoize( (proxyCandles: any, includePreviousCandles: boolean ) => {
+	let candles = includePreviousCandles ? 
+		proxyCandles :
+		proxyCandles.slice(199)
+	;
+
 	return candles.map( (c: ArrayCandle) => {
 		return {
 			date: new Date(c[0]),

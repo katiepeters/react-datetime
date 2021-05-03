@@ -1,5 +1,5 @@
 const CONCURRENT_SYMBOLS = 1;
-const CONCURRENT_BUYS = 2;
+const CONCURRENT_BUYS = 3;
 
 function initializeState(config, state) {
 	let activeSymbols = {};
@@ -14,6 +14,7 @@ function initializeState(config, state) {
 
 	state.activeSymbols = activeSymbols;
 	state.openBuyOrders = openBuyOrders;
+	state.orderLevels
 }
 
 function onData({ config, state, trader, candles, utils }: BotInput) {
@@ -25,7 +26,7 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 	config.symbols.forEach((symbol: string) => {
 		const currentPrice = getCurrentPrice(symbol);
 
-		let orderLevels = {};
+		let orderLevels = getCurrentOrderLevels();
 
 		if (hasOpenBuyOrders(symbol)) {
 			const priceLevels = getPriceLevels(currentPrice, volatilities[symbol]);
@@ -41,16 +42,17 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 				else if (order.status === 'completed') {
 					// Some buy order got completed, set the sell order
 					openSellOrder(order.symbol, orderMeta.sellPrice, currentPrice);
+					orderLevels[getLevelId(orderMeta.sellPrice)] = 1;
 					delete state.openBuyOrders[symbol][id];
 				}
 				else if (order.status === 'cancelled' || order.status === 'error') {
 					// If there was an error, delete it from the open buy orders
 					delete state.openBuyOrders[symbol][id];
 				}
-				else if ( !levelIds[orderMeta.levelId] ){
+				else if (!levelIds[orderMeta.levelId]) {
 					// If the order got out of range,
 					// cancel it and unblock the money for placing other orders
-					trader.cancelOrder( order.id );
+					trader.cancelOrder(order.id);
 					delete state.openBuyOrders[symbol][id];
 				}
 				else {
@@ -64,7 +66,8 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 			const priceLevels = getPriceLevels(currentPrice, volatilities[symbol]);
 			priceLevels.forEach(level => {
 				let levelId = getLevelId(level[0]);
-				if (orderLevels[levelId]) return;
+				let sellLevelId = getLevelId(level[1]);
+				if (orderLevels[levelId] || orderLevels[sellLevelId]) return;
 				let order = openBuyOrder(symbol, level[0]);
 				state.openBuyOrders[symbol][order.id] = {
 					levelId,
@@ -319,7 +322,13 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 		return zeros;
 	}
 
-
+	function getCurrentOrderLevels() {
+		let orderLevels = {};
+		trader.getOpenOrders().forEach(order => {
+			orderLevels[getLevelId(order.price)] = 1;
+		});
+		return orderLevels;
+	}
 
 }
 

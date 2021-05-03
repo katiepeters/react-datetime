@@ -92,11 +92,12 @@ function renderClosing( ctx: any, xScale: any, yScale: any, order: Order ){
 
 	const Marker = getMarker(order);
 	const color = getColor(order.status, order.direction);
+
 	const styles = {
 		stroke: color,
 		fill: color,
-		width: 8,
-		opacity: .5,
+		width: order.status === 'cancelled' ? 4 : 8,
+		opacity: order.status === 'cancelled' ? .1 : .5,
 		strokeWidth: 1,
 	};
 	const point = {

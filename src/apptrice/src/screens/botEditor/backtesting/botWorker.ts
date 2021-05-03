@@ -8,6 +8,7 @@ import { ExchangeOrder } from "../../../../../lambdas/_common/exchanges/Exchange
 interface BotWorkerInput {
 	portfolio: Portfolio,
 	orders: { [id: string]: ExchangeOrder },
+	openOrders: string[],
 	state: BotState,
 	candles: BotCandles,
 	config: BotConfigurationExtra
