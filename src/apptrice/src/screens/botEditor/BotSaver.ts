@@ -1,9 +1,11 @@
+import apiCacher from "../../state/apiCacher";
+
 const SAVE_TIMEOUT = 2000;
 
 interface BotSaverConfig {
 	accountId: string
 	botId: string
-	apiCacher: any
+	apiCacher: typeof apiCacher
 	onSaveStart?: () => void
 	onSaveEnd?: () => void
 }
@@ -48,7 +50,7 @@ export default class BotSaver {
 		this.saveTimer = 0;
 
 		this.onSaveStart();
-		apiCacher.updateBot( accountId, botId, currentCode )
+		apiCacher.updateBot( accountId, botId, {code:currentCode} )
 			.then( () => {
 				this.onSaveEnd();
 			})

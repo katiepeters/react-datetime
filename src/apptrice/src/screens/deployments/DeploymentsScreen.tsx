@@ -27,5 +27,6 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 				keyField="id"
 			/>
 		);
+
 	}
 }

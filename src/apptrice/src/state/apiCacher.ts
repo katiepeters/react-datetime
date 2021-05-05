@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import apiClient, { CandleOptions } from './apiClient';
+import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput } from './apiClient';
 import store from './store';
 
 export interface DbBot {
@@ -10,10 +10,16 @@ export interface DbBot {
 }
 
 const apiCacher = {
+	///////////
+	// ACCOUNT
+	///////////
 	loadAccountData(accountId: string) {
 		return apiClient.loadAccountData( accountId );
 	},
 
+	////////////
+	// BOTS
+	////////////
 	loadBotList(accountId: string) {
 		return apiClient.loadBotList(accountId)
 			.then( res => {
@@ -40,18 +46,39 @@ const apiCacher = {
 		;
 	},
 
-	updateBot(accountId: string, botId: string, code: string): Promise<AxiosResponse> {
-		return apiClient.updateBot(accountId, botId, code)
+	updateBot(accountId: string, botId: string, payload: UpdateBotInput): Promise<AxiosResponse> {
+		return apiClient.updateBot(accountId, botId, payload)
 			.then( (res: AxiosResponse) => {
 				if( !res.data.error ){
-					store.bots[botId].code = code;
+					store.bots[botId] = {
+						...(store.bots[botId] || {}),
+						...res.data
+					}
 				}
 				return res
 			})
 		;
 	},
 
-	loadDeploymentList(accountId: string) {
+	deleteBot(accountId: string, botId: string ): Promise<AxiosResponse> {
+		return apiClient.deleteBot( accountId, botId )
+			.then( (res: AxiosResponse) => {
+				if( !res.data.error ){
+					let accountBots = store.accounts[accountId]?.bots;
+					if( accountBots ){
+						store.accounts[accountId].bots = accountBots.filter((id: string) => botId !== id);
+					}
+					delete store.bots[botId];
+				}
+				return res;
+			})
+		;
+	},
+
+	/////////////
+	// DEPLOYMENTS
+	///////////////
+	loadDeploymentList(accountId: string): Promise<AxiosResponse> {
 		return apiClient.loadDeploymentList(accountId)
 			.then( res => {
 				let deploymentIds = res.data.map( (d:any) => d.id );
@@ -62,10 +89,57 @@ const apiCacher = {
 				});
 
 				store.deployments = deployments;
+				return res;
+			});
+		;
+	},
+
+	loadSingleDeployment(accountId: string, deploymentId: string): Promise<AxiosResponse> {
+		return apiClient.loadSingleDeployment(accountId, deploymentId)
+			.then(res => {
+				if( !res.data.error ){
+					store.deployments[deploymentId] = res.data;
+				}
+				return res;
+			});
+		;
+	},
+
+	updateDeployment(accountId: string, deploymentId: string, payload: UpdateDeploymentInput): Promise<AxiosResponse> {
+		return apiClient.updateDeployment(accountId, deploymentId, payload)
+			.then( res => {
+				if( !res.data.error ){
+					store.deployment[deploymentId] = {
+						...(store.deployment[deploymentId] || {}),
+						accountId,
+						id: deploymentId,
+						...payload
+					};
+				}
+				return res;
 			})
 		;
 	},
 
+	deleteDeployment(accountId: string, deploymentId: string): Promise<AxiosResponse> {
+		return apiClient.deleteDeployment(accountId, deploymentId)
+			.then( res => {
+				if( !res.data.error ){
+					let deployments = store.accounts[accountId]?.deployments;
+					if( deployments ){
+							store.accounts[accountId].deployments = deployments.filter((id: string) => id !== deploymentId);
+					}
+					delete store.deployment[deploymentId];
+				}
+				return res;
+			})
+		;
+	},
+
+
+	////////////
+	// CANDLES
+	////////////
 	getCandles( options: CandleOptions ) {
 		return apiClient.loadCandles(options).then( res => {
 			let {symbol, runInterval, startDate, endDate} = options;
@@ -73,6 +147,84 @@ const apiCacher = {
 			store.candles[key] = res.data;
 			return res;
 		})
+	},
+
+
+	////////////
+	// EXCHANGE ACCOUNTS
+	////////////
+	loadExchangeAccountList(accountId: string): Promise<AxiosResponse> {
+		return apiClient.loadExchangeAccountList(accountId)
+			.then( res => {
+				if( !res.data.error ){
+					let ids: string[] = [];
+					let exchanges: any = {};
+					res.data.forEach( (exchange: any) => {
+						ids.push( exchange.id );
+						exchanges[ exchange.id ] = exchange;
+					});
+
+					let account = store.accounts[accountId];
+					if( account ){
+						account.exchangeAccounts = ids;
+					}
+					store.exchangeAccounts = {
+						...store.exchangeAccounts,
+						...exchanges
+					};
+				}
+				return res;
+			})
+		;
+	},
+
+	loadSingleExchangeAccount(accountId: string, exchangeAccountId: string): Promise<AxiosResponse> {
+		return apiClient.loadSingleExchangeAccount(accountId, exchangeAccountId)
+			.then(res => {
+				if( !res.data.error ){
+					store.exchangeAccounts[ exchangeAccountId ] = res.data; 
+				}
+				return res;
+			})
+		;
+	},
+
+	createExchangeAccount(payload: CreateExchangeAccountInput): Promise<AxiosResponse> {
+		return apiClient.createExchangeAccount(payload)
+			.then(res => {
+				if( !res.data.error ){
+					return this.loadSingleDeployment(payload.accountId, res.data.id)
+						.then( res => {
+							if( !res.data.error ){
+								let account = store.accounts[payload.accountId];
+								if( account ){
+									store.accounts[payload.accountId] = [
+										...(account.exchangeAccounts || []),
+										res.data.id
+									];					
+								}
+							}
+							return res;
+						})
+					;
+				}
+				return res;
+			})
+		;
+	},
+	deleteExchangeAccount(accountId: string, exchangeAccountId: string): Promise<AxiosResponse> {
+		return apiClient.deleteExchangeAccount(accountId, exchangeAccountId)
+			.then(res => {
+				if( !res.data.error ){
+					let exchanges = store.accounts[accountId]?.exchangeAccounts;
+					if( exchanges ){
+						store.accounts[accountId].exchangeAccounts = exchanges.filter( (id: string) => id !== exchangeAccountId );
+					} 
+					delete store.exchangeAccounts[exchangeAccountId];
+				}
+				return res;
+			});
+		;
 	}
 }
 

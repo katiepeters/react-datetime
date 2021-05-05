@@ -8,7 +8,8 @@ const store = ors({
 	deployments: {},
 	bots: {},
 	candles: {},
-	currentBackTesting: null
+	currentBackTesting: null,
+	exchangeAccounts: {},
 });
 
 // @ts-ignore

@@ -6,19 +6,19 @@ import getSingleExchangeAccountHandler from "./getSingleExchangeAccount";
 
 const exchangesAPI = {
 	initialize( app: any ){
-		app.post('/exchangeAccount', function(req,res) {
+		app.post('/exchanges', function(req,res) {
 			return mutationHandler( req, res, createExchangeAccountHandler );
 		});
 
-		app.get('/exchangeAccount', function( req,res) {
+		app.get('/exchanges', function( req,res) {
 			return queryHandler( req, res, getExchangeAccountListHandler );
 		});
 
-		app.get('/exchangeAccount/:exchangeAccountId', function(req,res) {
+		app.get('/exchanges/:exchangeAccountId', function(req,res) {
 			return queryHandler( req, res, getSingleExchangeAccountHandler );
 		});
 
-		app.delete('/exchangeAccount/:exchangeAccountId', function(req,res) {
+		app.delete('/exchanges/:exchangeAccountId', function(req,res) {
 			return  mutationHandler( req, res, deleteExchangeAccountHandler );
 		});
 	}

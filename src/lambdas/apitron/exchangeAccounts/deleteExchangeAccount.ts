@@ -14,7 +14,7 @@ const deleteExchangeAccountHandler: MutationHandler = {
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const exchangeAccount = models.exchangeAccount.getSingle(accountId, exchangeAccountId);
+		const exchangeAccount = await models.exchangeAccount.getSingle(accountId, exchangeAccountId);
 		if (!exchangeAccount) return { error: { code: 'not_found', status: 404 } };
 
 

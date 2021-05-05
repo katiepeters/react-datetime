@@ -1,5 +1,6 @@
 import { QueryContextInput, QueryHandler, ContextResult, QueryResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
+import toExchangeResponse from "./utils/toExchangeResponse";
 
 const getExchangeAccountListHandler: QueryHandler = {
 	name: 'getExchangeAccountList',
@@ -8,12 +9,12 @@ const getExchangeAccountListHandler: QueryHandler = {
 		const {error} = validateShape({accountId},{accountId: 'string'});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const exchangeAccounts = models.exchangeAccount.getAccountExchanges(accountId);
+		const exchangeAccounts = await models.exchangeAccount.getAccountExchanges(accountId);
 		return {context: {exchangeAccounts}};
 	},
 
 	getResponse({ context }: QueryResponseInput): ResponseResult {
-		return {status: 200, data: context.exchangeAccounts};
+		return {status: 200, data: context.exchangeAccounts.map( toExchangeResponse )};
 	}
 }
 

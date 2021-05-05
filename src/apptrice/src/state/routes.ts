@@ -10,6 +10,7 @@ import BtOrdersScreen from "../screens/backtesting/btOrders/BtOrdersScreen";
 import BtChartsScreen from "../screens/backtesting/btCharts/BtChartsScreen";
 import BtScreen from "../screens/backtesting/BtScreen";
 import DeploymentsScreen from "../screens/deployments/DeploymentsScreen";
+import ExchangesScreen from "../screens/exchanges/ExchangesScreen";
 
 const routes = [
 	{path: '/', cb: HomeScreen},
@@ -21,6 +22,7 @@ const routes = [
 			{ path: '*', cb: BotDetailsScreen },
 		]}
 	]},
+	{path: '/exchanges', cb: ExchangesScreen},
 	{
 		path: '/backtesting/:id', cb: BtScreen, children: [
 			{ path: '/settings', cb: BtSettingsScreen },

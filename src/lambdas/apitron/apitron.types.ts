@@ -76,3 +76,13 @@ export interface QueryHandler {
 	getResponse(input: QueryResponseInput): ResponseResult
 	name?: string
 }
+
+
+export interface ExchangeAccountResponse {
+	id: string
+	accountId: string
+	provider: string
+	type: string
+	key: string
+	portfolio: string | null
+}

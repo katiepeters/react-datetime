@@ -13,7 +13,7 @@ export interface TableColumn<T> {
 
 interface TableProps<T> {
 	data: T[]
-	keyField: string
+	keyField?: string
 	columns?: TableColumn<T>[]
 	defaultSortColumn?: string
 	defaultOrder?: number
