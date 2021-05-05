@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import mergeStyles from '../../utils/mergeStyles';
-import styles from './MenuLinkList.module.css';
+import styles from './_MenuLinkList.module.css';
 
 interface MenuLink  {
 	id: string,

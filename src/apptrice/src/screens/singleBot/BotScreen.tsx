@@ -16,7 +16,7 @@ export default class BotScreen extends React.Component<ScreenProps> {
 
 	renderMenu() {
 		return (
-			<div>
+			<div style={{ background: '#082238', flex: 1}}>
 				<h2>Bot</h2>
 				<MenuLinkList
 					active={this.getActiveItem()}

@@ -1,0 +1,13 @@
+.container {
+	padding: 20px;
+}
+
+.titleWrapper {
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.title {
+	margin-right: 10px;
+}

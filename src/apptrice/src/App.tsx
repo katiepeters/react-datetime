@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { MenuLinkList, SidebarLayout } from './components';
+import AppMenu from './AppMenu';
+import { SidebarLayout } from './components';
 import quickStore from './state/quickStore';
 import router from './state/router';
 import store from './state/store';
@@ -9,7 +10,9 @@ class App extends React.Component {
     let CurrentScreen = router.location.matches[0];
 
     return (
-      <SidebarLayout sidebar={ this.renderMenu() } >
+      <SidebarLayout sidebar={ this.renderMenu() }
+        sidebarWidth={65}
+        bgColor="#082238">
         <CurrentScreen
           quickStore={quickStore}
           store={store}
@@ -20,34 +23,8 @@ class App extends React.Component {
 
   renderMenu() {
     return (
-      <div>
-        <h2>Trading bots</h2>
-        <MenuLinkList
-          backgroundColor="#122e44"
-          active={this.getActiveItem()}
-          items={this.getMenuItems()} />
-      </div>
+      <AppMenu currentPath={ router.location.pathname } />
     );
-  }
-
-  getMenuItems() {
-    return [
-      { id: 'deployments', label: 'Deployments', link: `#/deployments` },
-      { id: 'bots', label: 'Bots', link: `#/bots` }
-    ]
-  }
-
-  getActiveItem() {
-    const {pathname} = router.location;
-
-    if( pathname.startsWith('/deployments') ){
-      return 'deployments';
-    }
-    if( pathname.startsWith('/bots')) {
-      return 'bots';
-    }
-
-    return '';
   }
 
   componentDidMount() {

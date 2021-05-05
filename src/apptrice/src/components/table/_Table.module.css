@@ -1,0 +1,21 @@
+.headCell {
+	padding: 0 10px 5px;
+	text-align: left;
+}
+
+.row {
+	background-color: #eeccff11;
+	border-top: 1px solid #eeccff11;
+}
+
+.row:hover {
+	background-color: #eeccff22;
+}
+
+.rowClickable {
+	cursor: pointer;
+}
+
+.cell {
+	padding: 10px 10px 12px 10px;
+}

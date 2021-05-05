@@ -6,3 +6,6 @@ export { default as IconButton } from './iconButton/IconButton';
 export { default as InputGroup } from './inputGroup/InputGroup';
 export { default as Modal } from './modal/Modal';
 export { default as ModalBox } from './modal/ModalBox';
+export { default as ClickOut } from './clickOut/ClickOut';
+export { default as Table } from './table/Table';
+export { default as ScreenWrapper } from './screenWrapper/ScreenWrapper';

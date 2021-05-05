@@ -2,16 +2,15 @@ import * as React from 'react'
 import styles from './_DeploymentsScreen.module.css';
 import deploymentsLoader from './deployments.loader';
 import { ScreenProps } from '../../types';
+import { Button, ScreenWrapper, Table } from '../../components';
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {
 
 	render() {
 		return (
-			<div className={styles.container}>
-				<h1>Deployments</h1>
+			<ScreenWrapper title="Deployments" titleExtra={ <Button size="s">Create new deployment</Button> } >
 				{ this.renderDeployments() }
-				<button>Create deployment</button>
-			</div>
+			</ScreenWrapper>
 		);
 	}
 
@@ -22,6 +21,11 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 
 		if( !data?.length ) return 'No deployments yet.';
 
-		
+		return (
+			<Table
+				data={ data }
+				keyField="id"
+			/>
+		);
 	}
 }

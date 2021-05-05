@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import botListLoader from './botList.loader';
-import { DbBot } from '../../state/apiCacher'
-import BotItem from './BotItem';
+import { DbBot } from '../../state/apiCacher';
+import { Table } from '../../components';
+import { TableColumn } from '../../components/table/Table';
 
 interface BotListProps {
-	accountId: string
+	accountId: string,
+	onBotClick: (bot: DbBot ) => any
 }
 
 export default class BotList extends Component<BotListProps> {
@@ -15,20 +17,20 @@ export default class BotList extends Component<BotListProps> {
 			return <span>Loading...</span>;
 		}
 
-		if( !data.length ){
-			return <span>No bots created yet</span>;
-		}
-
 		return (
-			<div>
-				{ data.map( this._renderBot ) }
-			</div>
-		)
+			<Table
+				data={ data }
+				keyField="id"
+				columns={ this.getColumns() }
+				onRowClick={this.props.onBotClick}
+			/>
+		);
 	}
 
-	_renderBot = (bot:DbBot) => {
-		return (
-			<BotItem key={bot.id} bot={bot} />
-		);
+	getColumns(): TableColumn<DbBot>[] {
+		return [
+			{ field: 'name', title: 'Bot name'},
+			{ field: 'accountId', title: 'Account'}
+		]
 	}
 }

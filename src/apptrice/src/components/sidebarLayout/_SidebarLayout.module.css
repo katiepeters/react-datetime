@@ -6,16 +6,13 @@
 }
 
 .sidebarWrapper {
-	width: 250px;
 	display: flex;
 	flex-direction: column;
 	flex-shrink: 0;
-	background-color: #082238;	
 	overflow-x: hidden;
 }
 
 .contentWrapper {
-	background-color: #011627;
 	display: flex;
 	flex: 1;
 	min-width: 0;

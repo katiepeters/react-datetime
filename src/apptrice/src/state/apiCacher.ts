@@ -56,10 +56,12 @@ const apiCacher = {
 			.then( res => {
 				let deploymentIds = res.data.map( (d:any) => d.id );
 				store.accounts[accountId].deployments = deploymentIds;
-				store.deployments = {
-					...store.deployments,
-					...res.data
-				};
+				let deployments = {...store.deployments};
+				res.data.forEach( (deployment:any) => {
+					deployments[deployment.id] = deployment;
+				});
+
+				store.deployments = deployments;
 			})
 		;
 	},
