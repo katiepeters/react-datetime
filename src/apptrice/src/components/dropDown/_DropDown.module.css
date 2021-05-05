@@ -1,0 +1,24 @@
+.container {
+	position: relative;
+}
+
+.containerEnter {
+	opacity: 0;
+	transform: translateY(-20px);
+}
+.containerEnterActive {
+	opacity: 1;
+	transform: translateY(0);
+}
+.containerLeave {
+	opacity: 0;
+	transform: translateY(-20px);
+}
+
+.panel {
+	position: absolute;
+	background-color: #47294c;
+	box-shadow: 0 0 15px 0 #00000088;
+	transition: transform .2s ease-in-out, opacity .2s;
+	border-radius: 4px;
+}

@@ -137,3 +137,12 @@ export interface DbExchangeAccountInput {
 	key: string
 	secret: string
 }
+
+export interface ExchangeAccountResponse {
+	id: string
+	accountId: string
+	provider: string
+	type: string
+	key: string
+	portfolio: string | null
+}

@@ -101,7 +101,7 @@ const apiClient = {
 	},
 
 	updateDeployment(accountId: string, deploymentId: string, payload: UpdateDeploymentInput): Promise<AxiosResponse> {
-		return axios.patch(`${API_URL}/bots/${deploymentId}?accountId=${accountId}`, payload)
+		return axios.patch(`${API_URL}/deployments/${deploymentId}?accountId=${accountId}`, payload)
 			.then(res => {
 				console.log(res);
 				return res;

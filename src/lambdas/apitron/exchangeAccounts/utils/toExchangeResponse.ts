@@ -1,7 +1,6 @@
-import { DbExchangeAccount } from "../../../model.types";
-import { ExchangeAccountResponse } from "../../apitron.types";
+import { DbExchangeAccount, ExchangeAccountResponse } from "../../../model.types";
 
-export default function toExchangeResponse( exchange: DbExchangeAccount ): ExchangeAccountResponse{
+export default function toExchangeResponse( exchange: DbExchangeAccount ): ExchangeAccountResponse {
 	return {
 		id: exchange.id,
 		accountId: exchange.accountId,

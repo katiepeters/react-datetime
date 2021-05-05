@@ -316,6 +316,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	getPlaceDate(asset: string) {
+		// @ts-ignore
 		let midCandle = (candles.getTime(this.lastCandles[asset][1]) - candles.getTime(this.lastCandles[asset][0])) / 2;
 		return this.lastDate + midCandle;
 	}

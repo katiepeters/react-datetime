@@ -1,0 +1,20 @@
+.container {
+	display: flex;
+	flex-direction: column;
+}
+
+.button {
+	background: none;
+	border: 0;
+	color: #eee;
+	cursor: pointer;
+	white-space: nowrap;
+	padding: 10px;
+  text-shadow: 2px 2px #00000033;
+	font-family: "Sarabun", sans-serif;
+	font-size: 14px;
+}
+
+.button:hover {
+	background-color: #eeccff11;
+}

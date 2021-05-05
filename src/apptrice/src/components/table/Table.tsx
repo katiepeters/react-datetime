@@ -6,7 +6,7 @@ import memoize from 'memoize-one';
 export interface TableColumn<T> {
 	field: string,
 	title?: string
-	renderFn?: (item: T, field: string) => JSX.Element
+	renderFn?: (item: T, field?: string) => JSX.Element
 	sortFn?: (a: T, b: T) => number
 	noSort?: boolean
 }
@@ -62,7 +62,7 @@ class Table<T> extends React.Component<TableProps<T>> {
 
 		return (
 			<th className={st} onClick={() => this.sortByColumn(column)}>
-				{ column.title || column.field } { this.renderSortIcon(column.field) }
+				{ column.title === undefined ? column.field : column.title } { this.renderSortIcon(column.field) }
 			</th>
 		);
 	}
