@@ -32,7 +32,6 @@ export default class DropDown extends React.Component<DropDownProps> {
 					in={this.isOpen()}
 					timeout={200}
 					unmountOnExit
-					className={styles.container}
 					classNames={classNames}>
 					<ClickOut onClickout={this._onClickOut}>
 						<div className={styles.panel} style={st}>

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import AppMenu from './AppMenu';
 import { SidebarLayout } from './components';
+import Toaster from './components/toaster/Toaster';
 import quickStore from './state/quickStore';
 import router from './state/router';
 import store from './state/store';
@@ -10,14 +11,17 @@ class App extends React.Component {
     let CurrentScreen = router.location.matches[0];
 
     return (
-      <SidebarLayout sidebar={ this.renderMenu() }
-        sidebarWidth={65}
-        bgColor="#082238">
-        <CurrentScreen
-          quickStore={quickStore}
-          store={store}
-          router={router} />
-      </SidebarLayout>
+      <div>
+        <SidebarLayout sidebar={this.renderMenu()}
+          sidebarWidth={65}
+          bgColor="#082238">
+          <CurrentScreen
+            quickStore={quickStore}
+            store={store}
+            router={router} />
+        </SidebarLayout>
+        <Toaster />
+      </div>
     );
   }
 

@@ -34,11 +34,10 @@ const updateDeploymentHandler: MutationHandler = {
 
 		return [{
 			model: 'deployment',
-			action: 'update',
+			action: active ? 'activate' : 'deactivate',
 			data: {
 				accountId,
-				deploymentId: input.params.deploymentId,
-				update: {active}
+				deploymentId: input.params.deploymentId
 			}
 		}];
 	},

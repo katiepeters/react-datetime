@@ -6,6 +6,7 @@ import { Button, ButtonList, DropDownButton, ScreenWrapper, Spinner, Table } fro
 import { DBBotDeployment, DbBotInput } from '../../../../lambdas/model.types';
 import { TableColumn } from '../../components/table/Table';
 import apiCacher from '../../state/apiCacher';
+import Toaster from '../../components/toaster/Toaster';
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	state = {
@@ -14,9 +15,17 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 
 	render() {
 		return (
-			<ScreenWrapper title="Deployments" titleExtra={ <Button size="s">Create new deployment</Button> } >
+			<ScreenWrapper title="Deployments" titleExtra={ this.renderCreateButton() } >
 				{ this.renderDeployments() }
 			</ScreenWrapper>
+		);
+	}
+
+	renderCreateButton() {
+		return (
+			<Button size="s" onClick={ () => Toaster.show('This is a toast!')}>
+				Create new deployment
+			</Button>
 		);
 	}
 
@@ -74,9 +83,10 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	}
 
 	_onExchangeAction = (item: DBBotDeployment, action: string) => {
+		const {authenticatedId} = this.props.store;
 		if( action === 'activate' ){
 			this.setState({loadingItems: {[item.id]: true}});
-			apiCacher.updateDeployment(this.props.store.authenticatedId, item.id, {active: true})
+			apiCacher.updateDeployment( item.id, {active: true, accountId: authenticatedId})
 				.then( () => {
 					this.setState({loadingItems: {}});
 				})
@@ -84,7 +94,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		}
 		else if (action === 'deactivate') {
 			this.setState({ loadingItems: { [item.id]: true } });
-			apiCacher.updateDeployment(this.props.store.authenticatedId, item.id, { active: false })
+			apiCacher.updateDeployment(item.id, { active: false, accountId: authenticatedId })
 				.then(() => {
 					this.setState({ loadingItems: {} });
 				})

@@ -6,6 +6,7 @@
 	transition: opacity .3s;
 	display: flex;
 	overflow: auto;
+	z-index: 100;
 }
 .containerEnter {
 	opacity: 0;

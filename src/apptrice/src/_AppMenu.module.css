@@ -11,6 +11,7 @@
 .title {
 	width: 30px; height: 30px;
 	transform: rotate(-90deg);
+  text-shadow: 0 0 10px #ff99ff;
 }
 
 .link {
@@ -39,4 +40,8 @@
 	display: block;
 	font-size: 30px;
 	margin-bottom: 5px;
+}
+
+.linkActive .linkIcon {
+	text-shadow: 0 0 7px #99ffff66;
 }

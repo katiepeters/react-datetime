@@ -12,7 +12,7 @@ export default class Spinner extends React.Component<SpinnerProps> {
 		let color = this.props.color || '#d8a3fb';
 
 		return (
-			<div className={styles.container} style={{width:size, height:size}}>
+			<div className={styles.container}>
 				<i className={ `fa fa-clock ${styles.clock}` }
 					style={{fontSize: size, color}} />
 			</div>

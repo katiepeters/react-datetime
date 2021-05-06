@@ -105,13 +105,12 @@ const apiCacher = {
 		;
 	},
 
-	updateDeployment(accountId: string, deploymentId: string, payload: UpdateDeploymentInput): Promise<AxiosResponse> {
-		return apiClient.updateDeployment(accountId, deploymentId, payload)
+	updateDeployment(deploymentId: string, payload: UpdateDeploymentInput): Promise<AxiosResponse> {
+		return apiClient.updateDeployment(deploymentId, payload)
 			.then( res => {
 				if( !res.data.error ){
-					store.deployment[deploymentId] = {
-						...(store.deployment[deploymentId] || {}),
-						accountId,
+					store.deployments[deploymentId] = {
+						...(store.deployments[deploymentId] || {}),
 						id: deploymentId,
 						...payload
 					};
@@ -129,7 +128,7 @@ const apiCacher = {
 					if( deployments ){
 							store.accounts[accountId].deployments = deployments.filter((id: string) => id !== deploymentId);
 					}
-					delete store.deployment[deploymentId];
+					delete store.deployments[deploymentId];
 				}
 				return res;
 			})

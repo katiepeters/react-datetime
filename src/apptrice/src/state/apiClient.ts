@@ -21,6 +21,7 @@ export interface UpdateBotInput {
 }
 
 export interface UpdateDeploymentInput {
+	accountId: string,
 	active: boolean
 }
 
@@ -100,13 +101,13 @@ const apiClient = {
 		;
 	},
 
-	updateDeployment(accountId: string, deploymentId: string, payload: UpdateDeploymentInput): Promise<AxiosResponse> {
-		return axios.patch(`${API_URL}/deployments/${deploymentId}?accountId=${accountId}`, payload)
+	updateDeployment(deploymentId: string, payload: UpdateDeploymentInput): Promise<AxiosResponse> {
+		return axios.patch(`${API_URL}/deployments/${deploymentId}`, payload)
 			.then(res => {
 				console.log(res);
 				return res;
 			})
-			;
+		;
 	},
 
 	deleteDeployment(accountId: string, deploymentId: string): Promise<AxiosResponse> {

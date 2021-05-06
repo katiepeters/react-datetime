@@ -1,10 +1,11 @@
 .labelWrapper {
-	margin-bottom: 4;
+	margin-bottom: 4px;
 }
 
 .inputWrapper {
-		display: flex;
-		width: 100%;
-		flex-direction: column;
-		align-items: stretch
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	align-items: stretch
 }
+
