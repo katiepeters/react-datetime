@@ -2,28 +2,33 @@ import * as React from 'react'
 import styles from './_DeploymentsScreen.module.css';
 import deploymentsLoader from './deployments.loader';
 import { ScreenProps } from '../../types';
-import { Button, ButtonList, DropDownButton, ScreenWrapper, Spinner, Table } from '../../components';
-import { DBBotDeployment, DbBotInput } from '../../../../lambdas/model.types';
+import { Button, ButtonList, DropDownButton, ScreenWrapper, Spinner, Table, Card, Modal, ModalBox } from '../../components';
+import { DBBotDeployment } from '../../../../lambdas/model.types';
 import { TableColumn } from '../../components/table/Table';
 import apiCacher from '../../state/apiCacher';
 import Toaster from '../../components/toaster/Toaster';
+import CreateDeploymentForm, { CreateDeploymentPayload } from './CreateDeploymentForm';
+
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	state = {
-		loadingItems: {}
+		loadingItems: {},
+		createModalOpen: false
 	}
 
 	render() {
 		return (
 			<ScreenWrapper title="Deployments" titleExtra={ this.renderCreateButton() } >
 				{ this.renderDeployments() }
+				{ this.renderCreateModal() }
 			</ScreenWrapper>
 		);
 	}
 
 	renderCreateButton() {
 		return (
-			<Button size="s" onClick={ () => Toaster.show('This is a toast!')}>
+			<Button size="s"
+				onClick={ () => this.setState({createModalOpen: true}) }>
 				Create new deployment
 			</Button>
 		);
@@ -32,18 +37,41 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	renderDeployments() {
 		const { data, isLoading } = deploymentsLoader.getData(this, this.props.store.authenticatedId);
 
-		if( isLoading ) return 'Loading...';
-
-		if( !data?.length ) return 'No deployments yet.';
+		if( isLoading || !data ) return 'Loading...';
 
 		return (
 			<Table
 				data={ data }
 				keyField="id"
 				columns={ this.getColumns() }
+				disabledItems={ this.state.loadingItems }
+				noElementsMessage={ this.renderNoElements() }
 			/>
 		);
+	}
 
+	renderNoElements() {
+		return (
+			<Card>
+				No deployments yet.
+			</Card>
+		)
+	}
+
+	renderCreateModal() {
+		return (
+			<Modal open={this.state.createModalOpen}
+				onClose={() => this.setState({ createModalOpen: false })}>
+				{() => (
+					<ModalBox>
+						<CreateDeploymentForm
+							accountId={this.props.store.authenticatedId}
+							onClose={() => this.setState({ createModalOpen: false })}
+							onCreate={this._onCreateDeployment} />
+					</ModalBox>
+				)}
+			</Modal>
+		)
 	}
 
 	getColumns(): TableColumn<DBBotDeployment>[] {
@@ -61,8 +89,8 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 
 	_renderControls = (item: DBBotDeployment) => {
 		// @ts-ignore
-		if( this.state.loadingItems[item.id] ){
-			return <Spinner />;
+		if (this.state.loadingItems[item.id]) {
+			return <Spinner color="#fff" />;
 		}
 
 		let buttons = [
@@ -100,6 +128,22 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 				})
 			;
 		}
-		console.log(item.id, action);
+		else if (action === 'delete') {
+			this.setState({ loadingItems: { [item.id]: true } });
+			apiCacher.deleteDeployment(authenticatedId, item.id)
+				.then(() => {
+					this.setState({ loadingItems: {} });
+				})
+			;
+		}
+	}
+
+	_onCreateDeployment( data: CreateDeploymentPayload ) {
+		return apiCacher.createDeployment( data ).then( res => {
+			if( !res.data?.error ){
+				this.setState({createModalOpen: false});
+				Toaster.show('The bot has been deployed', 'success');
+			}
+		});
 	}
 }

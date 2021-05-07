@@ -1,0 +1,13 @@
+.container {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.item {
+	margin-left: 10px;
+}
+
+.firstItem {
+	margin-left: 0;
+}

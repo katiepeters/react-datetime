@@ -13,3 +13,5 @@ export { default as DropDown } from './dropDown/DropDown';
 export { default as DropDownButton } from './dropDownButton/DropDownButton';
 export { default as ButtonList } from './buttonList/ButtonList';
 export { default as Spinner } from './spinner/Spinner';
+export { default as Controls } from './controls/Controls';
+export { default as Card } from './card/Card';

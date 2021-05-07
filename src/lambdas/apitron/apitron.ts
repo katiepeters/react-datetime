@@ -97,6 +97,7 @@ async function setTestData(event) {
 		await ExchangeAccountModel.create({
 			accountId,
 			id: 'testExchange',
+			name: 'Test exchange real',
 			provider: 'bitfinex',
 			type: 'real',
 			key: 'Mma7B6ISTUNVcnUPOrDJgVgcNRh3VbmeIalaBDvUpml',
@@ -106,6 +107,7 @@ async function setTestData(event) {
 		await ExchangeAccountModel.create({
 			accountId,
 			id: 'virtualExchange',
+			name: 'Virtua exchange',
 			provider: 'bitfinex',
 			type: 'virtual',
 			key: '{"BTC": {"asset": "BTC", "free": 0, "total": 0}, "USD": {"asset": "USD", "free": 1000, "total": 1000}}',

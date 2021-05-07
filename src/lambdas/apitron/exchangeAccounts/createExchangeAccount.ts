@@ -7,6 +7,7 @@ const createExchangeAccountHandler: MutationHandler = {
 	async getContext({body, params, models}: MutationContextInput<any>): Promise<ContextResult> {
 		// Validate input
 		let {error} = validateShape(body, {
+			name: 'string',
 			accountId: 'string',
 			provider: 'provider',
 			type: 'providerType',
@@ -24,10 +25,10 @@ const createExchangeAccountHandler: MutationHandler = {
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {
-		const {accountId, provider, type, key, secret} = input.body;
+		const {accountId, provider, type, key, secret, name} = input.body;
 		let data = {
 			id: uuid(),
-			accountId, provider, type, key, secret
+			accountId, provider, type, key, secret, name
 		}
 		return [{
 			model: 'exchangeAccount',

@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput } from './apiClient';
+import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput } from './apiClient';
 import store from './store';
 
 export interface DbBot {
@@ -105,6 +105,25 @@ const apiCacher = {
 		;
 	},
 
+	createDeployment(input: CreateDeploymentInput ): Promise<AxiosResponse> {
+		return apiClient.createDeployment(input).then( res => {
+			if( !res.data.error ){
+				store.deployments[res.data.id] = {
+					...input,
+					id: res.data.id
+				}
+				let account = store.accounts[input.accountId];
+				if( account ){
+					account.deployments = [
+						...(account.deployments || [] ),
+						res.data.id
+					];
+				}
+			}
+			return res;
+		})
+	},
+
 	updateDeployment(deploymentId: string, payload: UpdateDeploymentInput): Promise<AxiosResponse> {
 		return apiClient.updateDeployment(deploymentId, payload)
 			.then( res => {
@@ -192,20 +211,19 @@ const apiCacher = {
 		return apiClient.createExchangeAccount(payload)
 			.then(res => {
 				if( !res.data.error ){
-					return this.loadSingleDeployment(payload.accountId, res.data.id)
-						.then( res => {
-							if( !res.data.error ){
-								let account = store.accounts[payload.accountId];
-								if( account ){
-									store.accounts[payload.accountId] = [
-										...(account.exchangeAccounts || []),
-										res.data.id
-									];					
-								}
-							}
-							return res;
-						})
-					;
+					let account = store.accounts[payload.accountId];
+					if( account ){
+						store.accounts[payload.accountId].exchangeAccounts = [
+							...(account.exchangeAccounts || []),
+							res.data.id
+						];					
+					}
+					store.exchangeAccounts[ res.data.id ] = {
+						id: res.data.id,
+						name: payload.name,
+						provider: payload.provider,
+						type: payload.type
+					};
 				}
 				return res;
 			})

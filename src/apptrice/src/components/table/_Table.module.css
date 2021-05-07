@@ -17,6 +17,10 @@
 	background-color: #eeccff22;
 }
 
+.rowDisabled:hover {
+	background-color: #eeccff11;
+}
+
 .rowClickable {
 	cursor: pointer;
 }
@@ -24,4 +28,9 @@
 .cell {
 	padding: 10px;
 	min-height: 45px;
+	vertical-align: middle;
+}
+
+.rowDisabled .cell {
+	opacity: .6;
 }

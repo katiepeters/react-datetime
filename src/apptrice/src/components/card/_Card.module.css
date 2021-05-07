@@ -1,0 +1,26 @@
+.container {
+	padding: 20px;
+	border: 1px solid #11223311;
+	border-radius: 10px;
+}
+
+.dark {
+	background-color: #05001144;
+}
+
+.light {
+	background-color: #EED9FF11;
+}
+
+.red {
+	background-color: red;
+}
+
+.yellow {
+	background-color: gold;
+	color: #444
+}
+
+.blue {
+	background-color: blue;
+}

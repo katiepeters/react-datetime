@@ -9,3 +9,20 @@
 	align-items: stretch
 }
 
+.caption {
+	font-size: 14px;
+	margin-top: 2px;
+}
+
+.text_error {
+	color: red;
+}
+
+.text_warning {
+	color: gold;
+}
+
+.iconWrapper {
+	display: inline-block;
+	margin-right: 5px;
+}

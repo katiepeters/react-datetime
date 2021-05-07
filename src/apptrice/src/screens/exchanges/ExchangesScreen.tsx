@@ -1,18 +1,23 @@
 import * as React from 'react'
 import { ExchangeAccountResponse } from '../../../../lambdas/model.types';
-import { Button, ButtonList, DropDownButton, Modal, ModalBox, ScreenWrapper, Table } from '../../components';
+import { Button, ButtonList, DropDownButton, Modal, ModalBox, ScreenWrapper, Spinner, Table } from '../../components';
 import { TableColumn } from '../../components/table/Table';
+import Toaster from '../../components/toaster/Toaster';
+import apiCacher from '../../state/apiCacher';
+import { CreateExchangeAccountInput } from '../../state/apiClient';
 import exchangeListLoader from '../../state/loaders/exchangeList.loader';
 import { ScreenProps } from '../../types';
-import CreateExchangeForm from './CreateExchangeForm';
+import CreateExchangeForm, {CreateExchangePayload} from './CreateExchangeForm';
 import styles from './_ExchangesScreen.module.css';
 
 interface ExchangeScreenState {
-	createModalOpen: boolean
+	createModalOpen: boolean,
+	loadingItems: { [id: string]: boolean }
 }
 export default class ExchangesScreen extends React.Component<ScreenProps> {
 	state: ExchangeScreenState = {
-		createModalOpen: false
+		createModalOpen: false,
+		loadingItems: {}
 	}
 
 	render() {
@@ -34,7 +39,9 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 
 	renderList(data: any) {
 		return (
-			<Table data={ data } columns={ this.getColumns() } />
+			<Table data={ data }
+				columns={ this.getColumns() }
+				disabledItems={ this.state.loadingItems } />
 		);
 	}
 
@@ -48,13 +55,15 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 
 	renderCreateForm() {
 		return (
-			<CreateExchangeForm />
+			<CreateExchangeForm
+				onClose={ () => this.setState({createModalOpen: false}) }
+				onCreate={ this._onCreateExchange }/>
 		);
 	}
 
 	getColumns(): TableColumn<ExchangeAccountResponse>[] {
 		return [
-			{field: 'id'},
+			{field: 'name'},
 			{field: 'provider'},
 			{field: 'type'},
 			{field: 'controls', title: '', renderFn: this._renderControls, noSort: true }
@@ -62,6 +71,11 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 	}
 
 	_renderControls = (item: ExchangeAccountResponse) => {
+
+		if( this.state.loadingItems[item.id] ){
+			return <Spinner color="#fff" />;
+		}
+
 		let buttons = [
 			{label: 'Delete this exchange', value: 'delete'}
 		];
@@ -76,6 +90,36 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 	}
 
 	_onExchangeAction = (item: ExchangeAccountResponse, action: string) => {
-		console.log( item.id, action );
+		if( action === 'delete' ){
+			this.setState({loadingItems: {[item.id]: true}});
+			apiCacher.deleteExchangeAccount(this.props.store.authenticatedId, item.id)
+				.then( res => {
+					this.setState({ loadingItems: {} });
+					if( !res.data?.error ){
+						Toaster.show('The API account is deleted.');
+					}
+				})
+			;
+		}
+	}
+
+	_onCreateExchange = (exchange: CreateExchangePayload ) => {
+		let payload: CreateExchangeAccountInput = {
+			name: exchange.name,
+			accountId: this.props.store.authenticatedId,
+			provider: exchange.provider,
+			type: 'real',
+			key: exchange.key,
+			secret: exchange.secret
+		};
+
+		return apiCacher.createExchangeAccount(payload)
+			.then( (res:any) => {
+				if( !res.data.error ){
+					this.setState({createModalOpen: false});
+					Toaster.show('The exchange has been linked.', 'success');
+				}
+			})
+		;
 	}
 }

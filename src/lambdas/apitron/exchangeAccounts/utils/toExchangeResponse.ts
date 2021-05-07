@@ -4,6 +4,7 @@ export default function toExchangeResponse( exchange: DbExchangeAccount ): Excha
 	return {
 		id: exchange.id,
 		accountId: exchange.accountId,
+		name: exchange.name,
 		provider: exchange.provider,
 		type: exchange.type,
 		key: exchange.key.slice(0, 5) + '...',

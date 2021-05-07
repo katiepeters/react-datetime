@@ -17,10 +17,11 @@ interface TableProps<T> {
 	columns?: TableColumn<T>[]
 	defaultSortColumn?: string
 	defaultOrder?: number
-	noElementsMessage?: string
+	noElementsMessage?: any
 	showHeader?: boolean
 	filterFn?: (item: T) => boolean
 	onRowClick?: (item: T) => any
+	disabledItems?: {[id:string]: boolean}
 }
 
 class Table<T> extends React.Component<TableProps<T>> {
@@ -80,7 +81,7 @@ class Table<T> extends React.Component<TableProps<T>> {
 		let items = this.filterAndSort();
 
 		if( !items.length ){
-			this.renderNoItems();
+			return this.renderNoItems();
 		}
 
 		return (
@@ -92,17 +93,22 @@ class Table<T> extends React.Component<TableProps<T>> {
 
 	_renderRow = ( item: T ) => {
 		let columns = this.getColumns();
+		let { disabledItems = {}, onRowClick, keyField = 'id'} = this.props;
+		// @ts-ignore
+		let isDisabled = disabledItems[item[keyField]];
 		let st = mergeStyles(
 			styles.row,
-			this.props.onRowClick && styles.rowClickable
+			onRowClick && !isDisabled && styles.rowClickable,
+			// @ts-ignore
+			isDisabled && styles.rowDisabled
 		);
 
 		return (
 			<tr className={st}
-				onClick={ () => this.onRowClick(item) }
+				onClick={ () => !isDisabled && onRowClick && onRowClick(item) }
 				key={ 
 					// @ts-ignore
-					item[ this.props.keyField || 'id']
+					item[ keyField ]
 				}>
 				{ columns.map( (column: TableColumn<T>) => this.renderCell(item, column) ) }
 			</tr>
@@ -121,9 +127,13 @@ class Table<T> extends React.Component<TableProps<T>> {
 
 	renderNoItems(){
 		return (
-			<div className={styles.noItems}>
-				{ this.props.noElementsMessage || 'No items'}
-			</div>
+			<tbody>
+				<tr>
+					<td className={styles.noItems}>
+						{this.props.noElementsMessage || 'No items'}
+					</td>
+				</tr>
+			</tbody>
 		);
 	}
 

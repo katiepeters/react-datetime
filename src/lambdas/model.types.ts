@@ -123,6 +123,7 @@ export interface OrderInput {
 // EXCHANGE ACCOUNT
 export interface DbExchangeAccount extends TableItem {
 	id: string
+	name: string
 	provider: 'bitfinex'
 	type: 'real' | 'virtual'
 	key: string
@@ -132,6 +133,7 @@ export interface DbExchangeAccount extends TableItem {
 export interface DbExchangeAccountInput {
 	accountId: string
 	id: string
+	name: string
 	provider: 'bitfinex'
 	type: 'real' | 'virtual'
 	key: string
@@ -140,6 +142,7 @@ export interface DbExchangeAccountInput {
 
 export interface ExchangeAccountResponse {
 	id: string
+	name: string
 	accountId: string
 	provider: string
 	type: string

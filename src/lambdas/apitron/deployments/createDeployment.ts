@@ -1,11 +1,12 @@
-import { BotConfiguration } from "../../lambda.types";
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 import { v4 as uuid } from 'uuid';
 interface CreateDeploymentInput {
 	accountId: string
 	botId: string
-	config: BotConfiguration
+	exchangeAccountId: string
+	runInterval: string
+	symbols: string[]
 	active?: boolean
 }
 
@@ -17,11 +18,9 @@ const createDeploymentHandler: MutationHandler = {
 			accountId: 'string',
 			botId: 'string',
 			active: 'boolean?',
-			config: {
-				exchangeAccountId: 'string',
-				runInterval: 'runInterval',
-				symbols: 'symbols'
-			}
+			exchangeAccountId: 'string',
+			runInterval: 'runInterval',
+			symbols: 'symbols'
 		});
 
 		if( error ) {
@@ -35,7 +34,7 @@ const createDeploymentHandler: MutationHandler = {
 		let [account, bot, exchange] = await Promise.all([
 			models.account.getSingle(body.accountId),
 			models.bot.getSingle(body.accountId, body.botId),
-			models.exchangeAccount.getSingle(body.accountId, body.config.exchangeAccountId)
+			models.exchangeAccount.getSingle(body.accountId, body.exchangeAccountId)
 		]);
 
 		if( !account ) return {error: {code: 'unknown_account'}};

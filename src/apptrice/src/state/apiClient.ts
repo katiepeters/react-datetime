@@ -7,8 +7,18 @@ export interface CandleOptions {
 	endDate: number
 }
 
+export interface CreateDeploymentInput {
+	accountId: string
+	botId: string
+	exchangeAccountId: string
+	runInterval: string
+	symbols: string[]
+	active?: boolean
+}
+
 export interface CreateExchangeAccountInput {
 	accountId: string
+	name: string,
 	provider: string,
 	type: 'real' | 'virtual',
 	key: string,
@@ -101,6 +111,13 @@ const apiClient = {
 		;
 	},
 
+	createDeployment( input: CreateDeploymentInput ): Promise<AxiosResponse> {
+		return axios.post(`${API_URL}/deployments`, input ).then( res => {
+			console.log(res);
+			return res;
+		});
+	},
+ 
 	updateDeployment(deploymentId: string, payload: UpdateDeploymentInput): Promise<AxiosResponse> {
 		return axios.patch(`${API_URL}/deployments/${deploymentId}`, payload)
 			.then(res => {
