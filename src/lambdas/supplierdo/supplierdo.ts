@@ -14,7 +14,7 @@ export async function supplierdo({ accountId, deploymentId }) {
 		await handleRunRequest( accountId, deploymentId );
 	}
 	catch(err) {
-		console.warn(err);
+		console.error(err);
 		return {error: err.code};
 	}
 
@@ -22,10 +22,14 @@ export async function supplierdo({ accountId, deploymentId }) {
 }
 
 async function handleRunRequest( accountId: string, deploymentId: string ) {
+	console.log('Supplierdo here!');
+	
 	// Get data
 	const {bot, exchangeAccount, deployment} = await getModels(accountId, deploymentId);
 	const exchangeAdapter = getAdapter(accountId, exchangeAccount);
 	const { portfolio, orders: exchangeOrders, candles } = await getExchangeData( exchangeAdapter, deployment );
+
+	console.log('All data ok');
 
 	// Store any updated order from the last run
 	const orders = mergeOrders( deployment.orders, exchangeOrders );
@@ -34,6 +38,9 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 		deploymentId: deployment.id, 
 		update: {orders}
 	});
+
+
+	console.log('Orders updated');
 
 	// Run the bot
 	const botInput: BotExecutorPayload = {
@@ -50,6 +57,7 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 		portfolio
 	}
 
+	console.log('Invoking executor');
 	const result = await lambdaUtil.invokeExecutor(botInput);
 	if( result.error ){
 		// When the bot finishes in an error we probably want to log the error
@@ -61,6 +69,7 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 		return;
 	}
 
+	console.log('Placing and cancelling orders', result);
 	const ordersToPlace = filterOrderToPlaceSymbols( result.ordersToPlace, deployment.symbols );
 
 	// Update orders
@@ -96,14 +105,20 @@ async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeplo
 
 	// Then get updated orders (virtual exchanges will use previously fetched candles)
 	let orderIds: string[] = [];
-	Object.values( deployment.orders.items ).forEach( order => {
-		if( order.status === 'placed' ){
-			// @ts-ignore
-			orderIds.push( order.foreignId );
-		}
-	});
+	if (deployment.orders?.items) {
+		Object.values(deployment.orders.items).forEach(order => {
+			if (order.status === 'placed') {
+				// @ts-ignore
+				orderIds.push(order.foreignId);
+			}
+		});
+	}
 
-	const orders = await adapter.getOrders(orderIds);
+	const orders = orderIds.length ?
+		await adapter.getOrders(orderIds) :
+		[]
+	;
+
 	return { portfolio, orders, candles };
 }
 

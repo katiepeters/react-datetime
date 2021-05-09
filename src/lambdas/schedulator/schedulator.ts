@@ -7,22 +7,39 @@ export async function schedulator(event) {
 	let deployments = await BotDeploymentModel.getActiveDeployments('1h');
 	console.log(deployments);
 
+	let promises: any[] = [];
 	deployments.forEach( ({accountId, resourceId}) => {
-		lambdaUtil.invokeSupplierdo({
+		console.log(`invoking supplierdo ${resourceId}`);
+		let payload = {
 			accountId,
 			deploymentId: resourceId.split('#')[1]
-		});
+		};
+
+		promises.push( lambdaUtil.invokeSupplierdo(payload)
+			.then( res => console.log('Supplierdo invoked', res) )
+			.catch( err => console.log('Supplierdo error', err) )
+		);
 	});
 
-	return {
-		statusCode: 200,
-		body: JSON.stringify(
-			{
-				message: 'Go Serverless v1.0! Your function executed successfully!',
-				input: event,
-			},
-			null,
-			2
-		),
-	};
+	return Promise.all( promises )
+		.then((results: any) => {
+			console.log('promises results', results);
+			return {
+				statusCode: 200,
+				body: JSON.stringify(
+					{
+						message: 'Schedulator run ok'
+					},
+					null,
+					2
+				),
+			};
+		})
+		.catch( err => {
+			return {
+				statusCode: 500,
+				body: JSON.stringify({error: err})
+			};
+		})
+	;
 }

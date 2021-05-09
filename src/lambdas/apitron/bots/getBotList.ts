@@ -8,7 +8,6 @@ const getBotListHandler: QueryHandler = {
 		}
 
 		let bots = await models.bot.getAccountBots(query.accountId);
-
 		return { context: bots };
 	},
 

@@ -11,7 +11,8 @@
     "invoke": "aws lambda invoke /dev/null --endpoint-url http://localhost:3002 --function-name awstrader-dev-hello --payload '{\"isTest\": true, \"accountId\":\"testAccount\", \"deploymentId\":\"testDeployment\"}' --cli-binary-format raw-in-base64-out",
     "schedulator": "aws lambda invoke /dev/null --endpoint-url http://localhost:3032 --function-name awstrader-dev-schedulator",
     "dynamo:browse": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
-    "deploy": "serverless deploy"
+    "deploy": "serverless deploy",
+    "build": "serverless build"
   },
   "author": "",
   "license": "ISC",
@@ -19,7 +20,9 @@
     "bfx-api-node-rest": "^4.1.0",
     "crypto-js": "^4.0.0",
     "express": "^4.17.1",
+    "node-fetch": "^2.6.1",
     "serverless-http": "^2.7.0",
+    "typescript": "^4.2.4",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -29,7 +32,6 @@
     "serverless": "^2.30.3",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.8.0",
-    "serverless-plugin-typescript": "^1.1.9",
-    "typescript": "^4.2.3"
+    "serverless-plugin-typescript": "^1.1.9"
   }
 }

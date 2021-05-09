@@ -6,7 +6,6 @@ import lambdaUtil from '../_common/utils/lambda';
 import BitfinexAdapter from '../_common/exchanges/adapters/BitfinexAdapter';
 import exchangeUtils from '../_common/exchanges/exchangeUtils';
 import deploymentAPI from './deployments/deploymentsAPI';
-import allModels from '../_common/dynamo/allModels';
 import exchangesAPI from './exchangeAccounts/exchangesAPI';
 import botsAPI from './bots/botsAPI';
 
@@ -20,7 +19,9 @@ const app = express()
 app.use(express.json());
 app.use(function (req, res, next) {
 	res.setHeader('charset', 'utf-8')
+	res.setHeader("Access-Control-Allow-Headers", "Content-Type")
 	res.setHeader("Access-Control-Allow-Origin", "*")
+	res.setHeader("Access-Control-Allow-Methods", "OPTIONS,POST,GET,PATCH,DELETE")
 	next();
 });
 
@@ -31,6 +32,13 @@ app.get('/', function (req, res) {
 
 app.get('/accounts/:id', function(req, res){
 	res.send('/account/:id not implemented yet');
+});
+
+app.post('/schedulator', function( req, res ){
+	lambdaUtil.invokeSchedulator().then( result => {
+		console.log( 'Schedulator', result );
+		res.send(`ok`);
+	});
 });
 
 botsAPI.initialize(app);
