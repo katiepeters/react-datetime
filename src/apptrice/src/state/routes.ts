@@ -11,6 +11,7 @@ import BtChartsScreen from "../screens/backtesting/btCharts/BtChartsScreen";
 import BtScreen from "../screens/backtesting/BtScreen";
 import DeploymentsScreen from "../screens/deployments/DeploymentsScreen";
 import ExchangesScreen from "../screens/exchanges/ExchangesScreen";
+import SettingsScreen from "../screens/settings/SettingsScreen";
 
 const routes = [
 	{path: '/', cb: HomeScreen},
@@ -36,7 +37,8 @@ const routes = [
 			},
 			{ path: '*', cb: BtSettingsScreen },
 		]
-	}
+	},
+	{ path: '/settings', cb: SettingsScreen },
 ];
 
 export default routes;

@@ -18,6 +18,11 @@ const express = require('express')
 const app = express()
 
 app.use(express.json());
+app.use(function (req, res, next) {
+	res.setHeader('charset', 'utf-8')
+	res.setHeader("Access-Control-Allow-Origin", "*")
+	next();
+});
 
 app.get('/', function (req, res) {
 	console.log('Hello!');

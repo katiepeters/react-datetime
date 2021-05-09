@@ -1,9 +1,12 @@
+import localStore from "./state/localStore";
 import quickStore from "./state/quickStore";
+import store from "./state/store";
 
 export interface ScreenProps {
-	store: any,
+	store: typeof store,
 	router: any,
-	quickStore: typeof quickStore
+	quickStore: typeof quickStore,
+	localStore: typeof localStore
 }
 
 export interface FormCaption {

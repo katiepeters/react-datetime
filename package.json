@@ -9,7 +9,8 @@
     "dynamo:browse": "cd src/lambdas && npm run dynamo:browse",
     "lambda:serve": "cd src/lambdas && npm run offline",
     "app:serve": "cd src/apptrice && npm run start",
-    "botWorker:build": "cd src/apptrice && npm run botWorker:build"
+    "botWorker:build": "cd src/apptrice && npm run botWorker:build",
+    "deploy": "cd src/lambdas && npm run deploy"
   },
   "repository": {
     "type": "git",

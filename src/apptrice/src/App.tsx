@@ -5,8 +5,15 @@ import Toaster from './components/toaster/Toaster';
 import quickStore from './state/quickStore';
 import router from './state/router';
 import store from './state/store';
+import localStore from './state/localStore';
+import apiClient from './state/apiClient';
 
 class App extends React.Component {
+  constructor(props: any) {
+    super(props);
+    apiClient.initialize(localStore.getApiUrl());
+  }
+
   render() {
     let CurrentScreen = router.location.matches[0];
 
@@ -18,7 +25,8 @@ class App extends React.Component {
           <CurrentScreen
             quickStore={quickStore}
             store={store}
-            router={router} />
+            router={router}
+            localStore={localStore} />
         </SidebarLayout>
         <Toaster />
       </div>
@@ -37,6 +45,7 @@ class App extends React.Component {
     store.addChangeListener( refresh );
     quickStore.addChangeListener( refresh );
     router.onChange( refresh );
+    localStore.addChangeListener( refresh );
   }
 }
 

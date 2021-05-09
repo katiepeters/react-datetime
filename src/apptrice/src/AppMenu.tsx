@@ -15,6 +15,7 @@ export default class AppMenu extends React.Component<AppMenuProps> {
 					<AppLink name="Deploys" icon="rocket" link="#/deployments" isActive={this.isActive('deployments')} />
 					<AppLink name="Bots" icon="robot" link="#/bots" isActive={this.isActive('bots')} />
 					<AppLink name="API accounts" icon="plug" link="#/exchanges" isActive={this.isActive('exchanges')} />
+					<AppLink name="Settings" icon="cogs" link="#/settings" isActive={this.isActive('settings')} />
 				</div>
 			</div>
 		)

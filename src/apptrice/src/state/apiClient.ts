@@ -41,8 +41,11 @@ export interface CreateBotInput {
 	code: string
 }
 
-const API_URL = 'http://localhost:3030/dev';
+let API_URL: string;
 const apiClient = {
+	initialize( url: string ){
+		API_URL = url;
+	},
 
 	//////////
 	// ACCOUNT
