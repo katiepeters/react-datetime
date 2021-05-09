@@ -138,7 +138,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		}
 	}
 
-	_onCreateDeployment( data: CreateDeploymentPayload ) {
+	_onCreateDeployment = ( data: CreateDeploymentPayload ) => {
 		return apiCacher.createDeployment( data ).then( res => {
 			if( !res.data?.error ){
 				this.setState({createModalOpen: false});

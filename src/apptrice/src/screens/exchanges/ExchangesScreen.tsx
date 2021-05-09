@@ -96,7 +96,7 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 				.then( res => {
 					this.setState({ loadingItems: {} });
 					if( !res.data?.error ){
-						Toaster.show('The API account is deleted.');
+						Toaster.show('The API account is deleted.', 'success');
 					}
 				})
 			;

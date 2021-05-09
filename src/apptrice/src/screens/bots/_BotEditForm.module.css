@@ -1,0 +1,15 @@
+.container {
+	min-width: 500px;
+}
+
+.titleWrapper {
+	margin-bottom: 20px;
+}
+
+.inputWrapper {
+	margin-bottom: 10px;
+}
+
+.controls {
+	margin-top: 20px;
+}

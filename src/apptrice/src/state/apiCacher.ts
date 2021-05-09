@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput } from './apiClient';
+import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput, CreateBotInput } from './apiClient';
 import store from './store';
 
 export interface DbBot {
@@ -30,6 +30,8 @@ const apiCacher = {
 				})
 
 				store.accounts[accountId].bots = botIds;
+
+				return res;
 			})
 		;
 	},
@@ -46,12 +48,36 @@ const apiCacher = {
 		;
 	},
 
+	createBot( input: CreateBotInput ): Promise<AxiosResponse>{
+		return apiClient.createBot( input )
+			.then( (res: AxiosResponse) => {
+				if (!res.data.error) {
+					const bot = {
+						id: res.data.id,
+						...input
+					};
+
+					store.bots[bot.id] = bot;
+					let account = store.accounts[bot.accountId];
+					if( account ){
+						account.bots = [
+							...(account.bots || []),
+							bot.id
+						];
+					}
+				}
+				return res;
+			})
+		;
+	},
+
 	updateBot(accountId: string, botId: string, payload: UpdateBotInput): Promise<AxiosResponse> {
 		return apiClient.updateBot(accountId, botId, payload)
 			.then( (res: AxiosResponse) => {
 				if( !res.data.error ){
 					store.bots[botId] = {
 						...(store.bots[botId] || {}),
+						...payload,
 						...res.data
 					}
 				}

@@ -44,6 +44,7 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		creating: false
 	}
 
+	dataLoaded = false;
 	render() {
 		let {accountId} = this.props;
 		let { data: bots } = botListLoader.getData(this, accountId);
@@ -52,6 +53,9 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		if( !bots || !exchanges ){
 			return <span>Loading...</span>;
 		} 
+		if( !this.dataLoaded ){
+			this.dataLoaded = true;
+		}
 
 		return (
 			<div className={styles.container}>
@@ -208,5 +212,30 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 	mounted = true
 	componentWillUnmount() {
 		this.mounted = false;
+	}
+
+	componentDidMount(){
+		this.checkSelectedResources();
+	}
+
+	componentDidUpdate() {
+		this.checkSelectedResources();
+	}
+
+	checkSelectedResources(){
+		if( !this.dataLoaded ) return;
+		if( !this.state.botId ){
+			const {accountId} = this.props;
+			let { data: bots } = botListLoader.getData(this, accountId);
+			let { data: exchanges } = exchangeListLoader.getData(this, accountId);
+
+			if( bots && exchanges ){
+				console.log('Setting state');
+				this.setState({
+					botId: bots.length ? bots[0].id : '',
+					exchangeAccountId: exchanges.length ? exchanges[0].id : ''
+				});
+			}
+		}
 	}
 }

@@ -35,6 +35,12 @@ export interface UpdateDeploymentInput {
 	active: boolean
 }
 
+export interface CreateBotInput {
+	accountId: string,
+	name: string,
+	code: string
+}
+
 const API_URL = 'http://localhost:3030/dev';
 const apiClient = {
 
@@ -55,6 +61,15 @@ const apiClient = {
 	//////////
 	loadBotList( accountId: string ): Promise<AxiosResponse>{
 		return axios.get(`${API_URL}/bots?accountId=${accountId}`)
+			.then(res => {
+				console.log(res);
+				return res;
+			})
+		;
+	},
+
+	createBot( input: CreateBotInput ): Promise<AxiosResponse> {
+		return axios.post(`${API_URL}/bots`, input )
 			.then(res => {
 				console.log(res);
 				return res;

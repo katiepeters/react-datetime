@@ -9,14 +9,14 @@
     },
     {
       "token": "number", 
-      "foreground": "99ddff"
+      "foreground": "86d2f1"
     },
     {
       "foreground": "637777",
       "token": "comment"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "string"
     },
     {
@@ -48,39 +48,39 @@
       "token": "constant.character.numeric"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "variable"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "punctuation.accessor"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "storage"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "meta.var.expr"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "meta.class meta.method.declaration meta.var.expr storage.type.jsm"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "storage.type.property.js"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "storage.type.property.ts"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "storage.type.property.tsx"
     },
     {
@@ -96,7 +96,7 @@
       "token": "meta.class entity.name.type.class"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "entity.other.inherited-class"
     },
     {
@@ -104,7 +104,7 @@
       "token": "entity.name.function"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "punctuation.definition.variable"
     },
     {
@@ -156,12 +156,12 @@
       "token": "string.template punctuation.definition.string"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "fontStyle": "italic",
       "token": "italic"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "fontStyle": "bold",
       "token": "bold"
     },
@@ -198,7 +198,7 @@
       "token": "constant.character.escape"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "entity.other.inherited-class"
     },
     {
@@ -222,11 +222,11 @@
       "token": "punctuation.definition.tag.end"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "entity.other.attribute-name"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "entity.name.tag.custom"
     },
     {
@@ -242,15 +242,15 @@
       "token": "upport.constant.meta.property-value"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "support.type"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "support.class"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "support.variable.dom"
     },
     {
@@ -274,67 +274,51 @@
       "token": "keyword.control"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.operator.comparison"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.flow.js"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.flow.ts"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.flow.tsx"
     },
     {
-      "foreground": "c792ea",
-      "token": "keyword.control.ruby"
-    },
-    {
-      "foreground": "c792ea",
-      "token": "keyword.control.module.ruby"
-    },
-    {
-      "foreground": "c792ea",
-      "token": "keyword.control.class.ruby"
-    },
-    {
-      "foreground": "c792ea",
-      "token": "keyword.control.def.ruby"
-    },
-    {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.loop.js"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.loop.ts"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.import.js"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.import.ts"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.import.tsx"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.from.js"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.from.ts"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.control.from.tsx"
     },
     {
@@ -352,27 +336,27 @@
       "token": "keyword.operator"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.operator.relational"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.operator.assignement"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.operator.arithmetic"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.operator.bitwise"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.operator.increment"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "keyword.operator.ternary"
     },
     {
@@ -392,7 +376,7 @@
       "token": "meta.brace"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "meta.delimiter.period"
     },
     {
@@ -444,7 +428,7 @@
       "token": "keyword.other.unit"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "meta.selector"
     },
     {
@@ -456,11 +440,11 @@
       "token": "meta.property-name"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "entity.name.tag.doctype"
     },
     {
-      "foreground": "c792ea",
+      "foreground": "f390dd",
       "token": "meta.tag.sgml.doctype"
     },
     {
@@ -480,15 +464,15 @@
       "token": "string.quoted.single"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "support.constant.math"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "support.type.property-name.json"
     },
     {
-      "foreground": "addb67",
+      "foreground": "ffe084",
       "token": "support.constant.json"
     },
     {
@@ -502,26 +486,6 @@
     {
       "foreground": "ff5874",
       "token": "meta.structure.dictionary.json meta.structure.dictionary.value constant.language"
-    },
-    {
-      "foreground": "d6deeb",
-      "token": "variable.other.ruby"
-    },
-    {
-      "foreground": "ecc48d",
-      "token": "entity.name.type.class.ruby"
-    },
-    {
-      "foreground": "ecc48d",
-      "token": "keyword.control.class.ruby"
-    },
-    {
-      "foreground": "ecc48d",
-      "token": "meta.class.ruby"
-    },
-    {
-      "foreground": "7fdbca",
-      "token": "constant.language.symbol.hashkey.ruby"
     },
     {
       "foreground": "e0eddd",
@@ -576,100 +540,6 @@
     {
       "foreground": "269186",
       "token": "other.add"
-    },
-    {
-      "foreground": "ff5874",
-      "token": "constant.language.python"
-    },
-    {
-      "foreground": "82aaff",
-      "token": "variable.parameter.function.python"
-    },
-    {
-      "foreground": "82aaff",
-      "token": "meta.function-call.arguments.python"
-    },
-    {
-      "foreground": "b2ccd6",
-      "token": "meta.function-call.python"
-    },
-    {
-      "foreground": "b2ccd6",
-      "token": "meta.function-call.generic.python"
-    },
-    {
-      "foreground": "d6deeb",
-      "token": "punctuation.python"
-    },
-    {
-      "foreground": "addb67",
-      "token": "entity.name.function.decorator.python"
-    },
-    {
-      "foreground": "8eace3",
-      "token": "source.python variable.language.special"
-    },
-    {
-      "foreground": "82b1ff",
-      "token": "markup.heading.markdown"
-    },
-    {
-      "foreground": "c792ea",
-      "fontStyle": "italic",
-      "token": "markup.italic.markdown"
-    },
-    {
-      "foreground": "addb67",
-      "fontStyle": "bold",
-      "token": "markup.bold.markdown"
-    },
-    {
-      "foreground": "697098",
-      "token": "markup.quote.markdown"
-    },
-    {
-      "foreground": "80cbc4",
-      "token": "markup.inline.raw.markdown"
-    },
-    {
-      "foreground": "ff869a",
-      "token": "markup.underline.link.markdown"
-    },
-    {
-      "foreground": "ff869a",
-      "token": "markup.underline.link.image.markdown"
-    },
-    {
-      "foreground": "d6deeb",
-      "token": "string.other.link.title.markdown"
-    },
-    {
-      "foreground": "d6deeb",
-      "token": "string.other.link.description.markdown"
-    },
-    {
-      "foreground": "82b1ff",
-      "token": "punctuation.definition.string.markdown"
-    },
-    {
-      "foreground": "82b1ff",
-      "token": "punctuation.definition.string.begin.markdown"
-    },
-    {
-      "foreground": "82b1ff",
-      "token": "punctuation.definition.string.end.markdown"
-    },
-    {
-      "foreground": "82b1ff",
-      "token": "meta.link.inline.markdown punctuation.definition.string"
-    },
-    {
-      "foreground": "7fdbca",
-      "token": "punctuation.definition.metadata.markdown"
-    },
-    {
-      "foreground": "82b1ff",
-      "token": "beginning.punctuation.definition.list.markdown"
     }
   ],
   "colors": {
