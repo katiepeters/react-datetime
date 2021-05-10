@@ -16,6 +16,16 @@ module.exports = {
 				},
         exclude: /node_modules/,
       },
+      {
+        test: /\.tsx?$/,
+        loader: 'string-replace-loader',
+        options: {
+          search: "import { v4 as uuid } from 'uuid';",
+          replace: `
+// @ts-ignore (needed for compile the bot worker)
+const uuid = require("uuid/dist/v4").default;`
+        }
+      },
     ],
   },
   resolve: {

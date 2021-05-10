@@ -1,9 +1,14 @@
 const AWS = require('aws-sdk');
 if (process.env.IS_OFFLINE) {
+	console.log('OFFLINE DB');
 	AWS.config.update({
 		endpoint: "http://localhost:8000"
 	});
 }
+else {
+	console.log('ONLNE DB');
+}
+
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 interface GSIQuery {

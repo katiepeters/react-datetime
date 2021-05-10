@@ -1,8 +1,7 @@
 import { OrderInput, Order, Orders, Portfolio, BotCandles, Balance } from '../lambda.types';
 import candles from '../_common/utils/candles';
 import symbols from '../_common/utils/symbols';
-// @ts-ignore (needed for compile the bot worker)
-const uuid = require('uuid/dist/v4').default;
+import { v4 as uuid } from 'uuid';
 export default class Trader {
 	portfolio: Portfolio
 	orders: Orders
