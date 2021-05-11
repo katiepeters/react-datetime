@@ -12,10 +12,13 @@ import BtScreen from "../screens/backtesting/BtScreen";
 import DeploymentsScreen from "../screens/deployments/DeploymentsScreen";
 import ExchangesScreen from "../screens/exchanges/ExchangesScreen";
 import SettingsScreen from "../screens/settings/SettingsScreen";
+import SingleDeploymentScreen from "../screens/singleDeployment/SingleDeploymentScreen";
 
 const routes = [
 	{path: '/', cb: HomeScreen},
-	{path: '/deployments', cb: DeploymentsScreen},
+	{path: '/deployments', cb: DeploymentsScreen, children: [
+		{path: '/:id', cb: SingleDeploymentScreen}
+	]},
 	{path: '/bots', cb: BotListScreen, children: [
 		{path: '/:id', cb: BotScreen, children: [
 			{ path: '/details', cb: BotDetailsScreen },

@@ -40,6 +40,7 @@ provider:
   lambdaHashingVersion: 20201221
   environment:
     ACCOUNTS_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    S3_BUCKET: ${self:custom.bucket}
   iam:
     role: defaultRole
 
@@ -217,4 +218,5 @@ resources:
 plugins:
   - serverless-plugin-typescript
   - serverless-dynamodb-local
+  - serverless-s3-local
   - serverless-offline

@@ -8,6 +8,7 @@ import exchangeUtils from '../_common/exchanges/exchangeUtils';
 import deploymentAPI from './deployments/deploymentsAPI';
 import exchangesAPI from './exchangeAccounts/exchangesAPI';
 import botsAPI from './bots/botsAPI';
+import s3Helper from '../_common/utils/s3';
 
 const fs = require('fs');
 const path = require('path');
@@ -39,6 +40,16 @@ app.post('/schedulator', function( req, res ){
 		console.log( 'Schedulator', result );
 		res.send(`ok`);
 	});
+});
+
+app.post('/trys3', function (req, res) {
+	s3Helper.setContent('some/path', 'My content')
+		.then( res => {
+			s3Helper.getContent('some/path').then( res2 => {
+				console.log('get path', res);
+			})
+		})
+	;
 });
 
 botsAPI.initialize(app);

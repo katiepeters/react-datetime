@@ -17,6 +17,11 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	}
 
 	render() {
+		let Subscreen = this.getSubscreen();
+		if( Subscreen ){
+			return <Subscreen { ...this.props } />
+		}
+
 		return (
 			<ScreenWrapper title="Deployments" titleExtra={ this.renderCreateButton() } >
 				{ this.renderDeployments() }
@@ -46,6 +51,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 				columns={ this.getColumns() }
 				disabledItems={ this.state.loadingItems }
 				noElementsMessage={ this.renderNoElements() }
+				onRowClick={ (item: DBBotDeployment) => this.props.router.push(`/deployments/${item.id}`)}
 			/>
 		);
 	}
@@ -102,11 +108,13 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		];
 
 		return (
-			<DropDownButton closeOnClick={true}>
-				<ButtonList buttons={buttons}
-					onButtonPress={(action: string) => this._onExchangeAction(item, action)}
-				/>
-			</DropDownButton>
+			<div onClick={(e:any) => e.stopPropagation()}>
+				<DropDownButton closeOnClick={true}>
+					<ButtonList buttons={buttons}
+						onButtonPress={(action: string) => this._onExchangeAction(item, action)}
+					/>
+				</DropDownButton>
+			</div>
 		);
 	}
 
@@ -145,5 +153,9 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 				Toaster.show('The bot has been deployed', 'success');
 			}
 		});
+	}
+
+	getSubscreen() {
+		return this.props.router.location.matches[1];
 	}
 }
