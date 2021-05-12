@@ -18,11 +18,8 @@ interface UpdateDeploymentInput {
 export default {
 	async getAccountDeployments( accountId: string ): Promise<SimpleBotDeployment[]> {
 		let deployments = await Db.getMultiple(accountId, 'DEPLOYMENT#');
-		return deployments.map( (d: any) => ({
-			id: d.id,
-			accountId,
-			config: d.config,
-			botId: d.botId,
+		return deployments.map((d: any) => ({
+			...d,
 			active: d.active === 'true' ? true : false
 		}));
 	},
@@ -45,6 +42,17 @@ export default {
 			logs: JSON.parse(logs)
 		};
 	},
+
+	async getSingleSimple(accountId: string, deploymentId: string): Promise<SimpleBotDeployment|void> {
+		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
+
+		if (!entry) return;
+		return {
+			...entry,
+			active: entry.active ? true : false
+		};
+	},
+
 
 	async create( input: DBBotDeploymentInput ){
 		const {id: deploymentId, accountId } = input;
@@ -77,18 +85,37 @@ export default {
 	},
 
 	async update({ accountId, deploymentId, update }: UpdateDeploymentInput ){
-		let rawUpdate:any = {...update};
-		if( rawUpdate.state ){
-			rawUpdate.state = JSON.stringify(rawUpdate.state);
+		let promises: any = [];
+		let {botId, runInterval, symbols} = update;
+		if( botId || runInterval || symbols ) {
+			promises.push(
+				Db.update(accountId, `DEPLOYMENT#${deploymentId}`, {
+					botId, runInterval, symbols
+				})
+			);
 		}
-		if (rawUpdate.orders) {
-			rawUpdate.orders = JSON.stringify(rawUpdate.orders);
+
+		if( update.logs ){
+			promises.push( saveLogs(accountId, deploymentId, JSON.stringify(update.logs)) );
 		}
-		return await Db.update(accountId, `DEPLOYMENT#${deploymentId}`, rawUpdate);
+		if (update.orders) {
+			promises.push( saveOrders(accountId, deploymentId, JSON.stringify(update.orders)) );
+		}
+		if (update.state) {
+			promises.push( saveState(accountId, deploymentId, JSON.stringify(update.state)) );
+		}
+
+		return await Promise.all( promises );
 	},
 
 	async delete({accountId, deploymentId}: DeleteDeploymentInput) {
-		return await Db.del(accountId, `DEPLOYMENT#${deploymentId}`);
+		let promises = [
+			Db.del(accountId, `DEPLOYMENT#${deploymentId}`),
+			delLogs(accountId, deploymentId),
+			delOrders(accountId, deploymentId),
+			delState(accountId, deploymentId),
+		]
+		return await Promise.all(promises);
 	},
 
 	async getActiveDeployments( runInterval: string ) {
@@ -135,4 +162,14 @@ function saveState(accountId: string, deploymentId: string, state: string) {
 }
 function saveOrders(accountId: string, deploymentId: string, orders: string) {
 	return s3Helper.setContent(getOrdersFileName(accountId, deploymentId), orders);
+}
+
+function delLogs(accountId: string, deploymentId: string) {
+	return s3Helper.delObject(getLogsFileName(accountId, deploymentId));
+}
+function delState(accountId: string, deploymentId: string) {
+	return s3Helper.delObject(getStateFileName(accountId, deploymentId));
+}
+function delOrders(accountId: string, deploymentId: string) {
+	return s3Helper.delObject(getOrdersFileName(accountId, deploymentId));
 }

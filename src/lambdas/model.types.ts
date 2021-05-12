@@ -67,7 +67,9 @@ export interface SimpleBotDeployment {
 	id: string
 	accountId: string
 	botId: string
-	config: string
+	exchangeAccountId: string
+	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	symbols: string[]
 	active: boolean
 }
 

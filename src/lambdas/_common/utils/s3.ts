@@ -53,6 +53,22 @@ const s3Helper = {
 				return data.Body.toString();
 			})
 		;
+	},
+	delObject( path: string ) {
+		const payload = {
+			Bucket: BUCKET_NAME,
+			Key: path
+		}
+		return S3.deleteObject(payload).promise()
+			.then(data => {
+				console.log('delOk', data);
+				return { error: false };
+			})
+			.catch(err => {
+				console.error('delError', err);
+				return { error: err };
+			})
+		;
 	}
 }
 

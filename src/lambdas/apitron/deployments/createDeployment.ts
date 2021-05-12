@@ -53,7 +53,6 @@ const createDeploymentHandler: MutationHandler = {
 			data: {
 				...input.body,
 				id,
-				orders: [],
 				state: { newState: 'stateNew' },
 				active: input.body.active === undefined ? true : input.body.active
 			}
