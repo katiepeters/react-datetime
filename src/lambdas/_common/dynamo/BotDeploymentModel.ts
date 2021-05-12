@@ -1,4 +1,5 @@
 import { DBBotDeploymentRaw, DBBotDeployment, DBBotDeploymentInput, DBBotDeploymentUpdate, SimpleBotDeployment } from '../../model.types';
+import s3Helper from '../utils/s3';
 import { DBModel } from './db';
 
 const Db = new DBModel<DBBotDeploymentRaw>();
@@ -28,34 +29,51 @@ export default {
 
 	async getSingle(accountId: string, deploymentId: string): Promise<DBBotDeployment | void> {
 		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
-		if( !entry ) return entry;
+		if( !entry ) return;
+
+		let [ logs, state, orders ] = await Promise.all([
+			getLogs(accountId, deploymentId),
+			getState(accountId, deploymentId),
+			getOrders(accountId, deploymentId)
+		]);
 
 		return {
 			...entry,
 			active: entry.active ? true : false,
-			orders: JSON.parse(entry.orders),
-			state: JSON.parse(entry.state)
+			orders: JSON.parse(orders),
+			state: JSON.parse(state),
+			logs: JSON.parse(logs)
 		};
 	},
 
-	async create( deployment: DBBotDeploymentInput ){
-		let toStore: DBBotDeploymentRaw = {
-			id: deployment.id,
-			accountId: deployment.accountId,
-			botId: deployment.botId,
-			resourceId: `DEPLOYMENT#${deployment.id}`,
-			exchangeAccountId: deployment.exchangeAccountId,
-			runInterval: deployment.runInterval,
-			symbols: deployment.symbols,
-			orders: JSON.stringify(deployment.orders),
-			state: JSON.stringify(deployment.state)
+	async create( input: DBBotDeploymentInput ){
+		const {id: deploymentId, accountId } = input;
+		let dbDeployment: DBBotDeploymentRaw = {
+			id: deploymentId,
+			accountId,
+			botId: input.botId,
+			resourceId: `DEPLOYMENT#${input.id}`,
+			exchangeAccountId: input.exchangeAccountId,
+			runInterval: input.runInterval,
+			symbols: input.symbols
 		};
 
-		if( deployment.active ){
-			toStore.active = 'true';
+		if( input.active ){
+			dbDeployment.active = 'true';
 		}
-		
-		return await Db.put(toStore);
+
+		const defaultOrders = {
+			foreignIdIndex: {},
+			items: {},
+			openOrderIds: []
+		};
+
+		return await Promise.all([
+			Db.put(dbDeployment),
+			saveLogs(accountId, deploymentId, JSON.stringify(input.logs || [])),
+			saveState(accountId, deploymentId, JSON.stringify(input.state || [])),
+			saveOrders(accountId, deploymentId, JSON.stringify(input.orders || defaultOrders)),
+		]);
 	},
 
 	async update({ accountId, deploymentId, update }: UpdateDeploymentInput ){
@@ -87,4 +105,34 @@ export default {
 	async activate({ accountId, deploymentId }: DeleteDeploymentInput) {
 		return await Db.update(accountId, `DEPLOYMENT#${deploymentId}`, {active: 'true'});
 	},
+}
+
+function getLogsFileName( accountId: string, deploymentId: string ){
+	return `${accountId}/${deploymentId}/logs`;
+}
+function getStateFileName(accountId: string, deploymentId: string) {
+	return `${accountId}/${deploymentId}/state`;
+}
+function getOrdersFileName(accountId: string, deploymentId: string) {
+	return `${accountId}/${deploymentId}/orders`;
+}
+
+function getLogs( accountId: string, deploymentId: string ){
+	return s3Helper.getContent( getLogsFileName(accountId, deploymentId) );
+}
+function getState(accountId: string, deploymentId: string) {
+	return s3Helper.getContent(getStateFileName(accountId, deploymentId));
+} 
+function getOrders(accountId: string, deploymentId: string) {
+	return s3Helper.getContent(getOrdersFileName(accountId, deploymentId));
+}
+
+function saveLogs(accountId: string, deploymentId: string, logs: string) {
+	return s3Helper.setContent(getLogsFileName(accountId, deploymentId), logs);
+}
+function saveState(accountId: string, deploymentId: string, state: string) {
+	return s3Helper.setContent(getStateFileName(accountId, deploymentId), state);
+}
+function saveOrders(accountId: string, deploymentId: string, orders: string) {
+	return s3Helper.setContent(getOrdersFileName(accountId, deploymentId), orders);
 }

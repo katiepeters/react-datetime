@@ -1,4 +1,4 @@
-import { ConsoleEntry } from "./executor/Consoler"
+import { ConsoleEntry, DeploymentOrders } from "./model.types"
 
 export interface BotConfigurationExtra{
 	[key: string]: any
@@ -107,7 +107,7 @@ export interface BotExecutorPayload {
 	candles: BotCandles,
 	config: BotConfiguration,
 	state: BotState,
-	orders: Orders,
+	orders: DeploymentOrders,
 	portfolio: Portfolio
 }
 

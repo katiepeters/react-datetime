@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { ConsoleEntry } from '../../../../../../../lambdas/executor/Consoler';
 import mergeStyles from '../../../../../utils/mergeStyles';
 import styles from './_BotEditorConsolePanel.module.css';
 import { DynamicList } from '../../../../../components';
 import quickStore from '../../../../../state/quickStore';
+import { ConsoleEntry } from '../../../../../../../lambdas/model.types';
 
 interface BotEditorConsolePanelProps {
 	quickStore: typeof quickStore

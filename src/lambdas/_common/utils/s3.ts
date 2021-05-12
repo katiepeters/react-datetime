@@ -29,12 +29,16 @@ const s3Helper = {
 			Body: content
 		};
 
+		console.log('setting s3 content');
+
 		return S3.putObject( payload ).promise()
 			.then( data => {
 				console.log('setOk', data );
+				return {error: false};
 			})
-			.catch( error => {
-				console.error('setError', error );
+			.catch( err => {
+				console.error('setError', err);
+				return {error:err};
 			})
 		;
 	},
@@ -46,11 +50,9 @@ const s3Helper = {
 
 		return S3.getObject( payload ).promise()
 			.then( data => {
-				console.log( 'getOk', data.Body.toString() )
+				return data.Body.toString();
 			})
-			.catch( err => {
-				console.error( 'getError', err )
-			})
+		;
 	}
 }
 

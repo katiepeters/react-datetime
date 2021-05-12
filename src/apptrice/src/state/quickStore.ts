@@ -1,6 +1,6 @@
 import Emitter from 'eventemitter3';
-import { ConsoleEntry } from '../../../lambdas/executor/Consoler';
 import { BotCandles, Orders } from '../../../lambdas/lambda.types';
+import { ConsoleEntry } from '../../../lambdas/model.types';
 
 let emitter = new Emitter();
 let orders: Orders = {};

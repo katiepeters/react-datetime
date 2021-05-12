@@ -44,9 +44,10 @@ app.post('/schedulator', function( req, res ){
 
 app.post('/trys3', function (req, res) {
 	s3Helper.setContent('some/path', 'My content')
-		.then( res => {
-			s3Helper.getContent('some/path').then( res2 => {
-				console.log('get path', res);
+		.then( () => {
+			s3Helper.getContent('some/path').then( content => {
+				console.log('get path', content);
+				res.json({content});
 			})
 		})
 	;
@@ -144,7 +145,8 @@ async function setTestData(event) {
 			botId: 'testBot',
 			orders: {
 				foreignIdIndex: {},
-				items: {}
+				items: {},
+				openOrderIds: []
 			},
 			exchangeAccountId: 'virtualExchange',
 			runInterval: '1h',

@@ -53,7 +53,7 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 			exchangeType: exchangeAccount.type
 		},
 		state: deployment.state,
-		orders: orders.items,
+		orders: orders,
 		portfolio
 	}
 
@@ -88,7 +88,11 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	BotDeploymentModel.update({
 		accountId, 
 		deploymentId: deployment.id,
-		update: {orders, state: result.state}
+		update: {
+			orders,
+			state: result.state,
+			logs: result.logs
+		}
 	});
 }
 interface ExchangeData {
@@ -105,14 +109,9 @@ async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeplo
 
 	// Then get updated orders (virtual exchanges will use previously fetched candles)
 	let orderIds: string[] = [];
-	if (deployment.orders?.items) {
-		Object.values(deployment.orders.items).forEach(order => {
-			if (order.status === 'placed') {
-				// @ts-ignore
-				orderIds.push(order.foreignId);
-			}
-		});
-	}
+	deployment.orders?.openOrderIds.forEach( orderId => {
+		orderIds.push(deployment.orders.foreignIdIndex[orderId]);
+	});
 
 	const orders = orderIds.length ?
 		await adapter.getOrders(orderIds) :
@@ -139,20 +138,28 @@ async function getCandles( adapter: ExchangeAdapter, deployment: any ) {
 function mergeOrders( orders:any, exchangeOrders: ExchangeOrder[] ) {
 	let {foreignIdIndex, items} = orders;
 
-	let mergedOrders = {
+	let mergedOrders: DeploymentOrders = {
 		foreignIdIndex: {...foreignIdIndex},
-		items: {...items}
+		items: {...items },
+		openOrderIds: []
 	}
 	
 	exchangeOrders.forEach( exchangeOrder => {
 		let storedOrderId = foreignIdIndex[exchangeOrder.id];
 		if( storedOrderId ){
-			mergedOrders.items[storedOrderId] = mergeOrder( items[storedOrderId], exchangeOrder );
+			let order = mergeOrder(items[storedOrderId], exchangeOrder);
+			mergedOrders.items[storedOrderId] = order;
+			if( order.status === 'placed' ){
+				mergedOrders.openOrderIds.push( storedOrderId );
+			}
 		}
 		else {
 			let id = uuid();
 			mergedOrders.foreignIdIndex[exchangeOrder.id] = id;
 			mergedOrders.items[id] = createOrder(id, exchangeOrder);
+			if (exchangeOrder.status === 'placed') {
+				mergedOrders.openOrderIds.push(exchangeOrder.id);
+			}
 		}
 	});
 
@@ -242,7 +249,8 @@ function getAdapter( accountId: string, exchangeAccount: DbExchangeAccount ): Ex
 
 async function cancelOrders(exchangeAdapter: ExchangeAdapter, orderIds: string[], storedOrders: DeploymentOrders ): Promise<void> {
 	if(!orderIds.length) return;
-	
+
+	let ordersToClose = {};
 	let foreignIds: string[] = [];
 	orderIds.forEach(id => {
 		let order = storedOrders.items[id];
@@ -250,17 +258,21 @@ async function cancelOrders(exchangeAdapter: ExchangeAdapter, orderIds: string[]
 			return console.warn(`Trying to cancel an unknown order ${id}`);
 		}
 
+		ordersToClose[id] = true;
 		foreignIds.push(order.foreignId);
 	});
 
 	console.log('cancelling orders', foreignIds);
 	await exchangeAdapter.cancelOrders(foreignIds);
+
 	orderIds.forEach(id => {
 		if (storedOrders.items[id]) {
 			storedOrders.items[id].status = 'cancelled';
 			storedOrders.items[id].closedAt = Date.now();
 		}
 	});
+
+	storedOrders.openOrderIds = storedOrders.openOrderIds.filter( id => !ordersToClose[id] );
 }
 
 async function placeOrders(exchangeAdapter: ExchangeAdapter, ordersToPlace: Order[], storedOrders: DeploymentOrders ): Promise<void> {
@@ -279,6 +291,7 @@ async function placeOrders(exchangeAdapter: ExchangeAdapter, ordersToPlace: Orde
 		if (order.foreignId) {
 			storedOrders.foreignIdIndex[order?.foreignId] = order.id;
 		}
+		storedOrders.openOrderIds.push(order.id);
 	});
 }
 

@@ -21,7 +21,7 @@ service: awstrader
 # frameworkVersion: "=X.X.X"
 
 custom:
-  bucket: aws-trader-bot-states #unique global name it will create for the bucket
+  bucket: aws-trader-${self:provider.stage}-bot-states #unique global name it will create for the bucket
   dynamodb:
     stages:
       - ${self:provider.stage}
@@ -41,6 +41,8 @@ provider:
   environment:
     ACCOUNTS_TABLE: ${self:service}-${opt:stage, self:provider.stage}
     S3_BUCKET: ${self:custom.bucket}
+    region: ${self:provider.region}
+    stage: ${self:provider.stage}
   iam:
     role: defaultRole
 
@@ -198,8 +200,12 @@ resources:
                         - 'log-group:/aws/lambda/*:*:*'
                 - Effect: Allow
                   Action:
-                    - s3:*
-                  Resource: "arn:aws:s3:::${self:custom.bucket}"
+                    - s3:PutObject
+                    - s3:PutObjectAcl
+                    - s3:GetObject
+                    - s3:GetObjectAcl
+                    - s3:DeleteObject
+                  Resource: "*"
                 - Effect: Allow
                   Action:
                     - dynamodb:Query

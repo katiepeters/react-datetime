@@ -49,6 +49,7 @@ export interface Order extends OrderInput {
 export interface DeploymentOrders {
 	foreignIdIndex: { [foreignId: string]: string }
 	items: { [orderId: string]: Order }
+	openOrderIds: string[]
 }
 
 export interface DBBotDeploymentConfig {
@@ -78,6 +79,7 @@ export interface DBBotDeployment extends TableItem {
 	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	symbols: string[]
 	state: DBBotDeploymentState
+	logs: ConsoleEntry[]
 	active: boolean
 }
 
@@ -87,8 +89,6 @@ export interface DBBotDeploymentRaw extends TableItem {
 	exchangeAccountId: string
 	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	symbols: string[]
-	orders: string
-	state: string
 	active?: string
 }
 
@@ -101,6 +101,7 @@ export interface DBBotDeploymentInput {
 	symbols: string[]
 	orders: DeploymentOrders
 	state?: DBBotDeploymentState
+	logs?: ConsoleEntry[]
 	active: boolean
 }
 
@@ -110,6 +111,7 @@ export interface DBBotDeploymentUpdate {
 	symbols?: string[]
 	orders?: DeploymentOrders
 	state?: DBBotDeploymentState
+	logs?: ConsoleEntry[]
 }
 
 export interface OrderInput {
@@ -118,6 +120,14 @@ export interface OrderInput {
 	direction: 'buy' | 'sell'
 	amount: number
 }
+
+export interface ConsoleEntry {
+	id: number,
+	date: number,
+	type: 'error' | 'warn' | 'log',
+	message: string
+}
+
 
 
 // EXCHANGE ACCOUNT

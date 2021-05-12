@@ -1,16 +1,11 @@
+import { ConsoleEntry } from "../model.types";
+
 export interface RunConsole {
 	log(...messages: any[]): void
 	warn(...messages: any[]): void
 	error(...messages: any[]): void
 	getEntries(): ConsoleEntry[]
 	clear(): void
-}
-
-export interface ConsoleEntry {
-	id: number,
-	date: number,
-	type: 'error' | 'warn' | 'log',
-	message: string
 }
 
 let entries: ConsoleEntry[] = [];

@@ -2,6 +2,7 @@ import { OrderInput, Order, Orders, Portfolio, BotCandles, Balance } from '../la
 import candles from '../_common/utils/candles';
 import symbols from '../_common/utils/symbols';
 import { v4 as uuid } from 'uuid';
+import { DeploymentOrders } from '../model.types';
 export default class Trader {
 	portfolio: Portfolio
 	orders: Orders
@@ -10,12 +11,12 @@ export default class Trader {
 	prices: {[asset: string]: number}
 	openOrderIds: string[]
 
-	constructor( portfolio: Portfolio, orders: Orders, candles: BotCandles )  {
+	constructor( portfolio: Portfolio, orders: DeploymentOrders, candles: BotCandles )  {
 		this.portfolio = portfolio
-		this.orders = orders
+		this.orders = orders.items
 		this.ordersToPlace = [];
 		this.ordersToCancel = [];
-		this.openOrderIds = [];
+		this.openOrderIds = orders.openOrderIds;
 		this.prices = getPrices( candles );
 	}
 
@@ -57,6 +58,10 @@ export default class Trader {
 		}
 
 		this.ordersToPlace.push( order )
+		this.orders = {
+			...this.orders,
+			[order.id]: order
+		};
 		return {...order};
 	}
 
