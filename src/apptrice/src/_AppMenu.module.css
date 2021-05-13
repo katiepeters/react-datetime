@@ -1,5 +1,5 @@
 .container {
-	background-color: #eeccff11;
+	background-color: #082238;
 	display: flex;
 	flex: 1;
 	flex-direction: column-reverse;
@@ -8,24 +8,43 @@
 	padding: 20px 0;
 }
 
+.container_primary {
+	background-color: #eeccff11;
+}
+
 .title {
 	width: 30px; height: 30px;
 	transform: rotate(-90deg);
+	color: '#ccc';
+}
+
+.title_primary {
   text-shadow: 0 0 10px #ff99ff;
 }
 
 .link {
 	display: block;
-	margin-left: 5px;
-	padding: 10px 10px;
+	margin: 0 0 8px 16px;
+  padding: 10px 20px 10px 10px;
 	text-align: center;
 	text-decoration: none;
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
+	color: #b2b1d8;
+}
+
+.link_primary {
 	color: #cdccee;
+	margin: 0 0 10px 5px;
+	padding: 10px 10px;
 }
 
 .linkActive {
+	background-color: #011627;
+	color: #b2b1d8;
+}
+
+.link_primary.linkActive {
 	background-color: #082238;
 	color: #3dc9b0;
 }
@@ -36,12 +55,17 @@
 	text-decoration: none;
 }
 
-.linkIcon {
+.icon {
 	display: block;
-	font-size: 30px;
+	font-size: 24px;
 	margin-bottom: 5px;
 }
 
-.linkActive .linkIcon {
+.icon_primary {
+	font-size: 30px;
+}
+
+.linkActive .icon {
 	text-shadow: 0 0 7px #99ffff66;
 }
+

@@ -16,7 +16,7 @@ const updateDeploymentHandler: MutationHandler = {
 		});
 		if( error ) return {error: {...error, code: 'invalid_payload'}};
 
-		const deployment = await models.deployment.getSingle(body.accountId, params.deploymentId);
+		const deployment = await models.deployment.getSingleSimple(body.accountId, params.deploymentId);
 		if( !deployment ){
 			return {error: {code: 'not_found', reason: 'deployment not found', status: 404}};
 		}

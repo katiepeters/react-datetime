@@ -5,7 +5,10 @@ import DataLoader, { DataLoaderConfig } from '../../utils/DataLoader';
 
 const config: DataLoaderConfig<DBBotDeployment> = {
 	getFromCache(id: string): DBBotDeployment | undefined {
-		return store.deployments[id];
+		let deployment = store.deployments[id];
+		if( deployment && deployment.orders ){
+			return deployment;
+		}
 	},
 	loadData(id: string) {
 		let accountId = store.authenticatedId;

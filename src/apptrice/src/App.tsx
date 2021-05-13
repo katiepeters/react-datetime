@@ -35,7 +35,11 @@ class App extends React.Component {
 
   renderMenu() {
     return (
-      <AppMenu currentPath={ router.location.pathname } />
+      <AppMenu
+        title="Tradingbots"
+        items={ menuItems }
+        currentPath={ router.location.pathname }
+        primary />
     );
   }
 
@@ -48,5 +52,12 @@ class App extends React.Component {
     localStore.addChangeListener( refresh );
   }
 }
+
+const menuItems = [
+  { name: 'Deploys', icon: "rocket", link: "#/deployments" },
+  {name: 'Bots', icon: "robot", link: "#/bots" },
+  {name: 'API accounts', icon: "plug", link: "#/exchanges" },
+  { name: 'Settings', icon: "cogs", link: "#/settings" },
+];
 
 export default App;

@@ -29,9 +29,10 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	const exchangeAdapter = getAdapter(accountId, exchangeAccount);
 	const { portfolio, orders: exchangeOrders, candles } = await getExchangeData( exchangeAdapter, deployment );
 
-	console.log('All data ok');
+	console.log('All data ok', exchangeOrders);
 
 	// Store any updated order from the last run
+	console.log('Updating open orders', deployment.orders.openOrderIds);
 	const orders = mergeOrders( deployment.orders, exchangeOrders );
 	BotDeploymentModel.update({
 		accountId: accountId, 
@@ -110,7 +111,10 @@ async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeplo
 	// Then get updated orders (virtual exchanges will use previously fetched candles)
 	let orderIds: string[] = [];
 	deployment.orders?.openOrderIds.forEach( orderId => {
-		orderIds.push(deployment.orders.foreignIdIndex[orderId]);
+		let order = deployment.orders.items[orderId];
+		if( order?.foreignId ){
+			orderIds.push( order.foreignId );
+		}
 	});
 
 	const orders = orderIds.length ?
@@ -289,7 +293,7 @@ async function placeOrders(exchangeAdapter: ExchangeAdapter, ordersToPlace: Orde
 	ordersToUpdate.forEach(order => {
 		storedOrders.items[order.id] = order;
 		if (order.foreignId) {
-			storedOrders.foreignIdIndex[order?.foreignId] = order.id;
+			storedOrders.foreignIdIndex[order.foreignId] = order.id;
 		}
 		storedOrders.openOrderIds.push(order.id);
 	});
