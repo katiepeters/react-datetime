@@ -15,11 +15,12 @@
 .title {
 	width: 30px; height: 30px;
 	transform: rotate(-90deg);
-	color: '#ccc';
+	color: #b2b1d8;
 }
 
 .title_primary {
   text-shadow: 0 0 10px #ff99ff;
+	color: #f390dd;
 }
 
 .link {
@@ -41,7 +42,7 @@
 
 .linkActive {
 	background-color: #011627;
-	color: #b2b1d8;
+	color: #e0dff3;
 }
 
 .link_primary.linkActive {

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { InputGroup, Button } from '../../components';
 import { BacktestConfig } from '../../screens/botEditor/tools/BotTools';
 import { getBtConfig, BtSettingsConfig, saveBtConfig } from './BtConfigStore';
+import InitialBalances from './InitialBalances';
 import styles from './_BtSettings.module.css';
 
 interface BtSettingsProps {
@@ -51,14 +52,14 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 						label="Base assets">
 						<input name="baseAssets"
 							value={this.state.baseAssets}
-							onChange={e => this.setState({ baseAssets: e.target.value })} />
+							onChange={e => this.setState({ baseAssets: e.target.value.toUpperCase() })} />
 					</InputGroup>
 				</div>
 				<div className={styles.field}>
 					<InputGroup name="quotedAsset" label="Quoted asset">
 						<input name="quotedAsset"
 							value={this.state.quotedAsset}
-							onChange={e => this.setState({ quotedAsset: e.target.value })} />
+							onChange={e => this.setState({ quotedAsset: e.target.value.toUpperCase() })} />
 					</InputGroup>
 				</div>
 				<InputGroup name="runInterval" label="Execution runInterval">
@@ -183,12 +184,10 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 
 	renderInitialBalances() {
 		return (
-			<div className={styles.fieldGroup}>
-				<div className={styles.groupHeader}>
-					Initial balances
-				</div>
-				{ this.getSymbols().map(this._renderBalanceInput)}
-			</div>
+			<InitialBalances
+				symbols={ this.getSymbols() }
+				balances={ this.state.initialBalances }
+				onChange={initialBalances => this.setState({initialBalances})} />
 		);
 	}
 

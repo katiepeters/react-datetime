@@ -10,14 +10,13 @@ export default class SingleDeploymentScreen extends React.Component<ScreenProps>
 		let {data, isLoading} = deploymentLoader.getData(this, this.getDeploymentId() )
 		console.log( data, isLoading );
 
+		let Subscreen = this.getSubscreen();
 		return (
 			<SidebarLayout
 				sidebar={ this.renderMenu() }
 				sidebarWidth={65}
 				bgColor="#061725">
-				<div>
-					Single deployment screen
-				</div>
+				<Subscreen {...this.props} />
 			</SidebarLayout>
 		)
 	}
@@ -43,5 +42,9 @@ export default class SingleDeploymentScreen extends React.Component<ScreenProps>
 			{ name: 'State', icon: 'paperclip', link: `#/deployments/${id}/state`},
 			{ name: 'Logs', icon: 'file-alt', link: `#/deployments/${id}/logs` },
 		]
+	}
+
+	getSubscreen() {
+		return this.props.router.location.matches[2] || (() => <span>Single deployment</span>);
 	}
 }
