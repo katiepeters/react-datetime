@@ -1,3 +1,5 @@
+import { Balance, Portfolio } from "../../lambda.types";
+import arrayize from "../../_common/utils/arrayize";
 import symbols from "../../_common/utils/symbols";
 
 interface ShapeValidationError {
@@ -77,10 +79,11 @@ const validIntervals = {
 const validators = {
 	string: value => typeof value === 'string',
 	runInterval: value => validIntervals[value] === true,
-	symbols: value => validateSymbols(value),
+	symbols: validateSymbols,
 	boolean: value => typeof value === 'boolean',
 	provider: value => value === 'bitfinex',
-	providerType: value => value === 'real' || value === 'virtual'
+	providerType: value => value === 'real' || value === 'virtual',
+	portfolio: validatePortfolio
 }
 
 function validateSymbols( symb ){
@@ -101,4 +104,20 @@ function validateSymbols( symb ){
 
 function validateSymbol( symbol ){
 	return typeof symbol === 'string' && symbol.split('/').length === 2;
+}
+
+function validatePortfolio( portfolio: Portfolio ){
+	if( !portfolio ) return false;
+	return !arrayize(portfolio)
+		.find( (balance:Balance) => !validateBalance(balance) )
+	;
+}
+
+function validateBalance( balance: Balance ){
+	if( !balance ) return false;
+	if( !balance.asset || typeof balance.asset === 'string' ) return false;
+	if (balance.free === undefined || typeof balance.free !== 'number' || balance.free < 0) return false;
+	if (balance.total === undefined || typeof balance.total !== 'number' || balance.total < 0) return false;
+	if( balance.free > balance.total ) return false;
+	return true;
 }

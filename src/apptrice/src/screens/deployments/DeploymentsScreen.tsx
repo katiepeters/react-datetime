@@ -8,8 +8,8 @@ import { TableColumn } from '../../components/table/Table';
 import apiCacher from '../../state/apiCacher';
 import Toaster from '../../components/toaster/Toaster';
 import CreateDeploymentForm, { CreateDeploymentPayload } from './CreateDeploymentForm';
-import arrayize from '../../utils/arrayize';
 import { CreateExchangeAccountInput } from '../../state/apiClient';
+import arrayize from '../../../../lambdas/_common/utils/arrayize';
 
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {

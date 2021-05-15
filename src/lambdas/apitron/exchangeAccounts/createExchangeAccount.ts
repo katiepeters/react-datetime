@@ -6,14 +6,7 @@ const createExchangeAccountHandler: MutationHandler = {
 	name: 'createExchangeAccount',
 	async getContext({body, params, models}: MutationContextInput<any>): Promise<ContextResult> {
 		// Validate input
-		let {error} = validateShape(body, {
-			name: 'string',
-			accountId: 'string',
-			provider: 'provider',
-			type: 'providerType',
-			key: 'string',
-			secret: 'string'
-		});
+		let {error} = validateShape(body, getValidShape( body.type ));
 		if( error ) return {error: {...error, code: 'invalid_payload'}};
 
 		let account = await models.account.getSingle(body.accountId);
@@ -46,3 +39,25 @@ const createExchangeAccountHandler: MutationHandler = {
 }
 
 export default createExchangeAccountHandler;
+
+
+function getValidShape( type ){
+	if( type === 'real' ){
+		return {
+			name: 'string',
+			accountId: 'string',
+			provider: 'provider',
+			type: 'providerType',
+			key: 'string',
+			secret: 'string'
+		};
+	}
+
+	return {
+		name: 'string',
+		accountId: 'string',
+		provider: 'provider',
+		type: 'providerType',
+		initialBalances: 'portfolio'
+	};
+}

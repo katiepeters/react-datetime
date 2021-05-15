@@ -1,4 +1,4 @@
-import { ExchangeProvider } from "./lambda.types";
+import { ExchangeProvider, Orders, Portfolio } from "./lambda.types";
 
 export interface TableItem {
 	accountId: string
@@ -138,6 +138,31 @@ export interface DbExchangeAccount extends TableItem {
 	type: 'real' | 'virtual'
 	key: string
 	secret: string
+}
+
+export interface PortfolioHistoryItem {
+	date: number
+	balances: Portfolio
+}
+
+export interface ExchangeAccountWithHistory extends DbExchangeAccount {
+	portfolioHistory: PortfolioHistoryItem[]
+}
+
+export interface ExchangeAccountWithOrders extends DbExchangeAccount {
+	lastPortfolio: Portfolio
+	orders: Orders
+}
+
+export interface CreateExchangeAccountInput {
+	accountId: string
+	id: string
+	name: string
+	provider: 'bitfinex'
+	type: 'real' | 'virtual'
+	key?: string
+	secret?: string
+	initialBalances: Portfolio
 }
 
 export interface DbExchangeAccountInput {
