@@ -2,6 +2,7 @@ import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, Mut
 import { validateShape } from "../utils/validators";
 import { v4 as uuid } from 'uuid';
 interface CreateDeploymentInput {
+	name: string
 	accountId: string
 	botId: string
 	exchangeAccountId: string
@@ -15,6 +16,7 @@ const createDeploymentHandler: MutationHandler = {
 	async getContext({body, models}: MutationContextInput<CreateDeploymentInput>): Promise<ContextResult> {
 		// Validate input
 		let {error} = validateShape(body, {
+			name: 'string',
 			accountId: 'string',
 			botId: 'string',
 			active: 'boolean?',

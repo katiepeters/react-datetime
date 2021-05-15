@@ -8,6 +8,8 @@ import { TableColumn } from '../../components/table/Table';
 import apiCacher from '../../state/apiCacher';
 import Toaster from '../../components/toaster/Toaster';
 import CreateDeploymentForm, { CreateDeploymentPayload } from './CreateDeploymentForm';
+import arrayize from '../../utils/arrayize';
+import { CreateExchangeAccountInput } from '../../state/apiClient';
 
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {
@@ -147,12 +149,55 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	}
 
 	_onCreateDeployment = ( data: CreateDeploymentPayload ) => {
-		return apiCacher.createDeployment( data ).then( res => {
-			if( !res.data?.error ){
-				this.setState({createModalOpen: false});
+		if( data.exchangeAccountId === 'virtual' ){
+			return this.createExchangeAccount( data )
+				.then( (exchangeId: string) => {
+					// @ts-ignore
+					let payload: CreateDeploymentPayload = arrayize(data).filterKeys(
+						['accountId', 'name', 'botId', 'symbols', 'active', 'runInterval']
+					);
+					payload.exchangeAccountId = exchangeId;
+					return this.createDeployment(payload);
+				})
+			;
+		}
+
+		return this.createDeployment( data );
+
+	}
+
+	createDeployment(data: CreateDeploymentPayload) {
+		return apiCacher.createDeployment(data).then(res => {
+			if (!res.data?.error) {
+				this.setState({ createModalOpen: false });
 				Toaster.show('The bot has been deployed', 'success');
 			}
 		});
+	}
+
+	createExchangeAccount(data: CreateDeploymentPayload): Promise<string> {
+		const balances = arrayize<string>(data.initialBalances)
+			.map((balance: string, asset: string) => ({
+				asset,
+				free: parseFloat(balance),
+				total: parseFloat(balance)
+			}))
+		;
+
+		const payload: CreateExchangeAccountInput = {
+			name: data.name + ' virtual exchange',
+			accountId: data.accountId,
+			provider: data.exchange || 'unknown',
+			type: 'virtual',
+			key: JSON.stringify(balances),
+			secret: "{}"
+		}
+
+		return apiCacher.createExchangeAccount(payload)
+			.then(res => {
+				return res.data.id;
+			})
+		;
 	}
 
 	getSubscreen() {

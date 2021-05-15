@@ -58,6 +58,7 @@ export default {
 		const {id: deploymentId, accountId } = input;
 		let dbDeployment: DBBotDeploymentRaw = {
 			id: deploymentId,
+			name: input.name,
 			accountId,
 			botId: input.botId,
 			resourceId: `DEPLOYMENT#${input.id}`,

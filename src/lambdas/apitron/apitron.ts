@@ -141,6 +141,7 @@ async function setTestData(event) {
 
 		await BotDeploymentModel.create({
 			accountId,
+			name: 'Test deployment',
 			id: 'testDeployment',
 			botId: 'testBot',
 			orders: {

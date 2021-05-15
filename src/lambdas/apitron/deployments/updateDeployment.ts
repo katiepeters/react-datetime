@@ -1,10 +1,6 @@
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 
-interface UpdateDeploymentInput {
-	accountId: string
-	active: boolean
-}
 
 const updateDeploymentHandler: MutationHandler = {
 	name: 'updateDeployment',
@@ -12,9 +8,14 @@ const updateDeploymentHandler: MutationHandler = {
 		// Validate input
 		let {error} = validateShape(body, {
 			accountId: 'string',
-			active: 'boolean'
+			active: 'boolean?',
+			name: 'string?'
 		});
 		if( error ) return {error: {...error, code: 'invalid_payload'}};
+
+		if( body.active === 'undefined' && (!body.name || !body.name.trim()) ){
+			return {error: {code: 'invalid_payload', reason: 'nothing to update'}};
+		} 
 
 		const deployment = await models.deployment.getSingleSimple(body.accountId, params.deploymentId);
 		if( !deployment ){

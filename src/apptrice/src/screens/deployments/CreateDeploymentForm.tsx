@@ -11,11 +11,14 @@ import styles from './_CreateDeploymentForm.module.css';
 
 export interface CreateDeploymentPayload {
 	accountId: string
+	name: string
 	botId: string
 	exchangeAccountId: string
 	runInterval: string
 	symbols: string[]
 	active: boolean
+	exchange?: string
+	initialBalances?: Balances
 }
 
 interface CreateDeploymentFormProps {
@@ -25,6 +28,7 @@ interface CreateDeploymentFormProps {
 }
 
 interface CreateDeploymentState {
+	name: string,
 	botId: string,
 	exchangeAccountId: string,
 	runInterval: string,
@@ -38,6 +42,7 @@ interface CreateDeploymentState {
 
 export default class CreateDeploymentForm extends React.Component<CreateDeploymentFormProps> {
 	state: CreateDeploymentState = {
+		name: '',
 		botId: '',
 		exchangeAccountId: '',
 		runInterval: '1h',
@@ -67,6 +72,18 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 				<div className={styles.titleWrapper}>
 					<h3>Launch a bot</h3>
 				</div>
+
+				<div className={styles.inputWrapper}>
+					<InputGroup
+						name="name"
+						label="Name"
+						caption={this.state.errors.name}>
+						<input name="name"
+							value={this.state.name}
+							onChange={e => this.setState({ name: e.target.value })} />
+					</InputGroup>
+				</div>
+
 				<div className={styles.inputWrapper}>
 					<InputGroup
 						name="botId"
@@ -207,12 +224,15 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		}
 
 		const symbols = this.getSymbols();
-		const {botId, exchangeAccountId, runInterval} = this.state;
+		const {botId, exchangeAccountId, runInterval, name} = this.state;
 		const payload = {
 			accountId: this.props.accountId,
+			name,
 			botId, exchangeAccountId, runInterval,
 			symbols,
-			active: true
+			active: true,
+			exchange: this.state.exchange,
+			initialBalances: this.state.initialBalances
 		};
 		
 		this.setState({ creating: true });
@@ -225,10 +245,12 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 	}
 
 	getValidationErrors() {
-		const { baseAssets, quotedAsset, runInterval } = this.state;
+		const { name, baseAssets, quotedAsset, runInterval, exchangeAccountId } = this.state;
 
 		let errors: FormErrors = {};
-
+		if(!name.trim()) {
+			errors.name = { type: 'error', message: 'Please type a name for the deployment.'};
+		}
 		if (!baseAssets) {
 			errors.baseAssets = { type: 'error', message: 'Please type the assets you want to trade separated by commas.' }
 		}
@@ -238,6 +260,20 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		if (!runInterval) {
 			errors.runInterval = { type: 'error', message: 'Please select a run interval.' }
 		}
+
+		if( exchangeAccountId === 'virtual' ){
+			const {initialBalances} = this.state;
+			let someBalance = false;
+			Object.keys(initialBalances).forEach((balance: string) => {
+				if( parseFloat(initialBalances[balance]) ){
+					someBalance = true;
+				}
+			});
+			if( !someBalance ){
+				errors.exchange = { type: 'error', message: 'You need to set a positive balance for some asset.'};
+			}
+		}
+
 		return errors;
 	}
 
@@ -252,7 +288,11 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 	}
 
 	getAssets() {
-		let symbols = [this.state.quotedAsset];
+		let symbols = this.state.quotedAsset ?
+			[this.state.quotedAsset] :
+			[]
+		;
+
 		this.state.baseAssets.split(/\s*,\s*/).forEach(symbol => {
 			if (symbol.trim()) {
 				symbols.push(symbol.trim());

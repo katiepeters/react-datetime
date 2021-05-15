@@ -1,13 +1,22 @@
 .container {
 	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	justify-content: flex-start;
 }
 
 .titleWrapper {
 	display: flex;
 	align-items: center;
 	margin-bottom: 20px;
+	flex-grow: 0;
 }
 
 .title {
 	margin-right: 10px;
+}
+.content {
+	display: flex;
+	flex: 1;
 }

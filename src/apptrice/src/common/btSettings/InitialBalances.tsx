@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InputGroup } from '../../components';
+import { Card, InputGroup } from '../../components';
 import styles from './_BtSettings.module.css';
 
 export interface Balances { [symbol: string]: string };
@@ -8,21 +8,36 @@ interface InitialBalancesProps {
 	symbols: string[]
 	balances: Balances
 	onChange: (balances: Balances) => any
+	innerPadding?: boolean
 }
 
 export default class InitialBalances extends React.Component<InitialBalancesProps> {
 	render() {
+		let cn = this.props.innerPadding ?
+			styles.fieldGroup :
+			''
+		;
+
 		return (
-			<div className={styles.fieldGroup}>
+			<div className={cn}>
 				<div className={styles.groupHeader}>
 					Initial balances
 				</div>
-				{ this.props.symbols.map(this._renderBalanceInput)}
+				{ this.renderSymbols() }
 			</div>
 		);
 	}
 
+	renderSymbols(){
+		const {symbols} = this.props;
+		if( !symbols.length ){
+			return <Card>Select assets first.</Card>
+		}
+		return this.props.symbols.map(this._renderBalanceInput);
+	}
+
 	_renderBalanceInput = (symbol: string) => {
+
 		return (
 			<div className={styles.field}>
 				<InputGroup
