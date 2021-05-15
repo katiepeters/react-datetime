@@ -265,7 +265,7 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 			const {initialBalances} = this.state;
 			let someBalance = false;
 			Object.keys(initialBalances).forEach((balance: string) => {
-				if( parseFloat(initialBalances[balance]) ){
+				if( initialBalances[balance] ){
 					someBalance = true;
 				}
 			});

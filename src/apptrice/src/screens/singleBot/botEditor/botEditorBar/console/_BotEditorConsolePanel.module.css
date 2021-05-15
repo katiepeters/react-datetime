@@ -4,37 +4,3 @@
 	width: 100%;
 	display: flex;
 }
-
-.content {
-	padding: 10px;
-	display: flex;
-	flex-direction: 'column';
-	width: 100%;
-}
-
-.row {
-	display: flex;
-	flex: 1;
-	min-width: 0;
-	padding-bottom: 4px;
-}
-
-.date {
-	width: 70px;
-	padding-right: 10px;
-	display: flex;
-	flex-shrink: 0;
-}
-
-.message {
-	display: flex;
-	flex: 1;
-}
-
-.error {
-	color: red
-}
-
-.warn {
-	color: yellow
-}

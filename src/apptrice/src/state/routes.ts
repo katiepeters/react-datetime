@@ -14,12 +14,16 @@ import ExchangesScreen from "../screens/exchanges/ExchangesScreen";
 import SettingsScreen from "../screens/settings/SettingsScreen";
 import SingleDeploymentScreen from "../screens/singleDeployment/SingleDeploymentScreen";
 import DeploymentOrdersScreen from "../screens/singleDeployment/orders/DeploymentOrdersScreen";
+import DeploymentStateScreen from "../screens/singleDeployment/state/DeploymentStateScreen";
+import DeploymentLogsScreen from "../screens/singleDeployment/logs/DeploymentLogsScreen";
 
 const routes = [
 	{path: '/', cb: HomeScreen},
 	{path: '/deployments', cb: DeploymentsScreen, children: [
 		{path: '/:id', cb: SingleDeploymentScreen, children: [
-			{path: '/orders', cb: DeploymentOrdersScreen }
+			{path: '/orders', cb: DeploymentOrdersScreen },
+			{path: '/state', cb: DeploymentStateScreen},
+			{path: '/logs', cb: DeploymentLogsScreen}
 		]}
 	]},
 	{path: '/bots', cb: BotListScreen, children: [

@@ -92,7 +92,10 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 		update: {
 			orders,
 			state: result.state,
-			logs: result.logs
+			logs: [
+				...deployment.logs,
+				...result.logs
+			]
 		}
 	});
 }

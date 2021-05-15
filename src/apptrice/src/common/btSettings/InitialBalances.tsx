@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Card, InputGroup } from '../../components';
 import styles from './_BtSettings.module.css';
 
-export interface Balances { [symbol: string]: string };
+export interface Balances { [symbol: string]: number };
 
 interface InitialBalancesProps {
 	symbols: string[]
@@ -13,6 +13,7 @@ interface InitialBalancesProps {
 
 export default class InitialBalances extends React.Component<InitialBalancesProps> {
 	render() {
+		console.log('Inner padding', this.props)
 		let cn = this.props.innerPadding ?
 			styles.fieldGroup :
 			''
@@ -55,14 +56,14 @@ export default class InitialBalances extends React.Component<InitialBalancesProp
 	updateBalances(symbol: string, value: string) {
 		this.props.onChange({
 			...this.props.balances,
-			[symbol]: value
+			[symbol]: parseFloat(value)
 		});
 	}
 
 	componentDidMount() {
 		let balances: Balances = {};
 		this.props.symbols.forEach( symbol => {
-			balances[symbol] = this.props.balances[symbol] || '0'
+			balances[symbol] = this.props.balances[symbol] || 0
 		});
 		this.props.onChange(balances);
 	}

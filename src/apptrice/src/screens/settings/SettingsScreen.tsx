@@ -29,5 +29,6 @@ export default class SettingsScreen extends React.Component<ScreenProps> {
 	_onChange = (e: any) => {
 		localStore.setApiUrl( e.target.value );
 		apiClient.initialize(e.target.value);
+		window.location.reload();
 	}
 }

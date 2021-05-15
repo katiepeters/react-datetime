@@ -4,6 +4,8 @@
 	flex-direction: column;
 	flex: 1;
 	justify-content: flex-start;
+	max-height: 100vh;
+	overflow: auto;
 }
 
 .titleWrapper {

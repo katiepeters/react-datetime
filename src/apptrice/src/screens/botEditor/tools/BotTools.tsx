@@ -1,7 +1,8 @@
 import * as React from 'react';
+import InitialBalances, { Balances } from '../../../common/btSettings/InitialBalances';
 import {Button, InputGroup} from '../../../components';
 import ProgressBar from './ProgressBar';
-interface BootToolsProps {
+interface BotToolsProps {
 	onRun: (config: BacktestConfig) => void,
 	onAbort: () => void,
 	currentBackTesting?: any
@@ -18,10 +19,22 @@ export interface BacktestConfig {
 	slippage: number
 }
 
+interface BotToolsState {
+	baseAssets: string
+	quotedAsset: string
+	runInterval: string
+	initialBalances: Balances
+	testingTimeframe: string
+	startDate: string
+	endDate: string
+	fees: string
+	slippage: string
+}
+
 const DAY = 24 * 60 * 60 * 1000;
 
-export default class BootTools extends React.Component<BootToolsProps> {
-	state = {
+export default class BotTools extends React.Component<BotToolsProps> {
+	state: BotToolsState = {
 		baseAssets: 'BTC,ETH',
 		quotedAsset: 'USD',
 		runInterval: '1h',
@@ -204,12 +217,11 @@ export default class BootTools extends React.Component<BootToolsProps> {
 
 	renderInitialBalances() {
 		return (
-			<div style={styles.fieldGroup}>
-				<div style={styles.groupHeader}>
-					Initial balances
-				</div>
-				{ this.getSymbols().map( this._renderBalanceInput ) }
-			</div>
+			<InitialBalances
+				symbols={ this.getSymbols() }
+				balances={ this.state.initialBalances }
+				onChange={ InitialBalances => this.setState({InitialBalances}) }
+				innerPadding={true} />
 		);
 	}
 

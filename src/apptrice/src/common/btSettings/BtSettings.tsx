@@ -187,22 +187,8 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 			<InitialBalances
 				symbols={ this.getSymbols() }
 				balances={ this.state.initialBalances }
-				onChange={initialBalances => this.setState({initialBalances})} />
-		);
-	}
-
-	_renderBalanceInput = (symbol: string) => {
-		return (
-			<div className={styles.field}>
-				<InputGroup
-					name={`${symbol}_balance`}
-					label={symbol}>
-					<input name={`${symbol}_balance`}
-						// @ts-ignore
-						value={this.state.initialBalances[symbol] || 0}
-						onChange={e => this.updateInitialBalance(symbol, e.target.value)} />
-				</InputGroup>
-			</div>
+				onChange={initialBalances => this.setState({initialBalances})}
+				innerPadding />
 		);
 	}
 
@@ -236,7 +222,7 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 		let end = new Date(endDate + 'T23:59:59.999Z');
 		let balances:{[asset:string]: number} = {};
 		for( let asset in initialBalances ){
-			balances[asset] = parseFloat(initialBalances[asset]);
+			balances[asset] = initialBalances[asset];
 		}
 
 		return {
@@ -249,15 +235,6 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 			fees: parseFloat(fees),
 			slippage: parseFloat(slippage)
 		};
-	}
-
-	updateInitialBalance(symbol: string, value: string) {
-		this.setState({
-			initialBalances: {
-				...this.state.initialBalances,
-				[symbol]: value
-			}
-		});
 	}
 
 	getQuotedSymbol() {
@@ -298,7 +275,7 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 			quotedAsset: 'USD',
 			runInterval: '1h',
 			initialBalances: {
-				USD: '1000'
+				USD: 1000
 			},
 			testingTimeframe: '7',
 			startDate: this.getInputDate(Date.now() - 8 * DAY),
