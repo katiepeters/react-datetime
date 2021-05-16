@@ -3,6 +3,7 @@ import { RESTv2 } from 'bfx-api-node-rest';
 import { Order as BfxOrder } from 'bfx-api-node-models';
 import { CandleQuery, ExchangeAdapter, ExchangeCredentials, ExchangeOrder } from '../ExchangeAdapter';
 import { ArrayCandle, OrderInput, Portfolio } from '../../../lambda.types';
+import { DbExchangeAccount } from '../../../model.types';
 
 const fetch = require('node-fetch');
 const baseUrl = 'https://api-pub.bitfinex.com/v2';
@@ -11,10 +12,10 @@ let cache = {};
 
 export default class BitfinexAdapter implements ExchangeAdapter {
 	bfx: RESTv2
-	constructor( credentials: ExchangeCredentials ){
+	constructor( exchangeAccount: DbExchangeAccount ){
 		this.bfx = new RESTv2({
-			apiKey: credentials.key,
-			apiSecret: credentials.secret
+			apiKey: exchangeAccount.key,
+			apiSecret: exchangeAccount.secret
 		});
 	}
 

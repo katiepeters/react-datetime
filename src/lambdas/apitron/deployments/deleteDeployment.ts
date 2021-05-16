@@ -19,15 +19,35 @@ const deleteDeploymentHandler: MutationHandler = {
 			return { error: { code: 'not_found', reason: 'deployment not found', status: 404 } };
 		}
 
-		return {context: {accountId, deploymentId}};
+		const exchange = await models.exchangeAccount.getSingle(accountId, deployment.exchangeAccountId);
+
+		return {context: {
+			deployment: {accountId, deploymentId},
+			exchange
+		}};
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {
-		return [{
+		const {deployment, exchange} = input.context;
+		let mutations = [{
 			model: 'deployment',
 			action: 'delete',
-			data: input.context
+			data: deployment
 		}];
+		
+		if( exchange.type === 'virtual' ){
+			mutations.push({
+				model: 'exchangeAccount',
+				action: 'delete',
+				data: {
+					accountId: exchange.accountId,
+					exchangeAccountId: exchange.id,
+					deleteExtra: true
+				}
+			});
+		}
+
+		return mutations;
 	},
 
 	getResponse(input: MutationResponseInput): ResponseResult {

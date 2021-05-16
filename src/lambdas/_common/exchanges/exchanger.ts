@@ -1,3 +1,4 @@
+import { DbExchangeAccount } from '../../model.types';
 import BitfinexAdapter from './adapters/BitfinexAdapter';
 import VirtualAdapter from './adapters/VirtualAdapter';
 import {ExchangeAdapter} from './ExchangeAdapter';
@@ -10,27 +11,26 @@ const adapters = {
 	virtual: VirtualAdapter
 };
 
-interface ExchangerConfig {
-	exchange: string
-	accountId: string
-	key: string
-	secret: string
-}
-
 const exchanger = {
-	getAdapter(config: ExchangerConfig): ExchangeAdapter | void {
-		let Adapter = adapters[config.exchange];
+	getAdapter(exchangeAccount: DbExchangeAccount): ExchangeAdapter | void {
+		let Adapter = exchangeAccount.type === 'virtual' ?
+			adapters.virtual :
+			adapters[exchangeAccount.exchange]
+		;
+		
 		if( !Adapter ) {
-			console.warn(`Cant find an adapter for ${config.exchange}`);
+			console.warn(`Cant find an adapter for ${exchangeAccount.exchange}`);
 			return;
 		}
-		
-		return new Adapter({
-			key: config.key,
-			secret: config.exchange === 'virtual' ?
-				config.secret : 
-				AES.decrypt(config.secret, config.accountId).toString(utf8Encode)
-		});
+
+		if( exchangeAccount.type === 'real' ){
+			exchangeAccount = {
+				...exchangeAccount,
+				secret: AES.decrypt(exchangeAccount.secret, exchangeAccount.accountId).toString(utf8Encode)
+			}
+		}
+
+		return new Adapter( exchangeAccount );
 	}
 }
 

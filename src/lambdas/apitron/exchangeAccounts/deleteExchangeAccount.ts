@@ -18,7 +18,11 @@ const deleteExchangeAccountHandler: MutationHandler = {
 		if (!exchangeAccount) return { error: { code: 'not_found', status: 404 } };
 
 
-		return {context: {accountId, deleteExchangeAccountHandler}};
+		return {context: {
+			accountId,
+			exchangeAccountId,
+			deleteExtra: exchangeAccount.type === 'virtual'
+		}};
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {

@@ -77,13 +77,13 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	await cancelOrders( exchangeAdapter, result.ordersToCancel, orders );
 	await placeOrders( exchangeAdapter, ordersToPlace, orders );
 
-	if( exchangeAdapter.getVirtualData ){
-		const data = exchangeAdapter.getVirtualData();
-		await ExchangeAccountModel.update(accountId, exchangeAccount.id, {
-			key: data.portfolio,
-			secret: data.orders
-		});
-	}
+	// Update exchange stats
+	const isVirtual = exchangeAccount.type === 'virtual';
+	await Promise.all([
+		await ExchangeAccountModel.updatePortfolio(accountId, exchangeAccount.id, portfolio, isVirtual),
+		// @ts-ignore
+		isVirtual && ExchangeAccountModel.updateOrders(accountId, exchangeAccount.id, exchangeAdapter.orders ) 
+	]);
 
 	// Store bot results
 	BotDeploymentModel.update({
@@ -105,6 +105,10 @@ interface ExchangeData {
 	candles: BotCandles
 }
 async function getExchangeData( adapter: ExchangeAdapter, deployment: DBBotDeployment ): Promise<ExchangeData>{
+	if( adapter.hydrate ){
+		await adapter.hydrate();
+	}
+
 	// First get candles (virtual exchanges will refresh its data)
 	const [ portfolio, candles ] = await Promise.all([
 		adapter.getPortfolio(),
@@ -240,12 +244,8 @@ async function getModels( accountId: string, deploymentId: string ): Promise<Bot
 }
 
 function getAdapter( accountId: string, exchangeAccount: DbExchangeAccount ): ExchangeAdapter {
-	const exchangeAdapter = exchanger.getAdapter({
-		accountId,
-		exchange: exchangeAccount.type === 'virtual' ? 'virtual' : exchangeAccount.provider,
-		key: exchangeAccount.key,
-		secret: exchangeAccount.secret
-	});
+	console.log('Get adapter', exchangeAccount);
+	const exchangeAdapter = exchanger.getAdapter( exchangeAccount );
 
 	if (!exchangeAdapter) {
 		throw new CodeError({ code: 'unknown_adapter', extra: { adapter: exchangeAccount.key } });

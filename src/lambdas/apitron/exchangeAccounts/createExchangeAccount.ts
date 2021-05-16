@@ -18,10 +18,10 @@ const createExchangeAccountHandler: MutationHandler = {
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {
-		const {accountId, provider, type, key, secret, name} = input.body;
+		const {accountId, provider, type, key, secret, name, initialBalances} = input.body;
 		let data = {
 			id: uuid(),
-			accountId, provider, type, key, secret, name
+			accountId, provider, type, key, secret, name, initialBalances
 		}
 		return [{
 			model: 'exchangeAccount',

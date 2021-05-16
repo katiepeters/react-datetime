@@ -245,10 +245,8 @@ function getIterationCandles(allCandles: BotCandles, iteration: number) {
 
 function getAdapter(iterationCandles: BotCandles, portfolio: Portfolio, orders: Orders, openOrderIds: string[]) {
 	// Create the empty adapter and set the attributes manually
-	let adapter = new VirtualAdapter({
-		key: '{}',
-		secret: '{}'
-	});
+	// @ts-ignore
+	let adapter = new VirtualAdapter({});
 
 	adapter.orders = orders;
 	adapter.openOrders = openOrderIds;

@@ -7,7 +7,6 @@ export default function toExchangeResponse( exchange: DbExchangeAccount ): Excha
 		name: exchange.name,
 		provider: exchange.provider,
 		type: exchange.type,
-		key: exchange.key.slice(0, 5) + '...',
-		portfolio: exchange.type === 'virtual' ? exchange.key : null
+		key: exchange.key ? exchange.key.slice(0, 5) + '...' : ''
 	}
 }

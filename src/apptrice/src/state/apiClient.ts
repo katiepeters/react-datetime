@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { Portfolio } from '../../../lambdas/lambda.types';
 
 export interface CandleOptions {
 	symbol: string
@@ -21,8 +22,9 @@ export interface CreateExchangeAccountInput {
 	name: string,
 	provider: string,
 	type: 'real' | 'virtual',
-	key: string,
-	secret: string
+	key?: string,
+	secret?: string,
+	initialBalances?: Portfolio
 }
 
 export interface UpdateBotInput {

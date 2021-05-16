@@ -1,7 +1,9 @@
 import { Portfolio, ArrayCandle, Order, OrderInput, Balance } from "../../../lambda.types";
+import { DbExchangeAccount } from "../../../model.types";
+import ExchangeAccountModel from "../../dynamo/ExchangeAccountModel";
 import candles from "../../utils/candles";
 import symbols from "../../utils/symbols";
-import { CandleQuery, ExchangeAdapter, ExchangeCredentials, ExchangeOrder, ExchangeVirtualData } from "../ExchangeAdapter";
+import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeVirtualData } from "../ExchangeAdapter";
 import BitfinexAdapter from "./BitfinexAdapter";
 
 export interface ExchangeAccountData {
@@ -10,6 +12,7 @@ export interface ExchangeAccountData {
 }
 
 export default class VirtualAdapter implements ExchangeAdapter {
+	exchangeAccount: DbExchangeAccount
 	portfolio: Portfolio
 	orders: {[id: string]: ExchangeOrder}
 	openOrders: string[]
@@ -17,15 +20,32 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	placeDate: number
 	lastCandles: {[symbol: string]: ArrayCandle}
 
-	constructor(credentials: ExchangeCredentials) {
-		this.portfolio = JSON.parse(credentials.key);
-		this.orders = JSON.parse(credentials.secret);
+	constructor(exchangeAccount: DbExchangeAccount) {
+		console.log('Setting exchangeAccount', exchangeAccount);
+		this.exchangeAccount = exchangeAccount;
+		this.portfolio = {};
+		this.orders = {};
 		this.lastDate = -1;
 		this.lastCandles = {};
 		this.openOrders = [];
-		Object.values(this.orders).forEach( order => {
-			if( order.status === 'pending' || order.status === 'placed' ){
-				this.openOrders.push( order.id );
+	}
+
+	// This method is called by supplierdo
+	// Backtracking set the portfolio and orders attributes directly
+	async hydrate() {
+		const { accountId, id: exchangeId } = this.exchangeAccount;
+		console.log('Hydrating', this.exchangeAccount);
+		let [portfolio, orders] = await Promise.all([
+			ExchangeAccountModel.getVirtualPorftolio(accountId, exchangeId),
+			ExchangeAccountModel.getVirtualOrders(accountId, exchangeId)
+		]);
+
+		this.portfolio = portfolio;
+		this.orders = orders;
+		this.openOrders = [];
+		Object.values(this.orders).forEach(order => {
+			if (order.status === 'pending' || order.status === 'placed') {
+				this.openOrders.push(order.id);
 			}
 		});
 	}
@@ -35,7 +55,8 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	async getCandles(options: CandleQuery): Promise<ArrayCandle[]> {
-		let bfx = new BitfinexAdapter({ key: 'virtua', secret: 'virtua' });
+		// Key and secret doesn't matter, candles are public
+		let bfx = new BitfinexAdapter(this.exchangeAccount);
 		let data = await bfx.getCandles(options);
 
 		this.lastCandles[options.market] = candles.getLast(data);

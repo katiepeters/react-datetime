@@ -10,6 +10,7 @@ import Toaster from '../../components/toaster/Toaster';
 import CreateDeploymentForm, { CreateDeploymentPayload } from './CreateDeploymentForm';
 import { CreateExchangeAccountInput } from '../../state/apiClient';
 import arrayize from '../../../../lambdas/_common/utils/arrayize';
+import { Portfolio } from '../../../../lambdas/lambda.types';
 
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {
@@ -176,7 +177,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	}
 
 	createExchangeAccount(data: CreateDeploymentPayload): Promise<string> {
-		const balances = arrayize<string>(data.initialBalances)
+		const balances: Portfolio = arrayize<string>(data.initialBalances)
 			.map((balance: string, asset: string) => ({
 				asset,
 				free: parseFloat(balance),
@@ -189,8 +190,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 			accountId: data.accountId,
 			provider: data.exchange || 'unknown',
 			type: 'virtual',
-			key: JSON.stringify(balances),
-			secret: "{}"
+			initialBalances: balances
 		}
 
 		return apiCacher.createExchangeAccount(payload)

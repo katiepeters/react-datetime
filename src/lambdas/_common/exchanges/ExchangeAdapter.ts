@@ -39,5 +39,5 @@ export interface ExchangeAdapter {
 	getOrders(ids: string[]): Promise<ExchangeOrder[]>
 	getOpenOrders(): Promise<ExchangeOrder[]>
 	getOrderHistory(): Promise<ExchangeOrder[]>
-	getVirtualData?: () => ExchangeVirtualData
+	hydrate?: () => Promise<void>
 }
