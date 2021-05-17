@@ -136,13 +136,13 @@ export default {
 }
 
 function getLogsFileName( accountId: string, deploymentId: string ){
-	return `${accountId}/${deploymentId}/logs`;
+	return `${accountId}/de-${deploymentId}/logs`;
 }
 function getStateFileName(accountId: string, deploymentId: string) {
-	return `${accountId}/${deploymentId}/state`;
+	return `${accountId}/de-${deploymentId}/state`;
 }
 function getOrdersFileName(accountId: string, deploymentId: string) {
-	return `${accountId}/${deploymentId}/orders`;
+	return `${accountId}/de-${deploymentId}/orders`;
 }
 
 function getLogs( accountId: string, deploymentId: string ){

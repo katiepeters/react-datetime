@@ -14,7 +14,8 @@ const getSingleExchangeAccountHandler: QueryHandler = {
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const exchangeAccount = await models.exchangeAccount.getSingle(accountId, exchangeAccountId);
+		const exchangeAccount = await models.exchangeAccount.getSingleWithHistory(accountId, exchangeAccountId);
+		console.log( exchangeAccount );
 		if( !exchangeAccount ) return {error:{code: 'not_found', status: 404}};
 
 		return {context: {exchangeAccount}};

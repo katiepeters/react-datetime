@@ -27,7 +27,7 @@ export default class DataLoader<T> {
 
 	getData(instance: ReactInstance, id: string) {
 		let value = this.values[id];
-		if (value && value.error) {
+		if (value) {
 			return value;
 		}
 

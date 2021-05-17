@@ -16,11 +16,14 @@ import SingleDeploymentScreen from "../screens/singleDeployment/SingleDeployment
 import DeploymentOrdersScreen from "../screens/singleDeployment/orders/DeploymentOrdersScreen";
 import DeploymentStateScreen from "../screens/singleDeployment/state/DeploymentStateScreen";
 import DeploymentLogsScreen from "../screens/singleDeployment/logs/DeploymentLogsScreen";
+import DeploymentStatsScreen from "../screens/singleDeployment/stats/DeploymentStatsScreen";
 
 const routes = [
 	{path: '/', cb: HomeScreen},
 	{path: '/deployments', cb: DeploymentsScreen, children: [
 		{path: '/:id', cb: SingleDeploymentScreen, children: [
+			{path: '/', cb: DeploymentStatsScreen },
+			{path: '/stats', cb: DeploymentStatsScreen },
 			{path: '/orders', cb: DeploymentOrdersScreen },
 			{path: '/state', cb: DeploymentStateScreen},
 			{path: '/logs', cb: DeploymentLogsScreen}

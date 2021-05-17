@@ -82,7 +82,10 @@ export default {
 		console.log('Createing exchange and portfolio history');
 		let promises = [
 			Db.put(exchange),
-			savePortfolioHistory( accountId, exchangeId, '[]' )
+			savePortfolioHistory(
+				accountId, exchangeId,
+				JSON.stringify(account.initialBalances ? [account.initialBalances] : [] )
+			)
 		];
 
 		if (account.type === 'virtual') {

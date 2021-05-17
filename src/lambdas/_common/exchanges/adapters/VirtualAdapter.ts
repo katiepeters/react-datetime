@@ -5,6 +5,7 @@ import candles from "../../utils/candles";
 import symbols from "../../utils/symbols";
 import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeVirtualData } from "../ExchangeAdapter";
 import BitfinexAdapter from "./BitfinexAdapter";
+import { v4 as uuid } from 'uuid';
 
 export interface ExchangeAccountData {
 	portfolio: Portfolio
@@ -78,7 +79,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 
 		if( !this.hasEnoughFunds(order) ){
 			let errorOrder: ExchangeOrder = {
-				id: order.id,
+				id: uuid(), // Simulate exchange orders having a different id
 				symbol: order.symbol,
 				type: order.type,
 				status: 'error',
@@ -95,7 +96,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 			return {...errorOrder};
 		}
 		let exchangeOrder: ExchangeOrder = {
-			id: order.id,
+			id: uuid(), // Simulate exchange orders having a different id
 			symbol: order.symbol,
 			type: order.type,
 			status: 'placed',

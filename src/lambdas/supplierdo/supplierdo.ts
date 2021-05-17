@@ -86,7 +86,8 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 	]);
 
 	// Store bot results
-	BotDeploymentModel.update({
+	console.log('Setting state', result.state);
+	await BotDeploymentModel.update({
 		accountId, 
 		deploymentId: deployment.id,
 		update: {

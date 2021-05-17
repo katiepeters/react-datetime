@@ -29,7 +29,7 @@ const s3Helper = {
 			Body: content
 		};
 
-		console.log('setting s3 content');
+		console.log('setting s3 content', path, content);
 
 		return S3.putObject( payload ).promise()
 			.then( data => {

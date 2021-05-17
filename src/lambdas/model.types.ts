@@ -136,8 +136,9 @@ export interface DbExchangeAccount extends TableItem {
 	name: string
 	provider: 'bitfinex'
 	type: 'real' | 'virtual'
-	key: string
-	secret: string
+	key?: string
+	secret?: string
+	portfolioHistory?: PortfolioHistoryItem[]
 }
 
 export interface PortfolioHistoryItem {
@@ -178,4 +179,5 @@ export interface ExchangeAccountResponse {
 	provider: string
 	type: string
 	key: string
+	portfolioHistory?: PortfolioHistoryItem[]
 }

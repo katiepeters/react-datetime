@@ -38,6 +38,7 @@ export default class SingleDeploymentScreen extends React.Component<ScreenProps>
 		let id = this.props.router.location.params.id;
 
 		return [
+			{ name: 'Stats', icon: 'percentage', link: `#/deployments/${id}` },
 			{ name: 'Orders', icon: 'exchange-alt', link: `#/deployments/${id}/orders` },
 			{ name: 'State', icon: 'paperclip', link: `#/deployments/${id}/state`},
 			{ name: 'Logs', icon: 'file-alt', link: `#/deployments/${id}/logs` },
