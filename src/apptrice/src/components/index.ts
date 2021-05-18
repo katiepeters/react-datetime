@@ -15,3 +15,5 @@ export { default as ButtonList } from './buttonList/ButtonList';
 export { default as Spinner } from './spinner/Spinner';
 export { default as Controls } from './controls/Controls';
 export { default as Card } from './card/Card';
+export { default as Tabs } from './tabs/Tabs';
+export { default as Tab } from './tabs/Tab';
