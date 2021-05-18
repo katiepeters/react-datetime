@@ -89,7 +89,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 				closedAt: date
 			};
 
-			this.orders[order.id] = errorOrder;
+			this.orders[errorOrder.id] = errorOrder;
 			return {...errorOrder};
 		}
 		let exchangeOrder: ExchangeOrder = {
@@ -106,8 +106,8 @@ export default class VirtualAdapter implements ExchangeAdapter {
 			closedAt: null
 		}
 		this.updateBalance( exchangeOrder );
-		this.orders[ order.id ] = exchangeOrder;
-		this.openOrders.push( order.id );
+		this.orders[exchangeOrder.id ] = exchangeOrder;
+		this.openOrders.push(exchangeOrder.id );
 		return {...exchangeOrder};
 	}
 

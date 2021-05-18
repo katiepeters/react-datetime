@@ -4,7 +4,7 @@
   "rules": [
     {
       "background": "061725",
-      "foreground": "eeeeee",
+      "foreground": "eef3fe",
       "token": ""
     },
     {
@@ -12,7 +12,7 @@
       "foreground": "86d2f1"
     },
     {
-      "foreground": "637777",
+      "foreground": "64ab67",
       "token": "comment"
     },
     {
@@ -360,7 +360,7 @@
       "token": "keyword.operator.ternary"
     },
     {
-      "foreground": "637777",
+      "foreground": "64ab67",
       "token": "comment.line.double-slash"
     },
     {

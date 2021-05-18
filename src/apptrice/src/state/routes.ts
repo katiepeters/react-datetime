@@ -17,6 +17,7 @@ import DeploymentOrdersScreen from "../screens/singleDeployment/orders/Deploymen
 import DeploymentStateScreen from "../screens/singleDeployment/state/DeploymentStateScreen";
 import DeploymentLogsScreen from "../screens/singleDeployment/logs/DeploymentLogsScreen";
 import DeploymentStatsScreen from "../screens/singleDeployment/stats/DeploymentStatsScreen";
+import DeploymentChartsScreen from "../screens/singleDeployment/charts/DeploymentChartsScreen";
 
 const routes = [
 	{path: '/', cb: HomeScreen},
@@ -24,6 +25,7 @@ const routes = [
 		{path: '/:id', cb: SingleDeploymentScreen, children: [
 			{path: '/', cb: DeploymentStatsScreen },
 			{path: '/stats', cb: DeploymentStatsScreen },
+			{path: '/charts', cb: DeploymentChartsScreen },
 			{path: '/orders', cb: DeploymentOrdersScreen },
 			{path: '/state', cb: DeploymentStateScreen},
 			{path: '/logs', cb: DeploymentLogsScreen}

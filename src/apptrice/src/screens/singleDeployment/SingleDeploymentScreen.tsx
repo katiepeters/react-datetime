@@ -39,6 +39,7 @@ export default class SingleDeploymentScreen extends React.Component<ScreenProps>
 
 		return [
 			{ name: 'Stats', icon: 'percentage', link: `#/deployments/${id}` },
+			{ name: 'Charts', icon: 'chart-bar', link: `#/deployments/${id}/charts` },
 			{ name: 'Orders', icon: 'exchange-alt', link: `#/deployments/${id}/orders` },
 			{ name: 'State', icon: 'paperclip', link: `#/deployments/${id}/state`},
 			{ name: 'Logs', icon: 'file-alt', link: `#/deployments/${id}/logs` },
