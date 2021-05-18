@@ -80,11 +80,17 @@ export default {
 		};
 		
 		console.log('Createing exchange and portfolio history');
+		let history: PortfolioHistoryItem[] = [];
+		if( account.initialBalances ){
+			history.push({
+				date: Date.now(),
+				balances: account.initialBalances
+			});
+		}
 		let promises = [
 			Db.put(exchange),
 			savePortfolioHistory(
-				accountId, exchangeId,
-				JSON.stringify(account.initialBalances ? [account.initialBalances] : [] )
+				accountId, exchangeId, JSON.stringify( history )
 			)
 		];
 

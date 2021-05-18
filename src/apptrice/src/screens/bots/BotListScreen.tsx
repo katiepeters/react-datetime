@@ -40,7 +40,7 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 
 	renderBotList() {
 		const { authenticatedId: accountId } = this.props.store;
-		const { isLoading, data } = botListLoader.getData(this, accountId);
+		const { isLoading, data } = botListLoader.getData(accountId);
 		if (isLoading || !data) {
 			return <span>Loading...</span>;
 		}
@@ -93,7 +93,7 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 		if( !botId ) return;
 
 		const { authenticatedId: accountId } = this.props.store;
-		const { data } = botListLoader.getData(this, accountId);
+		const { data } = botListLoader.getData(accountId);
 		if( !data ) return;
 
 		return data.find((bot: DbBot) => bot.id === botId);

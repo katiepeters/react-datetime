@@ -41,6 +41,7 @@ export interface Order extends OrderInput {
 	errorReason: string | null
 	price: number | null
 	executedPrice: number | null
+	marketPrice: number
 	createdAt: number
 	placedAt: number | null
 	closedAt: number | null

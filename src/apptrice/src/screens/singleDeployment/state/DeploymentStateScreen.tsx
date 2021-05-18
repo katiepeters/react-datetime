@@ -9,7 +9,7 @@ import styles from './_DeploymentStateScreen.module.css';
 
 export default class DeploymentStateScreen extends React.Component<ScreenProps> {
 	render() {
-		let { data: deployment } = deploymentLoader.getData(this, this.getDeploymentId())
+		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
 		let state = this.getState( deployment );
 		return (
 			<ScreenWrapper title="state data">
@@ -36,7 +36,8 @@ export default class DeploymentStateScreen extends React.Component<ScreenProps> 
 
 	getState(deployment?: DBBotDeployment): Orders | undefined {
 		if( !deployment ) return;
+		const state = deployment.state;
 		// @ts-ignore
-		return deployment.state.flatten();
+		return state.flatten ? state.flatten() : state;
 	}
 }

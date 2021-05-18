@@ -7,6 +7,7 @@ import router from './state/router';
 import store from './state/store';
 import localStore from './state/localStore';
 import apiClient from './state/apiClient';
+import DataLoader from './utils/DataLoader';
 
 class App extends React.Component {
   constructor(props: any) {
@@ -50,6 +51,7 @@ class App extends React.Component {
     quickStore.addChangeListener( refresh );
     router.onChange( refresh );
     localStore.addChangeListener( refresh );
+    DataLoader.onChange = refresh;
   }
 }
 

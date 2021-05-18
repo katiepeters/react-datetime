@@ -27,7 +27,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 
 	render() {
 		const botId = this.getBotId(this.props);
-		const { isLoading, data } = botLoader.getData(this, botId);
+		const { isLoading, data } = botLoader.getData(botId);
 		if (!this.state.resources || isLoading || !data) {
 			return <span>Loading</span>;
 		}
@@ -88,7 +88,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		monaco.editor.setTheme('editorTheme');
 		editor.updateOptions({ contextmenu: false });
 
-		const { data } = botLoader.getData(this, this.getBotId(this.props));
+		const { data } = botLoader.getData(this.getBotId(this.props));
 		this.botSaver.currentCode = data ? data.code : '';
 	}
 

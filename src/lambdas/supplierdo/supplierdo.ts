@@ -158,20 +158,10 @@ function mergeOrders( orders:any, exchangeOrders: ExchangeOrder[] ) {
 	
 	exchangeOrders.forEach( exchangeOrder => {
 		let storedOrderId = foreignIdIndex[exchangeOrder.id];
-		if( storedOrderId ){
-			let order = mergeOrder(items[storedOrderId], exchangeOrder);
-			mergedOrders.items[storedOrderId] = order;
-			if( order.status === 'placed' ){
-				mergedOrders.openOrderIds.push( storedOrderId );
-			}
-		}
-		else {
-			let id = uuid();
-			mergedOrders.foreignIdIndex[exchangeOrder.id] = id;
-			mergedOrders.items[id] = createOrder(id, exchangeOrder);
-			if (exchangeOrder.status === 'placed') {
-				mergedOrders.openOrderIds.push(exchangeOrder.id);
-			}
+		let order = mergeOrder(items[storedOrderId], exchangeOrder);
+		mergedOrders.items[storedOrderId] = order;
+		if( order.status === 'placed' ){
+			mergedOrders.openOrderIds.push( storedOrderId );
 		}
 	});
 
@@ -183,17 +173,8 @@ function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {
 		...exchangeOrder,
 		id: storedOrder.id,
 		foreignId: exchangeOrder.id,
-		createdAt: storedOrder.createdAt
-	}
-}
-
-function createOrder( id: string, exchangeOrder: ExchangeOrder ): Order {
-	return {
-		...exchangeOrder,
-		id: id,
-		foreignId: exchangeOrder.id,
-		errorReason: null,
-		createdAt: Date.now()
+		createdAt: storedOrder.createdAt,
+		marketPrice: storedOrder.marketPrice
 	}
 }
 

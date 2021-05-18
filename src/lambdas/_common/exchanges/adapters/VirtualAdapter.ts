@@ -68,9 +68,6 @@ export default class VirtualAdapter implements ExchangeAdapter {
 
 	async placeOrders(orders: OrderInput[]): Promise<ExchangeOrder[]> {
 		const placed = orders.map( this._placeOrder );
-		// Now we can complete any market order
-		// this.updateOpenOrders();
-		// But return the placed orders to simulate real exchanges
 		return placed;
 	}
 

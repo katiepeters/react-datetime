@@ -21,7 +21,7 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 	}
 
 	render() {
-		let { data, isLoading, error } = exchangeListLoader.getData(this, this.props.store.authenticatedId);
+		let { data, isLoading, error } = exchangeListLoader.getData(this.props.store.authenticatedId);
 		return (
 			<ScreenWrapper title="API accounts" titleExtra={ this.renderCreateButton() }>
 				{ data ? this.renderList(data) : 'Loading...' }

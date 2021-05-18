@@ -57,8 +57,8 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 	dataLoaded = false;
 	render() {
 		let {accountId} = this.props;
-		let { data: bots } = botListLoader.getData(this, accountId);
-		let { data: exchanges } = exchangeListLoader.getData(this, accountId);
+		let { data: bots } = botListLoader.getData(accountId);
+		let { data: exchanges } = exchangeListLoader.getData(accountId);
 
 		if( !bots || !exchanges ){
 			return <span>Loading...</span>;
@@ -318,8 +318,8 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		if( !this.dataLoaded ) return;
 		if( !this.state.botId ){
 			const {accountId} = this.props;
-			let { data: bots } = botListLoader.getData(this, accountId);
-			let { data: exchanges } = exchangeListLoader.getData(this, accountId);
+			let { data: bots } = botListLoader.getData(accountId);
+			let { data: exchanges } = exchangeListLoader.getData(accountId);
 
 			if( bots && exchanges ){
 				console.log('Setting state');

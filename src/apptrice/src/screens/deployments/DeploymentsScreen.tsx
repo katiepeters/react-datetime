@@ -44,7 +44,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	}
 
 	renderDeployments() {
-		const { data, isLoading } = deploymentsLoader.getData(this, this.props.store.authenticatedId);
+		const { data, isLoading } = deploymentsLoader.getData(this.props.store.authenticatedId);
 
 		if( isLoading || !data ) return 'Loading...';
 

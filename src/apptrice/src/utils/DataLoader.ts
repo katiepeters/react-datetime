@@ -1,86 +1,99 @@
-import { ReactInstance } from "react"
-
 export interface DataLoaderConfig<T> {
-	getFromCache: (id: string) => T | undefined
-	isValid?: (data?: T) => boolean
-	loadData: (id: string) => Promise<any>
+	getFromCache: (...args: string[]) => T | undefined
+	isValid?: (...args: string[]) => boolean
+	invalidate?: (...args:string[]) => void
+	loadData: (...args: string[]) => Promise<any>
 }
-
 export interface DataLoaderResult<T> {
 	error: any
 	isLoading: boolean
 	data?: T
+	retry: () => any
 }
 
-export default class DataLoader<T> {
-	getFromCache: (id: string) => T | undefined
-	isValid: (id: T) => boolean
-	loadData: (id: string) => Promise<any>
-	promises: { [key: string]: Promise<any> } = {}
-	values: { [key: string]: DataLoaderResult<T> } = {}
+class DataLoader<T> {
+
+	// This has to be set to update the app on initialization
+	static onChange = () => {} 
+
+	loadState = new Map();
+	getFromCache
+	loadData
+	isValid = (...args: string[]) => true
+	invalidate = (...args: string[]) => {}
 
 	constructor(config: DataLoaderConfig<T>) {
 		this.getFromCache = config.getFromCache;
-		this.isValid = config.isValid || (() => true);
 		this.loadData = config.loadData;
+
+		if (config.isValid) {
+			this.isValid = config.isValid;
+		}
+		if (config.invalidate) {
+			this.invalidate = config.invalidate;
+		}
 	}
 
-	getData(instance: ReactInstance, id: string) {
-		let value = this.values[id];
-		if (value) {
-			return value;
+	getData(...args: string[]) {
+		const cachedData = this.getFromCache(...args);
+		const key = JSON.stringify(args);
+		const loadDataState = this.loadState.get(key);
+		const { error } = loadDataState || {};
+
+		if (!error && cachedData !== undefined && this.isValid(...args)) {
+			if (loadDataState) {
+				this.loadState.delete(key);
+			}
+
+			return {
+				isLoading: false,
+				error: null,
+				data: cachedData,
+				retry: this.retry.bind(this),
+			};
 		}
 
-		let cachedData = this.getFromCache(id);
-		if (!cachedData || !this.isValid(cachedData)) {
-			this.handleDataLoading(id, instance);
-			this.setValue(id, { error: false, isLoading: true, data: cachedData });
-		}
-		else {
-			this.setValue(id, { error: false, isLoading: false, data: cachedData });
+		if (loadDataState) {
+			return loadDataState;
 		}
 
-		return this.values[id];
+		return this.load(key, ...args);
 	}
 
-	handleDataLoading(id: string, instance: ReactInstance) {
-		if (this.promises[id]) {
-			// @ts-ignore
-			this.promises[id].finally(() => instance.forceUpdate());
-		}
-
-		this.promises[id] = this.loadData(id)
-			.then(res => {
-				delete this.promises[id];
-
-				if (res.error) {
-					let cachedData = this.getFromCache(id);
-					this.setValue(id, { error: res.error, isLoading: false, data: cachedData });
-				}
-				else {
-					this.setValue(id, { error: false, isLoading: false, data: res.data });
-				}
-
-				// @ts-ignore
-				instance.forceUpdate();
-				return res;
+	load(key: string, ...args: string[]) {
+		this.loadData(...args)
+			.then(response => {
+				this.loadState.delete(key);
+				return response;
 			})
-			.catch(error => {
-				let cachedData = this.getFromCache(id);
-				this.setValue(id, { error: error, isLoading: false, data: cachedData });
+			.catch((err) => {
+				this.loadState.set(key, {
+					isLoading: false,
+					error: err,
+					data: null,
+					retry: this.retry.bind(this)
+				});
+				DataLoader.onChange();
 			})
-			;
+		;
+
+		const response = {
+			isLoading: true,
+			error: null,
+			data: null,
+			retry: this.retry.bind(this)
+		};
+
+		this.loadState.set(key, response);
+		return response;
 	}
 
-	setValue(id: string, value: DataLoaderResult<T>) {
-		let stored = this.values[id];
-		if (!stored || stored.error !== value.error || stored.isLoading !== value.isLoading || stored.data !== value.data) {
-			this.values[id] = value;
-		}
-		return this.values[id];
-	}
-
-	clearValue(id: string) {
-		delete this.values[id];
+	retry(...args: string[]) {
+		const key = JSON.stringify(args);
+		this.loadState.delete(key);
+		DataLoader.onChange();
+		this.load(key, ...args);
 	}
 }
+
+export default DataLoader;

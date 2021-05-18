@@ -24,7 +24,7 @@ export default class Trader {
 		return this.portfolio;
 	}
 
-	getBalance( asset: string ): Balance{
+	getBalance( asset: string ): Balance {
 		let balance = this.portfolio[asset];
 		return balance ?
 			{...balance} :
@@ -54,8 +54,9 @@ export default class Trader {
 			executedPrice: null,
 			createdAt: Date.now(),
 			placedAt: null,
-			closedAt: null
-		}
+			closedAt: null,
+			marketPrice: this.prices[ orderInput.symbol ]
+		};
 
 		this.ordersToPlace.push( order )
 		this.orders = {

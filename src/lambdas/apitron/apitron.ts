@@ -10,11 +10,11 @@ import exchangesAPI from './exchangeAccounts/exchangesAPI';
 import botsAPI from './bots/botsAPI';
 import s3Helper from '../_common/utils/s3';
 
-const fs = require('fs');
-const path = require('path');
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import * as express from 'express';
+import * as serverless from 'serverless-http';
 
-const serverless = require('serverless-http');
-const express = require('express')
 const app = express()
 
 app.use(express.json());
@@ -160,7 +160,7 @@ async function setTestData(event) {
 			name: 'Test bot',
 			accountId,
 			id: 'testBot',
-			code: fs.readFileSync(path.join(__dirname, '../../../bots/testBot.ts'), 'utf8')
+			code: readFileSync(join(__dirname, '../../../bots/testBot.ts'), 'utf8')
 		});
 	}
 	else {

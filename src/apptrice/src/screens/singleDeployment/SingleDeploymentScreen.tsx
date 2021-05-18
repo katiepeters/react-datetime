@@ -7,7 +7,7 @@ import deploymentLoader from './deployment.loader'
 
 export default class SingleDeploymentScreen extends React.Component<ScreenProps> {
 	render() {
-		let {data, isLoading} = deploymentLoader.getData(this, this.getDeploymentId() )
+		let {data, isLoading} = deploymentLoader.getData( this.getDeploymentId() )
 		console.log( data, isLoading );
 
 		let Subscreen = this.getSubscreen();

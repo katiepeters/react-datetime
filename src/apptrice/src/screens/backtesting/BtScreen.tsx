@@ -9,7 +9,7 @@ export default class BtScreen extends React.Component<ScreenProps> {
 
 	render() {
 		let Subscreen = this.getSubscreen();
-		let {isLoading, error} = botLoader.getData(this, this.getBotId());
+		let {isLoading, error} = botLoader.getData(this.getBotId());
 
 		if( isLoading ){
 			return 'Loading...';

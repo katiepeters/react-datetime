@@ -18,7 +18,7 @@ export default class BtDetailsScreen extends React.Component<ScreenProps> {
 
 	_onRunBt = (config: BacktestConfig) => {
 		const botId = this.getBotId();
-		let { data } = botLoader.getData(this, botId);
+		let { data } = botLoader.getData(botId);
 		let botData = {
 			botId,
 			source: data?.code

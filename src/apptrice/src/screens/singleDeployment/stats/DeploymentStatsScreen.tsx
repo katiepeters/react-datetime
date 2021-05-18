@@ -15,7 +15,7 @@ export default class DeploymentStatsScreen extends React.Component<ScreenProps> 
 	}
 
 	renderContent() {
-		let { data: deployment } = deploymentLoader.getData(this, this.getDeploymentId());
+		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId());
 		if (!deployment) {
 			return <Card>Loading...</Card>;
 		}

@@ -8,7 +8,7 @@ import styles from './_DeploymentLogsScreen.module.css';
 
 export default class DeploymentLogsScreen extends React.Component<ScreenProps> {
 	render() {
-		let { data: deployment } = deploymentLoader.getData(this, this.getDeploymentId())
+		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
 		let logs = this.getLogs( deployment );
 		return (
 			<ScreenWrapper title="logs">
@@ -34,7 +34,8 @@ export default class DeploymentLogsScreen extends React.Component<ScreenProps> {
 
 	getLogs(deployment?: DBBotDeployment): ConsoleEntry[] | undefined {
 		if( !deployment ) return;
+		let logs = deployment.logs;
 		// @ts-ignore
-		return deployment.logs.flatten();
+		return logs.flatten ? logs.flatten() : logs;
 	}
 }

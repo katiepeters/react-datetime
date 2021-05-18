@@ -9,7 +9,7 @@ import styles from './_DeploymentOrdersScreen.module.css';
 
 export default class DeploymentOrdersScreen extends React.Component<ScreenProps> {
 	render() {
-		let { data: deployment } = deploymentLoader.getData(this, this.getDeploymentId())
+		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
 		let orders = this.getOrders( deployment );
 		return (
 			<ScreenWrapper title={this.renderTitle(orders)}>
@@ -51,7 +51,8 @@ export default class DeploymentOrdersScreen extends React.Component<ScreenProps>
 
 	getOrders(deployment?: DBBotDeployment): Orders | undefined {
 		if( !deployment ) return;
+		let {items} = deployment.orders;
 		// @ts-ignore
-		return deployment.orders.items.flatten();
+		return items.flatten ? items.flatten() : items;
 	}
 }

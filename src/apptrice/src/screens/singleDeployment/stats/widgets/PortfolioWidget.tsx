@@ -22,7 +22,7 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 	}
 
 	renderContent() {
-		let { data: exchange } = exchangeLoader.getData(this, this.props.exchangeId);
+		let { data: exchange } = exchangeLoader.getData(this.props.exchangeId);
 		if (!exchange || !exchange.portfolioHistory) return <div>Loading...</div>;
 
 		let {portfolioHistory} = exchange;
