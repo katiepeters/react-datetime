@@ -7,15 +7,22 @@ import deploymentLoader from '../deployment.loader';
 import styles from './_DeploymentChartsScreen.module.css';
 
 export default class DeploymentChartsScreen extends React.Component<ScreenProps> {
+	state = {
+		activeTab: ''
+	}
+
 	render() {
 		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
 		let symbols = this.getSymbols( deployment );
 		return (
-			<ScreenWrapper title="state data">
-				<Tabs active="id1" onChange={ (id:string) => console.log('clicked ' + id )}>
-					<Tab id="id1">Text1</Tab>
-					<Tab id="id2">Text2</Tab>
-				</Tabs>
+			<ScreenWrapper title="Charts">
+				<div>
+					<Tabs active={ this.state.activeTab }
+						onChange={(activeTab: string) => this.setState({activeTab}) }>
+						<Tab id="id1">Text1</Tab>
+						<Tab id="id2">Text2</Tab>
+					</Tabs>
+				</div>
 				{ JSON.stringify(symbols) }
 			</ScreenWrapper>
 		)
@@ -45,5 +52,13 @@ export default class DeploymentChartsScreen extends React.Component<ScreenProps>
 			deployment.symbols.flatten() :
 			deployment.symbols
 		;
+	}
+
+	componentDidMount() {
+
+	}
+
+	componentDidUpdate() {
+
 	}
 }

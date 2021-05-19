@@ -12,7 +12,7 @@ interface TabsProps {
 export default class Tabs extends React.Component<TabsProps> {
 	render() {
 		return (
-			<div className={styles.container}>
+			<div className={styles.tabs}>
 				{ this.props.children.map( (child: React.ReactElement<Tab>) => (
 					this.renderTab( child )
 				))}

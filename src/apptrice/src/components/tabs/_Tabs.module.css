@@ -1,0 +1,21 @@
+.tabs {
+	display: flex;
+	flex: 1;
+	border-bottom: 1px solid #fff;
+	width: 100%;
+}
+
+.active .tab {
+	border-bottom: 1px solid red;
+}
+
+.tab {
+	padding: 10px 20px;
+	border-bottom: 1px solid transparent;
+	margin-bottom: -1px;
+	cursor: pointer;
+}
+
+.tab:hover {
+	background-color: rgba(255,255,255,.1);
+}

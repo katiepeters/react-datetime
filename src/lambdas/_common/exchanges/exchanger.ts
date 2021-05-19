@@ -15,7 +15,7 @@ const exchanger = {
 	getAdapter(exchangeAccount: DbExchangeAccount): ExchangeAdapter | void {
 		let Adapter = exchangeAccount.type === 'virtual' ?
 			adapters.virtual :
-			adapters[exchangeAccount.exchange]
+			adapters[exchangeAccount.provider]
 		;
 		
 		if( !Adapter ) {

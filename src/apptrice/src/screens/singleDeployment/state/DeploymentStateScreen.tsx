@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Orders } from '../../../../../lambdas/lambda.types';
 import { DBBotDeployment } from '../../../../../lambdas/model.types';
-import OrderList from '../../../common/orderList/OrderList';
 import { Card, ScreenWrapper } from '../../../components';
 import { ScreenProps } from '../../../types';
 import deploymentLoader from '../deployment.loader';
@@ -10,22 +9,22 @@ import styles from './_DeploymentStateScreen.module.css';
 export default class DeploymentStateScreen extends React.Component<ScreenProps> {
 	render() {
 		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
-		let orders = this.getOrders(deployment);
+		let state = this.getState(deployment);
 		return (
 			<ScreenWrapper title="state data">
-				{ this.renderCharts(orders) }
+				{ this.renderState(state)}
 			</ScreenWrapper>
 		)
 	}
 
-	renderCharts(orders?: any) {
-		if( !orders ){
+	renderState(state?: any) {
+		if (!state) {
 			return <Card>Loading...</Card>
 		}
 
 		return (
 			<Card>
-				<pre>{ JSON.stringify(orders, null, 2) }</pre>
+				<pre>{JSON.stringify(state, null, 2)}</pre>
 			</Card>
 		);
 	}
@@ -34,10 +33,10 @@ export default class DeploymentStateScreen extends React.Component<ScreenProps> 
 		return this.props.router.location.params.id;
 	}
 
-	getOrders(deployment?: DBBotDeployment): Orders | undefined {
+	getState(deployment?: DBBotDeployment): Orders | undefined {
 		if (!deployment) return;
-		let { items } = deployment.orders;
+		const state = deployment.state;
 		// @ts-ignore
-		return items.flatten ? items.flatten() : items;
+		return state.flatten ? state.flatten() : state;
 	}
 }
