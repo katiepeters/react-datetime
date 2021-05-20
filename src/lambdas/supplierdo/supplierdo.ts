@@ -169,6 +169,7 @@ function mergeOrders( orders:any, exchangeOrders: ExchangeOrder[] ) {
 }
 
 function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {
+	console.log('Mergin order, stored - exchange', storedOrder, exchangeOrder);
 	return {
 		...exchangeOrder,
 		id: storedOrder.id,

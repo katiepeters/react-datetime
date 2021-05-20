@@ -26,7 +26,7 @@ export default {
 
 		return {
 			...dbExchange,
-			portfolioHistory: JSON.parse(history)
+			portfolioHistory: JSON.parse(history || [])
 		}
 	},
 
@@ -47,8 +47,8 @@ export default {
 	},
 
 	async updatePortfolio( accountId: string, exchangeId: string, portfolio: Portfolio, updateLast: boolean ){
-		let historyRaw = await getPortfolioHistory(accountId, exchangeId) || '[]';
-		let history: PortfolioHistoryItem[] = JSON.parse(historyRaw);
+		let historyRaw = await getPortfolioHistory(accountId, exchangeId);
+		let history: PortfolioHistoryItem[] = JSON.parse(historyRaw || '[]');
 		history.push({
 			date: Date.now(),
 			balances: portfolio

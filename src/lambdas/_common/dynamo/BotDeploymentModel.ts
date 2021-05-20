@@ -4,6 +4,11 @@ import { DBModel } from './db';
 
 const Db = new DBModel<DBBotDeploymentRaw>();
 
+const defaultOrders = {
+	foreignIdIndex: {},
+	items: {},
+	openOrderIds: []
+};
 interface DeleteDeploymentInput {
 	accountId: string
 	deploymentId: string
@@ -37,9 +42,9 @@ export default {
 		return {
 			...entry,
 			active: entry.active ? true : false,
-			orders: JSON.parse(orders),
-			state: JSON.parse(state),
-			logs: JSON.parse(logs)
+			orders: orders ? JSON.parse(orders) : defaultOrders,
+			state: JSON.parse(state || '{}'),
+			logs: JSON.parse(logs || '[]')
 		};
 	},
 
@@ -70,12 +75,6 @@ export default {
 		if( input.active ){
 			dbDeployment.active = 'true';
 		}
-
-		const defaultOrders = {
-			foreignIdIndex: {},
-			items: {},
-			openOrderIds: []
-		};
 
 		return await Promise.all([
 			Db.put(dbDeployment),

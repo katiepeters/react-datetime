@@ -1,4 +1,5 @@
 import * as React from 'react'
+import symbols from '../../../../../lambdas/_common/utils/symbols';
 import { Card, ScreenWrapper } from '../../../components';
 import { ScreenProps } from '../../../types';
 import deploymentLoader from '../deployment.loader';
@@ -20,13 +21,28 @@ export default class DeploymentStatsScreen extends React.Component<ScreenProps> 
 			return <Card>Loading...</Card>;
 		}
 
+		const {baseAssets, quotedAsset} = this.getAssets( deployment.symbols );
 		return (
 			<PortfolioWidget
+				baseAssets={baseAssets}
+				quotedAsset={quotedAsset}
 				exchangeId={ deployment.exchangeAccountId } />
 		);
 	}
 
 	getDeploymentId() {
 		return this.props.router.location.params.id;
+	}
+
+	getAssets(deploySymbols: string[]){
+		let quotedAsset: string = '';
+		let baseAssets: string[] = [];
+		deploySymbols.forEach( (symbol: string) => {
+			if( !quotedAsset ){
+				quotedAsset = symbols.getQuoted(symbol);
+			}
+			baseAssets.push(symbols.getBase(symbol));
+		});
+		return {quotedAsset, baseAssets}
 	}
 }

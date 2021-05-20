@@ -29,7 +29,7 @@ const s3Helper = {
 			Body: content
 		};
 
-		console.log('setting s3 content', path, content);
+		console.log('setting s3 content', path);
 
 		return S3.putObject( payload ).promise()
 			.then( data => {
@@ -48,9 +48,13 @@ const s3Helper = {
 			Key: path
 		}
 
+		console.log('getting s3 content', path);
 		return S3.getObject( payload ).promise()
 			.then( data => {
 				return data.Body.toString();
+			})
+			.catch( err => {
+				console.log('error getting s3', path, err);
 			})
 		;
 	},
@@ -59,6 +63,7 @@ const s3Helper = {
 			Bucket: BUCKET_NAME,
 			Key: path
 		}
+		console.log('deleting s3 content', path);
 		return S3.deleteObject(payload).promise()
 			.then(data => {
 				console.log('delOk', data);

@@ -1,10 +1,13 @@
 import * as React from 'react'
+import { Balance, Portfolio } from '../../../../../../lambdas/lambda.types';
 import { Card, Table } from '../../../../components';
 import exchangeLoader from '../../../../state/loaders/exchange.loader';
 import styles from './_PortfolioWidget.module.css';
 
 interface PortfolioWidgetProps {
 	exchangeId: string
+	baseAssets: string[]
+	quotedAsset: string
 }
 
 export default class PortfolioWidget extends React.Component<PortfolioWidgetProps> {
@@ -33,9 +36,18 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 		let lastPortfolio = portfolioHistory[portfolioHistory.length - 1];
 		return (
 			<Table
-				data={Object.values(lastPortfolio.balances) || []}
+				data={ this.getData(lastPortfolio) }
 				keyField="asset"
 			/>
 		);
+	}
+
+	getData( portfolio: Portfolio ) {
+		const {baseAssets, quotedAsset} = this.props;
+		return Object.values(portfolio.balances)
+			.filter( (balance: Balance) => (
+				balance.asset === quotedAsset || baseAssets.includes(balance.asset)
+			))
+		;
 	}
 }

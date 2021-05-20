@@ -1,0 +1,13 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.tabs {
+	height: 40px;
+}
+
+.chart {
+	flex: 1
+}

@@ -22,7 +22,7 @@ const deleteDeploymentHandler: MutationHandler = {
 		const exchange = await models.exchangeAccount.getSingle(accountId, deployment.exchangeAccountId);
 
 		return {context: {
-			deployment: {accountId, deploymentId},
+			deployment: {accountId, deploymentId },
 			exchange
 		}};
 	},
@@ -35,7 +35,7 @@ const deleteDeploymentHandler: MutationHandler = {
 			data: deployment
 		}];
 		
-		if( exchange.type === 'virtual' ){
+		if( exchange && exchange.type === 'virtual' ){
 			mutations.push({
 				model: 'exchangeAccount',
 				action: 'delete',

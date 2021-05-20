@@ -119,7 +119,8 @@ function getSymbol(market) {
 function convertToExchangeOrder(rawOrder): ExchangeOrder {
 	let bfxOrder = new BfxOrder(rawOrder);
 	let status = getOrderStatus(bfxOrder.status);
-	return {
+
+	let exchangeOrder: ExchangeOrder =  {
 		id: bfxOrder.id,
 		symbol: getOrderSymbol(bfxOrder.symbol),
 		type: bfxOrder.type.includes('LIMIT') ? 'limit' : 'market',
@@ -132,6 +133,9 @@ function convertToExchangeOrder(rawOrder): ExchangeOrder {
 		placedAt: bfxOrder.mtsCreate,
 		closedAt: status === 'cancelled' || status === 'completed' ? bfxOrder.mtsUpdate : null
 	}
+
+	console.log('Converting to exchange order', rawOrder, exchangeOrder);
+	return exchangeOrder;
 }
 
 function getOrderSymbol( symbol: string ) {
