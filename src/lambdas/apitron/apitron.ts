@@ -42,6 +42,13 @@ app.post('/schedulator', function( req, res ){
 	});
 });
 
+app.post('/tickerUpdater', function( req, res ){
+	lambdaUtil.invokeTickerUpdater('bitfinex').then( result => {
+		console.log('Ticker updater', result );
+		res.send('ok');
+	})
+});
+
 app.post('/trys3', function (req, res) {
 	s3Helper.setContent('some/path', 'My content')
 		.then( () => {

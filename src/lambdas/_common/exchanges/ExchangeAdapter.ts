@@ -31,6 +31,27 @@ export interface ExchangeVirtualData {
 	orders: string
 }
 
+export interface Ticker {
+	[symbol: string]: SymbolTicker
+}
+
+export interface SymbolTicker {
+	date: number,
+	price: number,
+	volume: number,
+	change: number
+}
+
+export interface ExchangeSymbols {
+	[symbol:string]: ExchangeSymbol
+}
+
+export interface ExchangeSymbol {
+	symbolKey: string
+	minOrder: number
+	maxOrder: number
+}
+
 export interface ExchangeAdapter {
 	getPortfolio(): Promise<Portfolio>
 	getCandles(options: CandleQuery): Promise<ArrayCandle[]>
@@ -40,4 +61,6 @@ export interface ExchangeAdapter {
 	getOpenOrders(): Promise<ExchangeOrder[]>
 	getOrderHistory(): Promise<ExchangeOrder[]>
 	hydrate?: () => Promise<void>
+	getTicker: () => Promise<Ticker>
+	getSymbols: () => Promise<ExchangeSymbols>
 }

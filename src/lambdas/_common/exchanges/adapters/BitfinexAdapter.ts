@@ -1,7 +1,7 @@
 
 import { RESTv2 } from 'bfx-api-node-rest';
 import { Order as BfxOrder } from 'bfx-api-node-models';
-import { CandleQuery, ExchangeAdapter, ExchangeCredentials, ExchangeOrder } from '../ExchangeAdapter';
+import { CandleQuery, ExchangeAdapter, ExchangeCredentials, ExchangeOrder, ExchangeSymbols, Ticker } from '../ExchangeAdapter';
 import { ArrayCandle, OrderInput, Portfolio } from '../../../lambda.types';
 import { DbExchangeAccount } from '../../../model.types';
 
@@ -40,7 +40,7 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 		if (candles) {
 			return candles;
 		}
-		const exchangeSegment = getSymbol(options.market);
+		const exchangeSegment = toExchangeSymbol(options.market);
 		const pathParams = `candles/trade:${options.runInterval}:${exchangeSegment}/hist`;
 		const queryParams = `limit=${options.candleCount}&end=${options.lastCandleAt}`;
 
@@ -58,7 +58,7 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 		let toSubmit = orders.map( order => {
 			let bfxOptions: any = {
 				type: getBfxOrderType(order.type),
-				symbol: getSymbol(order.symbol),
+				symbol: toExchangeSymbol(order.symbol),
 				amount: order.direction === 'buy' ? order.amount : -order.amount
 			};
 
@@ -106,19 +106,64 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 		console.log('RAW ORDERS', orders);
 		return orders.map(convertToExchangeOrder);
 	}
+
+	async getTicker(): Promise<Ticker> {
+		let exchangeData: any[] = await this.bfx.tickers(['ALL']);
+		let ticker: Ticker = {};
+		let now = Date.now();
+
+		exchangeData.forEach( (tick: any) => {
+			if( tick[0][0] === 't' ){ // We are only interested in trade symbols like 'tBTCUSD'
+				ticker[toLocalSymbol(tick[0].slice(1))] = {
+					date: now,
+					price: tick[7],
+					volume: tick[8],
+					change: tick[6]
+				}
+			}
+		});
+
+		return ticker;
+	}
+
+	async getSymbols(): Promise<ExchangeSymbols> {
+		let symbols: ExchangeSymbols = {};
+
+		let data: any[] = await this.bfx.conf(['pub:info:pair']);
+
+		data[0].forEach( (symbolData: any) => {
+			symbols[ toLocalSymbol(symbolData[0]) ] = {
+				symbolKey: symbolData[0],
+				minOrder: parseFloat( symbolData[1][3] ),
+				maxOrder: parseFloat( symbolData[1][4] ),
+			}
+		});
+
+		return symbols;
+	}
 }
 
 function getKey(options: CandleQuery): string {
 	return `${options.market}:${options.runInterval}:${options.lastCandleAt}:${options.candleCount}`;
 }
 
-function getSymbol(market) {
+function toExchangeSymbol(market) {
 	return `t${market.replace('/', '')}`;
 }
 
+function toLocalSymbol( exchangeSymbol ){
+	let parts = exchangeSymbol.split(':');
+	if( parts.length === 1 ){
+		return `${exchangeSymbol.slice(0,3)}/${exchangeSymbol.slice(3)}`;
+	}
+	
+	return `${parts[0].slice(1)}/${parts[1]}`;
+}
+
 function convertToExchangeOrder(rawOrder): ExchangeOrder {
-	let bfxOrder = new BfxOrder(rawOrder);
-	let status = getOrderStatus(bfxOrder.status);
+	const bfxOrder = new BfxOrder(rawOrder);
+	const status = getOrderStatus(bfxOrder.status);
+	const amount = bfxOrder.amount || bfxOrder.amountOrig;
 
 	let exchangeOrder: ExchangeOrder =  {
 		id: bfxOrder.id,
@@ -126,15 +171,15 @@ function convertToExchangeOrder(rawOrder): ExchangeOrder {
 		type: bfxOrder.type.includes('LIMIT') ? 'limit' : 'market',
 		status,
 		errorReason: null,
-		direction: bfxOrder.amount > 0 ? 'buy' : 'sell',
-		amount: Math.abs(bfxOrder.amount || bfxOrder.amountOrig),
+		direction: amount ? 'buy' : 'sell',
+		amount: Math.abs(amount),
 		price: bfxOrder.price || null,
 		executedPrice: bfxOrder.priceAvg || null,
 		placedAt: bfxOrder.mtsCreate,
 		closedAt: status === 'cancelled' || status === 'completed' ? bfxOrder.mtsUpdate : null
 	}
 
-	console.log('Converting to exchange order', rawOrder, exchangeOrder);
+	console.log('Converting to exchange order', rawOrder, exchangeOrder, bfxOrder);
 	return exchangeOrder;
 }
 

@@ -79,6 +79,13 @@ const lambdaUtil = {
 			InvocationType: 'Event',
 			Payload: {}
 		})
+	},
+	invokeTickerUpdater(exchange: string): Promise<any> {
+		return this.invoke({
+			FunctionName: 'awstrader-dev-tickerUpdater',
+			InvocationType: 'Event',
+			Payload: { exchange }
+		});
 	}
 }
 

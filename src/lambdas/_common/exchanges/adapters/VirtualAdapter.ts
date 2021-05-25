@@ -3,7 +3,7 @@ import { DbExchangeAccount } from "../../../model.types";
 import ExchangeAccountModel from "../../dynamo/ExchangeAccountModel";
 import candles from "../../utils/candles";
 import symbols from "../../utils/symbols";
-import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeVirtualData } from "../ExchangeAdapter";
+import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeSymbols, ExchangeVirtualData, Ticker } from "../ExchangeAdapter";
 import BitfinexAdapter from "./BitfinexAdapter";
 import { v4 as uuid } from 'uuid';
 
@@ -338,5 +338,15 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		// @ts-ignore
 		let midCandle = (candles.getTime(this.lastCandles[asset][1]) - candles.getTime(this.lastCandles[asset][0])) / 2;
 		return this.lastDate + midCandle;
+	}
+
+	async getTicker(): Promise<Ticker> {
+		// we don't save tickers from virtual exchange
+		return Promise.resolve({});
+	}
+
+	async getSymbols(): Promise<ExchangeSymbols> {
+		// we don't transalte symbols from virtual exchange
+		return Promise.resolve({});
 	}
 }

@@ -63,6 +63,14 @@ functions:
   supplierdo:
     handler: supplierdo/supplierdo.supplierdo
     role: apiRole
+  tickerer:
+    handler: tickerer/tickerer.tickerer
+    role: apiRole
+    events:
+      - schedule: cron(*/5 * * * *) # every 5 minutes
+  tickerUpdater:
+    handler: tickerer/tickerUpdater.tickerUpdater
+    role: apiRole
 
 
 resources:
