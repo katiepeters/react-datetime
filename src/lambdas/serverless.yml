@@ -21,7 +21,8 @@ service: awstrader
 # frameworkVersion: "=X.X.X"
 
 custom:
-  bucket: aws-trader-${self:provider.stage}-bot-states #unique global name it will create for the bucket
+  stateBucket: aws-trader-${self:provider.stage}-bot-states #unique global name it will create for the bucket
+  exchangesBucket: aws-trader-${self:provider.stage}-exchanges #unique global name it will create for the bucket
   dynamodb:
     stages:
       - ${self:provider.stage}
@@ -40,7 +41,8 @@ provider:
   lambdaHashingVersion: 20201221
   environment:
     ACCOUNTS_TABLE: ${self:service}-${opt:stage, self:provider.stage}
-    S3_BUCKET: ${self:custom.bucket}
+    STATE_BUCKET: ${self:custom.stateBucket}
+    EXCHANGES_BUCKET: ${self:custom.exchangesBucket}
     region: ${self:provider.region}
     stage: ${self:provider.stage}
   iam:
@@ -67,29 +69,32 @@ functions:
     handler: tickerer/tickerer.tickerer
     role: apiRole
     events:
-      - schedule: cron(*/5 * * * *) # every 5 minutes
+      - schedule: cron(*/5 * * * ? *) # every 5 minutes
   tickerUpdater:
     handler: tickerer/tickerUpdater.tickerUpdater
     role: apiRole
-
 
 resources:
   Resources:
     botStateBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.bucket} # Getting the name of table I defined under custom in serverless.yml
-    # Make Bucket publicly accessable
-    botStateBucketPolicy:
-      Type: AWS::S3::BucketPolicy
+        BucketName: ${self:custom.stateBucket} # Getting the name of table I defined under custom in serverless.yml
+    
+    exchangesBucket:
+      Type: AWS::S3::Bucket
       Properties:
-          Bucket: !Ref botStateBucket
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Principal: '*' # public access to access the bucket files 
-                Action: s3:GetObject
-                Resource: 'arn:aws:s3:::${self:custom.bucket}/*'
+        BucketName: ${self:custom.exchangesBucket} # Getting the name of table I defined under custom in serverless.yml
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - HEAD
+              AllowedOrigins:
+                - "*"
+              AllowedHeaders:
+                - "*"
+
     
     AccountsDynamoTable:
       Type: 'AWS::DynamoDB::Table'

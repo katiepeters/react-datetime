@@ -16,10 +16,14 @@ export default class SettingsScreen extends React.Component<ScreenProps> {
 					name="api"
 					label="API URL">
 					<select
-						value={ this.props.localStore.getApiUrl() }
+						value={ this.props.localStore.getEnvironment() }
 						onChange={ this._onChange }>
-						<option>http://localhost:3030/dev</option>
-						<option>https://b682acd3ie.execute-api.eu-west-1.amazonaws.com/dev</option>
+						<option value="local">
+							Local
+						</option>
+						<option value="awsTest">
+							AWS test
+						</option>
 					</select>
 				</InputGroup>
 			</ScreenWrapper>
@@ -27,7 +31,7 @@ export default class SettingsScreen extends React.Component<ScreenProps> {
 	}
 
 	_onChange = (e: any) => {
-		localStore.setApiUrl( e.target.value );
+		localStore.setEnvironment( e.target.value );
 		apiClient.initialize(e.target.value);
 		window.location.reload();
 	}

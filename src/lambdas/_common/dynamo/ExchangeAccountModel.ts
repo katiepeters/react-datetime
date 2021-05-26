@@ -26,7 +26,7 @@ export default {
 
 		return {
 			...dbExchange,
-			portfolioHistory: JSON.parse(history || [])
+			portfolioHistory: JSON.parse(history || '[]')
 		}
 	},
 
@@ -54,10 +54,17 @@ export default {
 			balances: portfolio
 		});
 
-		let results = await Promise.all([
-			savePortfolioHistory(accountId, exchangeId, JSON.stringify(history) ),
-			updateLast && saveLastPortfolio(accountId, exchangeId, JSON.stringify(portfolio) )
-		]);
+		let promises = [
+			savePortfolioHistory(accountId, exchangeId, JSON.stringify(history) )
+		];
+
+		if( updateLast ){
+			promises.push(
+				saveLastPortfolio(accountId, exchangeId, JSON.stringify(portfolio) )
+			);
+		}
+
+		await Promise.all( promises );
 
 		return {error: false};
 	},
@@ -102,6 +109,7 @@ export default {
 			]];
 		}
 
+		// @ts-ignore
 		await Promise.all( promises );
 	},
 	async update(accountId: string, exchangeId: string, update: any ){
@@ -136,31 +144,31 @@ function getOrdersFileName(accountId: string, exchangeId: string) {
 }
 
 function getLastPortfolio(accountId: string, exchangeId: string) {
-	return s3Helper.getContent(getLastPortfolioFileName(accountId, exchangeId));
+	return s3Helper.botState.getContent(getLastPortfolioFileName(accountId, exchangeId));
 }
 function getPortfolioHistory(accountId: string, exchangeId: string) {
-	return s3Helper.getContent(getPortfolioHistoryFileName(accountId, exchangeId));
+	return s3Helper.botState.getContent(getPortfolioHistoryFileName(accountId, exchangeId));
 }
 function getOrders(accountId: string, exchangeId: string) {
-	return s3Helper.getContent(getOrdersFileName(accountId, exchangeId));
+	return s3Helper.botState.getContent(getOrdersFileName(accountId, exchangeId));
 }
 
 function saveLastPortfolio(accountId: string, exchangeId: string, logs: string) {
-	return s3Helper.setContent(getLastPortfolioFileName(accountId, exchangeId), logs);
+	return s3Helper.botState.setContent(getLastPortfolioFileName(accountId, exchangeId), logs);
 }
 function savePortfolioHistory(accountId: string, exchangeId: string, state: string) {
-	return s3Helper.setContent(getPortfolioHistoryFileName(accountId, exchangeId), state);
+	return s3Helper.botState.setContent(getPortfolioHistoryFileName(accountId, exchangeId), state);
 }
 function saveOrders(accountId: string, exchangeId: string, orders: string) {
-	return s3Helper.setContent(getOrdersFileName(accountId, exchangeId), orders);
+	return s3Helper.botState.setContent(getOrdersFileName(accountId, exchangeId), orders);
 }
 
 function delLastPortfolio(accountId: string, exchangeId: string) {
-	return s3Helper.delObject(getLastPortfolioFileName(accountId, exchangeId));
+	return s3Helper.botState.delObject(getLastPortfolioFileName(accountId, exchangeId));
 }
 function delPortfolioHistory(accountId: string, exchangeId: string) {
-	return s3Helper.delObject(getPortfolioHistoryFileName(accountId, exchangeId));
+	return s3Helper.botState.delObject(getPortfolioHistoryFileName(accountId, exchangeId));
 }
 function delOrders(accountId: string, exchangeId: string) {
-	return s3Helper.delObject(getOrdersFileName(accountId, exchangeId));
+	return s3Helper.botState.delObject(getOrdersFileName(accountId, exchangeId));
 }

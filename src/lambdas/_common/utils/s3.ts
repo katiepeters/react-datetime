@@ -14,66 +14,88 @@ else {
 	console.log('WE ARE IN AWS', process.env.region);
 }
 
-// @ts-ignore
-const BUCKET_NAME = process.env.S3_BUCKET;
 const S3 = new AWS.S3(s3Options);
 
-console.log('Bucket name', process.env.S3_BUCKET);
+console.log('Bucket name', process.env.STATE_BUCKET);
 
-const s3Helper = {
-	setContent( path: string, content: string ) {
-		const payload = {
-			Bucket: BUCKET_NAME,
-			Key: path,
-			ContentType: 'text/plain',
-			Body: content
-		};
+interface S3Response {
+	error: any
+}
+interface S3Accessor {
+	setContent( path: string, content: string, metadata?: any ): Promise<S3Response>
+	getContent( path: string ): Promise<string|undefined>
+	delObject( path: string ): Promise<S3Response>
+}
 
-		console.log('setting s3 content', path);
+interface S3Helper {
+	botState: S3Accessor,
+	exchanges: S3Accessor
+}
 
-		return S3.putObject( payload ).promise()
-			.then( data => {
-				console.log('setOk', data );
-				return {error: false};
-			})
-			.catch( err => {
-				console.error('setError', err);
-				return {error:err};
-			})
-		;
-	},
-	getContent( path: string ){
-		const payload = {
-			Bucket: BUCKET_NAME,
-			Key: path
+const s3Helper: S3Helper = {
+	// @ts-ignore
+	botState: createAccessor(process.env.STATE_BUCKET),
+	// @ts-ignore
+	exchanges: createAccessor(process.env.EXCHANGES_BUCKET)
+}
+
+function createAccessor( bucket: string ): S3Accessor {
+	return {
+		setContent( path: string, content: string, metadata?: any ) {
+			const payload = {
+				ContentType: 'text/plain',
+				...metadata,
+				Bucket: bucket,
+				Key: path,
+				Body: content
+			};
+
+			console.log('setting s3 content', path);
+
+			return S3.putObject( payload ).promise()
+				.then( data => {
+					console.log('setOk', data );
+					return {error: false};
+				})
+				.catch( err => {
+					console.error('setError', err);
+					return {error:err};
+				})
+			;
+		},
+		getContent( path: string ){
+			const payload = {
+				Bucket: bucket,
+				Key: path
+			}
+
+			console.log('getting s3 content', path);
+			return S3.getObject( payload ).promise()
+				.then( data => {
+					return data.Body.toString();
+				})
+				.catch( err => {
+					console.log('error getting s3', path, err);
+				})
+			;
+		},
+		delObject( path: string ) {
+			const payload = {
+				Bucket: bucket,
+				Key: path
+			}
+			console.log('deleting s3 content', path);
+			return S3.deleteObject(payload).promise()
+				.then(data => {
+					console.log('delOk', data);
+					return { error: false };
+				})
+				.catch(err => {
+					console.error('delError', err);
+					return { error: err };
+				})
+			;
 		}
-
-		console.log('getting s3 content', path);
-		return S3.getObject( payload ).promise()
-			.then( data => {
-				return data.Body.toString();
-			})
-			.catch( err => {
-				console.log('error getting s3', path, err);
-			})
-		;
-	},
-	delObject( path: string ) {
-		const payload = {
-			Bucket: BUCKET_NAME,
-			Key: path
-		}
-		console.log('deleting s3 content', path);
-		return S3.deleteObject(payload).promise()
-			.then(data => {
-				console.log('delOk', data);
-				return { error: false };
-			})
-			.catch(err => {
-				console.error('delError', err);
-				return { error: err };
-			})
-		;
 	}
 }
 

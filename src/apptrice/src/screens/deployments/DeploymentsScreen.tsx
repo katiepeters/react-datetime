@@ -11,7 +11,7 @@ import CreateDeploymentForm, { CreateDeploymentPayload } from './CreateDeploymen
 import { CreateExchangeAccountInput } from '../../state/apiClient';
 import arrayize from '../../../../lambdas/_common/utils/arrayize';
 import { Portfolio } from '../../../../lambdas/lambda.types';
-import DeploymentStatsScreen from '../singleDeployment/stats/DeploymentStatsScreen';
+import priceLoader from '../../state/loaders/price.loader';
 
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {

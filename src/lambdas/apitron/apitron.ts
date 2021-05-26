@@ -14,6 +14,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import * as express from 'express';
 import * as serverless from 'serverless-http';
+import { DbExchangeAccount } from '../model.types';
 
 const app = express()
 
@@ -49,17 +50,6 @@ app.post('/tickerUpdater', function( req, res ){
 	})
 });
 
-app.post('/trys3', function (req, res) {
-	s3Helper.setContent('some/path', 'My content')
-		.then( () => {
-			s3Helper.getContent('some/path').then( content => {
-				console.log('get path', content);
-				res.json({content});
-			})
-		})
-	;
-});
-
 botsAPI.initialize(app);
 deploymentAPI.initialize(app);
 exchangesAPI.initialize(app);
@@ -92,8 +82,12 @@ app.post('/runnow', function(req, res) {
 
 app.get('/candles', async function(req,res) {
 	const { symbol, runInterval, startDate, endDate, exchange = 'bitfinex' } = req.query;
-	const adapter = new BitfinexAdapter({key: 'candles', secret: 'candles'});
 
+	// @ts-ignore
+	const dummyExchangeAccount: DbExchangeAccount = {key: 'candles', secret: 'candles'};
+	const adapter = new BitfinexAdapter(dummyExchangeAccount);
+
+	// @ts-ignore
 	const lastCandleAt = exchangeUtils.getLastCandleAt(runInterval, endDate);
 	const candleCount = getCandleCount(startDate, endDate, runInterval );
 	const options = {
@@ -105,6 +99,7 @@ app.get('/candles', async function(req,res) {
 
 	console.log( options );
 
+	// @ts-ignore
 	const candles = await adapter.getCandles(options);
 
 	res.json(candles);

@@ -115,6 +115,7 @@ export default {
 			delOrders(accountId, deploymentId),
 			delState(accountId, deploymentId),
 		]
+		// @ts-ignore
 		return await Promise.all(promises);
 	},
 
@@ -145,31 +146,31 @@ function getOrdersFileName(accountId: string, deploymentId: string) {
 }
 
 function getLogs( accountId: string, deploymentId: string ){
-	return s3Helper.getContent( getLogsFileName(accountId, deploymentId) );
+	return s3Helper.botState.getContent( getLogsFileName(accountId, deploymentId) );
 }
 function getState(accountId: string, deploymentId: string) {
-	return s3Helper.getContent(getStateFileName(accountId, deploymentId));
+	return s3Helper.botState.getContent(getStateFileName(accountId, deploymentId));
 } 
 function getOrders(accountId: string, deploymentId: string) {
-	return s3Helper.getContent(getOrdersFileName(accountId, deploymentId));
+	return s3Helper.botState.getContent(getOrdersFileName(accountId, deploymentId));
 }
 
 function saveLogs(accountId: string, deploymentId: string, logs: string) {
-	return s3Helper.setContent(getLogsFileName(accountId, deploymentId), logs);
+	return s3Helper.botState.setContent(getLogsFileName(accountId, deploymentId), logs);
 }
 function saveState(accountId: string, deploymentId: string, state: string) {
-	return s3Helper.setContent(getStateFileName(accountId, deploymentId), state);
+	return s3Helper.botState.setContent(getStateFileName(accountId, deploymentId), state);
 }
 function saveOrders(accountId: string, deploymentId: string, orders: string) {
-	return s3Helper.setContent(getOrdersFileName(accountId, deploymentId), orders);
+	return s3Helper.botState.setContent(getOrdersFileName(accountId, deploymentId), orders);
 }
 
 function delLogs(accountId: string, deploymentId: string) {
-	return s3Helper.delObject(getLogsFileName(accountId, deploymentId));
+	return s3Helper.botState.delObject(getLogsFileName(accountId, deploymentId));
 }
 function delState(accountId: string, deploymentId: string) {
-	return s3Helper.delObject(getStateFileName(accountId, deploymentId));
+	return s3Helper.botState.delObject(getStateFileName(accountId, deploymentId));
 }
 function delOrders(accountId: string, deploymentId: string) {
-	return s3Helper.delObject(getOrdersFileName(accountId, deploymentId));
+	return s3Helper.botState.delObject(getOrdersFileName(accountId, deploymentId));
 }

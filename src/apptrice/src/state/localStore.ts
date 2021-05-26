@@ -20,12 +20,22 @@ const localStore = {
 	},
 
 	getApiUrl(): string {
-		return ls.getItem('API_URL') || 'http://localhost:3030/dev';
+		let env = this.getEnvironment();
+		return environments[env].apiUrl;
 	},
 
-	setApiUrl(url: string) {
-		ls.setItem('API_URL', url);
+	getS3Url(): string {
+		let env = this.getEnvironment();
+		return environments[env].s3Url;
+	},
+
+	setEnvironment( env: string ) {
+		ls.setItem('env', env);
 		this.emitChange();
+	},
+
+	getEnvironment(): string{
+		return ls.getItem('env') || 'local';
 	}
 }
 
@@ -41,5 +51,17 @@ const ls = {
 		if( value ){
 			return JSON.parse(value);
 		}
+	}
+}
+
+
+let environments: any = {
+	local: {
+		apiUrl: 'http://localhost:3030/dev',
+		s3Url: 'http://localhost:4569/aws-trader-dev-exchanges'
+	},
+	awsTest: {
+		apiUrl: 'https://b682acd3ie.execute-api.eu-west-1.amazonaws.com/dev',
+		s3Url: 'https://aws-trader-dev-exchanges.s3-eu-west-1.amazonaws.com'
 	}
 }

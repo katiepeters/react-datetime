@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Balance, Portfolio } from '../../../../../../lambdas/lambda.types';
 import { Card, Table } from '../../../../components';
 import exchangeLoader from '../../../../state/loaders/exchange.loader';
+import priceLoader from '../../../../state/loaders/price.loader';
 import styles from './_PortfolioWidget.module.css';
 
 interface PortfolioWidgetProps {
@@ -38,6 +39,7 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 			<Table
 				data={ this.getData(lastPortfolio) }
 				keyField="asset"
+				columns={ this.getColumns() }
 			/>
 		);
 	}
@@ -49,5 +51,28 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 				balance.asset === quotedAsset || baseAssets.includes(balance.asset)
 			))
 		;
+	}
+
+	getColumns() {
+		return [
+			{ field: 'asset', title: 'Asset' },
+			{ field: 'free', title: 'Free', renderFn: this._renderPrice },
+			{ field: 'total', title: 'Total', renderFn: this._renderPrice }
+		];
+	}
+
+	_renderPrice = (item: Balance, field?: string) => {
+		let { data: exchange } = exchangeLoader.getData(this.props.exchangeId);
+		// @ts-ignore
+		let amount = item[field];
+		let { data: value } = priceLoader.getData(exchange.provider, amount, `${item.asset}/${this.props.quotedAsset}` );
+		return (
+			<div>
+				<div>{ amount }</div>
+				<div>
+					{ value === undefined ? '...' : value } {this.props.quotedAsset}
+				</div>
+			</div>
+		);
 	}
 }

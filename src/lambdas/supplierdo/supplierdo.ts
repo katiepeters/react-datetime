@@ -79,11 +79,14 @@ async function handleRunRequest( accountId: string, deploymentId: string ) {
 
 	// Update exchange stats
 	const isVirtual = exchangeAccount.type === 'virtual';
-	await Promise.all([
-		await ExchangeAccountModel.updatePortfolio(accountId, exchangeAccount.id, portfolio, isVirtual),
-		// @ts-ignore
-		isVirtual && ExchangeAccountModel.updateOrders(accountId, exchangeAccount.id, exchangeAdapter.orders ) 
-	]);
+	let promises = [
+		ExchangeAccountModel.updatePortfolio(accountId, exchangeAccount.id, portfolio, isVirtual)
+	];
+	if( isVirtual ){
+		// @ts-ignore 
+		ExchangeAccountModel.updateOrders(accountId, exchangeAccount.id, exchangeAdapter.orders )
+	}
+	await Promise.all(promises);
 
 	// Store bot results
 	console.log('Setting state', result.state);
