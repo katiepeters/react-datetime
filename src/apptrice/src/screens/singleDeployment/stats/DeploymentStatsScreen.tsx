@@ -1,8 +1,10 @@
 import * as React from 'react'
 import symbols from '../../../../../lambdas/_common/utils/symbols';
 import { Card, ScreenWrapper } from '../../../components';
+import exchangeLoader from '../../../state/loaders/exchange.loader';
 import { ScreenProps } from '../../../types';
 import deploymentLoader from '../deployment.loader';
+import PortfolioHistoryWidget from './widgets/PortfolioHistoryWidget';
 import PortfolioWidget from './widgets/PortfolioWidget';
 
 export default class DeploymentStatsScreen extends React.Component<ScreenProps> {
@@ -21,12 +23,23 @@ export default class DeploymentStatsScreen extends React.Component<ScreenProps> 
 			return <Card>Loading...</Card>;
 		}
 
+		let { data: exchange } = exchangeLoader.getData(deployment.exchangeAccountId);
+		if (!exchange || !exchange.portfolioHistory) {
+			return <Card>Loading...</Card>;
+		}
+
 		const {baseAssets, quotedAsset} = this.getAssets( deployment.symbols );
 		return (
-			<PortfolioWidget
-				baseAssets={baseAssets}
-				quotedAsset={quotedAsset}
-				exchangeId={ deployment.exchangeAccountId } />
+			<div>
+				<PortfolioWidget
+					baseAssets={baseAssets}
+					quotedAsset={quotedAsset}
+					exchangeAccount={ exchange } />
+				<PortfolioHistoryWidget
+					baseAssets={baseAssets}
+					quotedAsset={quotedAsset}
+					exchangeAccount={ exchange } />
+			</div>
 		);
 	}
 

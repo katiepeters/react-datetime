@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { Balance, Portfolio } from '../../../../../../lambdas/lambda.types';
+import { Balance } from '../../../../../../lambdas/lambda.types';
+import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
 import { Card, Table } from '../../../../components';
-import exchangeLoader from '../../../../state/loaders/exchange.loader';
 import priceLoader from '../../../../state/loaders/price.loader';
+import trim from '../../../../utils/trim';
 import styles from './_PortfolioWidget.module.css';
 
 interface PortfolioWidgetProps {
-	exchangeId: string
+	exchangeAccount: DbExchangeAccount
 	baseAssets: string[]
 	quotedAsset: string
 }
@@ -17,7 +18,7 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 			<div className={styles.container}>
 				<Card>
 					<div>
-						<h3>Portfolio</h3>
+						<h3>Balances</h3>
 					</div>
 					{ this.renderContent() }
 				</Card>
@@ -26,10 +27,8 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 	}
 
 	renderContent() {
-		let { data: exchange } = exchangeLoader.getData(this.props.exchangeId);
-		if (!exchange || !exchange.portfolioHistory) return <div>Loading...</div>;
-
-		let {portfolioHistory} = exchange;
+		let portfolioHistory = this.getPortfolioHistory();
+		if (!portfolioHistory) return <div>Loading...</div>;
 		if( !portfolioHistory.length ){
 			return <div>The bot has not run yet. No portfolio available.</div>
 		}
@@ -44,13 +43,25 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 		);
 	}
 
-	getData( portfolio: Portfolio ) {
+	getPortfolioHistory() {
+		return this.props.exchangeAccount.portfolioHistory;
+	}
+
+	getData( portfolio: PortfolioHistoryItem ) {
 		const {baseAssets, quotedAsset} = this.props;
-		return Object.values(portfolio.balances)
+		let data = Object.values(portfolio.balances)
 			.filter( (balance: Balance) => (
 				balance.asset === quotedAsset || baseAssets.includes(balance.asset)
 			))
 		;
+
+		data.push({
+			asset: 'Total',
+			free: 0,
+			total: 0
+		});
+
+		return data;
 	}
 
 	getColumns() {
@@ -62,17 +73,42 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 	}
 
 	_renderPrice = (item: Balance, field?: string) => {
-		let { data: exchange } = exchangeLoader.getData(this.props.exchangeId);
+		const {exchangeAccount} = this.props;
+
 		// @ts-ignore
 		let amount = item[field];
-		let { data: value } = priceLoader.getData(exchange.provider, amount, `${item.asset}/${this.props.quotedAsset}` );
+		let { data: value } = priceLoader.getData(exchangeAccount.provider, amount, `${item.asset}/${this.props.quotedAsset}` );
+		if( item.asset === 'Total' ){
+			return field === 'total' ? this.renderTotal() : <span />;
+		}
+
 		return (
 			<div>
-				<div>{ amount }</div>
+				<div>{ trim(amount, 7) }</div>
 				<div>
-					{ value === undefined ? '...' : value } {this.props.quotedAsset}
+					{ value === undefined ? '...' : trim(value,7) } {this.props.quotedAsset}
 				</div>
 			</div>
 		);
+	}
+
+	renderTotal() {
+		// All these variables have been already loaded
+		const portfolioHistory = this.getPortfolioHistory();
+		if( !portfolioHistory ) return <span></span>;
+
+		const lastPortfolio = portfolioHistory[portfolioHistory.length - 1];
+		const {exchangeAccount} = this.props;
+
+		let total = 0;
+		this.getData( lastPortfolio ).forEach( (balance: Balance) => {
+			if( balance.asset === 'Total' ) return;
+			// @ts-ignore
+			let amount = balance.total;
+			let { data: value } = priceLoader.getData(exchangeAccount.provider, String(amount), `${balance.asset}/${this.props.quotedAsset}` );
+			total += value;
+		});
+
+		return <span>{trim(total, 7)} {this.props.quotedAsset}</span>;
 	}
 }
