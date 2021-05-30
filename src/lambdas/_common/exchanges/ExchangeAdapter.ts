@@ -1,8 +1,9 @@
 import { ArrayCandle, OrderInput, Portfolio } from "../../lambda.types";
 
+export type CandleInterval = '5m' | '10m' | '30m' | '1h' | '4h' | '1d' | '1w' | '1mo';
 export interface CandleQuery {
 	market: string
-	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	runInterval: CandleInterval
 	lastCandleAt: number
 	candleCount: number
 }

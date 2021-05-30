@@ -16,6 +16,7 @@ export function validateShape(obj: any, shape: any): ShapeValidatorResult{
 	for( const key in shape ){
 		const {error} = validateElement( obj[key], shape[key] );
 		if( error ){
+			console.log(error);
 			return {
 				error: {
 					...error,
@@ -83,7 +84,8 @@ const validators = {
 	boolean: value => typeof value === 'boolean',
 	provider: value => value === 'bitfinex',
 	providerType: value => value === 'real' || value === 'virtual',
-	portfolio: validatePortfolio
+	portfolio: validatePortfolio,
+	pricesType: oneOf(['hourly', 'daily', 'weekly', 'monthly'])
 }
 
 function validateSymbols( symb ){
@@ -120,4 +122,10 @@ function validateBalance( balance: Balance ){
 	if (balance.total === undefined || typeof balance.total !== 'number' || balance.total < 0) return false;
 	if( balance.free > balance.total ) return false;
 	return true;
+}
+
+function oneOf( elements: any[] ){
+	return function( value: any ){
+		return elements.includes(value);
+	}
 }

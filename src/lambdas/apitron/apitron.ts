@@ -8,7 +8,7 @@ import exchangeUtils from '../_common/exchanges/exchangeUtils';
 import deploymentAPI from './deployments/deploymentsAPI';
 import exchangesAPI from './exchangeAccounts/exchangesAPI';
 import botsAPI from './bots/botsAPI';
-import s3Helper from '../_common/utils/s3';
+import pricesAPI from './prices/pricesAPI';
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -53,6 +53,7 @@ app.post('/tickerUpdater', function( req, res ){
 botsAPI.initialize(app);
 deploymentAPI.initialize(app);
 exchangesAPI.initialize(app);
+pricesAPI.initialize(app);
 
 app.post('/runnow', function(req, res) {
 	const { accountId, deploymentId } = req.body;
