@@ -1,8 +1,8 @@
 export interface DataLoaderConfig<T> {
-	getFromCache: (...args: string[]) => T | undefined
-	isValid?: (...args: string[]) => boolean
-	invalidate?: (...args:string[]) => void
-	loadData: (...args: string[]) => Promise<any>
+	getFromCache: (...args: any[]) => T | undefined
+	isValid?: (...args: any[]) => boolean
+	invalidate?: (...args:any[]) => void
+	loadData: (...args: any[]) => Promise<any>
 }
 export interface DataLoaderResult<T> {
 	error: any
@@ -19,8 +19,8 @@ class DataLoader<T> {
 	loadState = new Map();
 	getFromCache
 	loadData
-	isValid = (...args: string[]) => true
-	invalidate = (...args: string[]) => {}
+	isValid = (...args: any[]) => true
+	invalidate = (...args: any[]) => {}
 
 	constructor(config: DataLoaderConfig<T>) {
 		this.getFromCache = config.getFromCache;
@@ -34,7 +34,7 @@ class DataLoader<T> {
 		}
 	}
 
-	getData(...args: string[]) {
+	getData(...args: any[]) {
 		const cachedData = this.getFromCache(...args);
 		const key = JSON.stringify(args);
 		const loadDataState = this.loadState.get(key);
@@ -60,7 +60,7 @@ class DataLoader<T> {
 		return this.load(key, ...args);
 	}
 
-	load(key: string, ...args: string[]) {
+	load(key: string, ...args: any[]) {
 		this.loadData(...args)
 			.then(response => {
 				this.loadState.delete(key);
@@ -88,7 +88,7 @@ class DataLoader<T> {
 		return response;
 	}
 
-	retry(...args: string[]) {
+	retry(...args: any[]) {
 		const key = JSON.stringify(args);
 		this.loadState.delete(key);
 		DataLoader.onChange();

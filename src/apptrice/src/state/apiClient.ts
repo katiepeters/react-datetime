@@ -207,6 +207,15 @@ const apiClient = {
 			})
 		;
 	},
+
+	loadPrices( exchange:string, symbol:string, type: string ){
+		return axios.get(`${API_URL}/prices?exchange=${exchange}&symbol=${symbol}&type=${type}`)
+			.then( res => {
+				console.log( res );
+				return res;
+			})
+		;
+	}
 }
 
 export default apiClient;
