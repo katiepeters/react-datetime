@@ -1,3 +1,7 @@
+const hourlyInterval = 100 * 60 * 60 * 1000;
+const dailyInterval = hourlyInterval * 24;
+const weeklyInterval = dailyInterval * 7;
+
 const tickerTimer = {
 	isHourlyTicker( timestamp: number ){
 		return (new Date(timestamp) ).getMinutes() < 5;
@@ -84,6 +88,14 @@ const tickerTimer = {
 		d.setUTCSeconds(0);
 		d.setUTCMilliseconds(0);
 		return d.getTime();
+	},
+
+	getTypeFromTimestamp(ts: number) {
+		let now = Date.now();
+		if( now - ts < hourlyInterval ) return 'hourly';
+		if( now - ts < dailyInterval ) return 'daily';
+		if( now - ts < weeklyInterval ) return 'weekly';
+		return 'monthly';
 	}
 }
 
