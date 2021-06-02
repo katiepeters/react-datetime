@@ -48,13 +48,13 @@ const tickerTimer = {
 	},
 
 	getWeeklyTime( timestamp: number ){
-		let d = new Date( this.getDailyTime() );
+		let d = new Date( this.getDailyTime(timestamp) );
 		d.setUTCDate( d.getUTCDate() - d.getUTCDay() );
 		return d.getTime();
 	},
 
 	getMonthlyTime( timestamp: number ){
-		let d = new Date( this.getDailyTime() );
+		let d = new Date( this.getDailyTime(timestamp) );
 		d.setUTCDate( 1 );
 		return d.getTime();
 	},

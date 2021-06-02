@@ -45,10 +45,11 @@ const config: DataLoaderConfig<PriceTypeHistory> = {
 				priceHistory[exchange] = {
 					...history,
 					[symbol]: {
-						...(history || {} ),
-						[type]: res
+						...(history[symbol] || {} ),
+						[type]: res.data
 					}
 				};
+				delete symbolPromises[ promiseKey ];
 			})
 		;
 

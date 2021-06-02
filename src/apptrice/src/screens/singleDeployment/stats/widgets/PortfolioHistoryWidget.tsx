@@ -9,6 +9,8 @@ import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambd
 import memoizeOne from 'memoize-one';
 import priceLoader from '../../../../state/loaders/price.loader';
 import trim from '../../../../utils/trim';
+import priceRangeLoader from '../../../../state/loaders/priceRange.loader';
+import historicalValueLoader from '../../../../state/loaders/historicalValue.loader';
 
 interface PortfolioHistoryWidgetProps {
 	exchangeAccount: DbExchangeAccount
@@ -31,6 +33,14 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 	}
 
 	renderContent() {
+		if( !this.hasHistory() ){
+			return 'This bot has not been run yet.';
+		}
+
+		if( this.isLoadingPrices() ){
+			return 'Loading...';
+		}
+
 		const data = this.getData();
 		const options = this.getOptions();
 		return (
@@ -81,7 +91,8 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 						}
 					}
 				}
-			}
+			},
+			pointBorderColor: '#fff'
 		};
 	}
 
@@ -94,6 +105,30 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 			`+${trim(ret, 2)}` :
 			trim(ret, 2)
 		;
+	}
+
+	isLoadingPrices() {
+		const {baseAssets, quotedAsset, exchangeAccount} = this.props;
+		const {provider, portfolioHistory} = exchangeAccount;
+		if( !portfolioHistory || !this.hasHistory() ) return true;
+
+		const symbols = baseAssets.map( (asset: string) => `${asset}/${quotedAsset}`);
+		const startDate = portfolioHistory[0].date;
+		const endDate = portfolioHistory[portfolioHistory.length - 1].date;
+
+		let loading = false;
+		symbols.forEach( (symbol:string) => {
+			const {isLoading} = priceRangeLoader.getData(provider, symbol, startDate, endDate);
+			loading = loading || isLoading;
+		});
+
+		return loading;
+	}
+
+	hasHistory(){
+		const {portfolioHistory} = this.props.exchangeAccount;
+		
+		return portfolioHistory && Object.keys(portfolioHistory).length > 0;
 	}
 }
 
@@ -114,7 +149,7 @@ const memoGetData = memoizeOne( (portfolioHistory: PortfolioHistoryItem[], quote
 		let total = 0; 
 		assets.forEach( (asset: string) => {
 			let amount = item.balances[asset] ? item.balances[asset].total : 0;
-			let { data: value } = priceLoader.getData( provider, String(amount), `${asset}/${quoted}` );
+			let { data: value } = historicalValueLoader.getData( provider, `${asset}/${quoted}`, amount, item.date );
 			total += (value || 0);
 			sets[asset].push( total );
 		});

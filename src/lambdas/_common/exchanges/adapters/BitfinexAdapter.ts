@@ -41,7 +41,7 @@ export default class BitfinexAdapter implements ExchangeAdapter {
 			return candles;
 		}
 		const exchangeSegment = toExchangeSymbol(options.market);
-		const pathParams = `candles/trade:${options.runInterval}:${exchangeSegment}/hist`;
+		const pathParams = `candles/trade:${getCandleInterval(options.runInterval)}:${exchangeSegment}/hist`;
 		const queryParams = `limit=${options.candleCount}&end=${options.lastCandleAt}`;
 
 		console.log(`Request ${baseUrl}/${pathParams}?${queryParams}`);
@@ -208,4 +208,10 @@ function getOrderStatus(status: string): 'pending' | 'placed' | 'completed' | 'c
 			return 'cancelled';
 	}
 	return 'pending';
+}
+
+function getCandleInterval(interval: string){
+	if( interval === '1w' ) return '7D';
+	if( interval === '2w' ) return '14D';
+	return interval.replace('d', 'D').replace('mo', 'M');
 }
