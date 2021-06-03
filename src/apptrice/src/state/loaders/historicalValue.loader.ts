@@ -4,6 +4,8 @@ import historicalPriceLoader from "./historicalPrice.loader";
 
 const config: DataLoaderConfig<number> = {
 	getFromCache(exchange: string, symbol: string, amount: number, timestamp: number ): number | undefined {
+		if( !amount ) return 0;
+		
 		let base = symbols.getBase(symbol);
 		let quoted = symbols.getQuoted(symbol);
 

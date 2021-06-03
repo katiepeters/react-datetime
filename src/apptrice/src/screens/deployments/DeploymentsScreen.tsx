@@ -87,6 +87,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	getColumns(): TableColumn<DBBotDeployment>[] {
 		return [
 			{ field: 'id' },
+			{ field: 'name' },
 			{ field: 'botId' },
 			{ field: 'active', title: '', renderFn: this._renderActive },
 			{ field: 'controls', title: '', renderFn: this._renderControls, noSort: true }

@@ -6,6 +6,7 @@ import { ScreenProps } from '../../../types';
 import deploymentLoader from '../deployment.loader';
 import PortfolioHistoryWidget from './widgets/PortfolioHistoryWidget';
 import PortfolioWidget from './widgets/PortfolioWidget';
+import ReturnsWidget from './widgets/ReturnsWidget';
 
 export default class DeploymentStatsScreen extends React.Component<ScreenProps> {
 	render() {
@@ -36,6 +37,10 @@ export default class DeploymentStatsScreen extends React.Component<ScreenProps> 
 					quotedAsset={quotedAsset}
 					exchangeAccount={ exchange } />
 				<PortfolioHistoryWidget
+					baseAssets={baseAssets}
+					quotedAsset={quotedAsset}
+					exchangeAccount={ exchange } />
+				<ReturnsWidget
 					baseAssets={baseAssets}
 					quotedAsset={quotedAsset}
 					exchangeAccount={ exchange } />

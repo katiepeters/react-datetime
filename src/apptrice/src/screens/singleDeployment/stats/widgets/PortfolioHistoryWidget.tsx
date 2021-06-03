@@ -7,7 +7,6 @@ import 'chartjs-adapter-date-fns';
 
 import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
 import memoizeOne from 'memoize-one';
-import priceLoader from '../../../../state/loaders/price.loader';
 import trim from '../../../../utils/trim';
 import priceRangeLoader from '../../../../state/loaders/priceRange.loader';
 import historicalValueLoader from '../../../../state/loaders/historicalValue.loader';
