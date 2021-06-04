@@ -65,10 +65,10 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 	});
 
 	quickStore.setCandles(candles);
+	quickStore.setLogs(logs);
 	
 	updateBtStore({
-		status: 'running',
-		logs
+		status: 'running'
 	});
 
 	await runIterations(bot, state, { symbols, candles, options });
@@ -168,7 +168,7 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 		try {
 			results = await bot.execute({
 				portfolio,
-				orders: adapter.orders,
+				orders: {items: adapter.orders},
 				openOrders: openOrderIds,
 				state,
 				candles: iterationCandles,
@@ -269,11 +269,12 @@ function getAdapter(iterationCandles: BotCandles, portfolio: Portfolio, orders: 
 }
 
 function setBtError( error: any ){
-	store.currentBackTesting.logs.push({
+	quickStore.appendLogs([{
+		id: -1,
 		type: 'error',
 		date: Date.now(),
 		message: error.message || error.toString()
-	});
+	}]);
 
 	updateBtStore({
 		status: 'error'

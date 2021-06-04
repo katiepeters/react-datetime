@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  // mode: 'development',
+  mode: 'development',
   devtool: 'none',
   entry: path.resolve(__dirname, './botWorkerSource.ts'),
   module: {

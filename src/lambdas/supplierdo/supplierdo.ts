@@ -5,9 +5,9 @@ import { ExchangeAdapter, ExchangeOrder } from '../_common/exchanges/ExchangeAda
 import exchanger from '../_common/exchanges/exchanger';
 import exchangeUtils from '../_common/exchanges/exchangeUtils';
 import lambdaUtil from '../_common/utils/lambda';
-import {v4 as uuid} from 'uuid';
 import { Order, BotExecutorPayload, Portfolio, BotCandles } from '../lambda.types';
 import { DbBot, DBBotDeployment, DbExchangeAccount, DeploymentOrders } from '../model.types';
+import { mergeOrders, mergeOrder } from '../_common/utils/virtualOrders';
 
 export async function supplierdo({ accountId, deploymentId }) {
 	try {
@@ -150,37 +150,6 @@ async function getCandles( adapter: ExchangeAdapter, deployment: any ) {
 	return candles;
 }
 
-function mergeOrders( orders:any, exchangeOrders: ExchangeOrder[] ) {
-	let {foreignIdIndex, items} = orders;
-
-	let mergedOrders: DeploymentOrders = {
-		foreignIdIndex: {...foreignIdIndex},
-		items: {...items },
-		openOrderIds: []
-	}
-	
-	exchangeOrders.forEach( exchangeOrder => {
-		let storedOrderId = foreignIdIndex[exchangeOrder.id];
-		let order = mergeOrder(items[storedOrderId], exchangeOrder);
-		mergedOrders.items[storedOrderId] = order;
-		if( order.status === 'placed' ){
-			mergedOrders.openOrderIds.push( storedOrderId );
-		}
-	});
-
-	return mergedOrders;
-}
-
-function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {
-	console.log('Mergin order, stored - exchange', storedOrder, exchangeOrder);
-	return {
-		...exchangeOrder,
-		id: storedOrder.id,
-		foreignId: exchangeOrder.id,
-		createdAt: storedOrder.createdAt,
-		marketPrice: storedOrder.marketPrice
-	}
-}
 
 interface BotModels {
 	deployment: DBBotDeployment,

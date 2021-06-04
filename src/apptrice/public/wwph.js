@@ -1,1 +1,596 @@
-!function(e){var t={};function r(n){if(t[n])return t[n].exports;var o=t[n]={i:n,l:!1,exports:{}};return e[n].call(o.exports,o,o.exports,r),o.l=!0,o.exports}r.m=e,r.c=t,r.d=function(e,t,n){r.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:n})},r.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},r.t=function(e,t){if(1&t&&(e=r(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var n=Object.create(null);if(r.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)r.d(n,o,function(t){return e[t]}.bind(null,o));return n},r.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return r.d(t,"a",t),t},r.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},r.p="",r(r.s=2)}([function(e,t,r){"use strict";function n(e){return e[3]}function o(e){return e[4]}Object.defineProperty(t,"__esModule",{value:!0}),t.default={getLast:function(e){return e[e.length-1]},getTime:function(e){return e[0]},getOpen:function(e){return e[1]},getClose:function(e){return e[2]},getHigh:n,getLow:o,getVolume:function(e){return e[5]},getMiddle:function(e){return(n(e)+o(e))/2},getAmplitude:function(e){return(n(e)-o(e))/o(e)}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default={getBase:function(e){return e.split("/")[0]},getQuoted:function(e){return e.split("/")[1]}}},function(e,t,r){"use strict";var n=this&&this.__assign||function(){return(n=Object.assign||function(e){for(var t,r=1,n=arguments.length;r<n;r++)for(var o in t=arguments[r])Object.prototype.hasOwnProperty.call(t,o)&&(e[o]=t[o]);return e}).apply(this,arguments)};Object.defineProperty(t,"__esModule",{value:!0});var o=r(3),u=r(9),i=r(10);console.log("#BOT"),self.onmessage=function(e){var t=e.data,r=t.action,a=t.input;if("init"===r){var s={},l=console;console=u.default,initializeState(a,s),self.postMessage({state:s||{},logs:u.default.getEntries()}),u.default.clear(),console=l}else{var f=new o.default(a.portfolio,a.orders,a.candles);f.openOrderIds=a.openOrders;l=console;console=u.default;s=n({},a.state);onData({candles:a.candles,config:a.config,trader:f,state:s,utils:i.default}),self.postMessage({ordersToCancel:f.ordersToCancel,ordersToPlace:f.ordersToPlace,state:s,logs:u.default.getEntries()}),u.default.clear(),console=l}},t.default=function(){}},function(e,t,r){"use strict";var n=this&&this.__assign||function(){return(n=Object.assign||function(e){for(var t,r=1,n=arguments.length;r<n;r++)for(var o in t=arguments[r])Object.prototype.hasOwnProperty.call(t,o)&&(e[o]=t[o]);return e}).apply(this,arguments)};Object.defineProperty(t,"__esModule",{value:!0});var o=r(0),u=r(1),i=r(4).default,a=function(){function e(e,t,r){var n,u;this.portfolio=e,this.orders=t.items,this.ordersToPlace=[],this.ordersToCancel=[],this.openOrderIds=t.openOrderIds,this.prices=(n=r,u={},Object.keys(n).forEach((function(e){u[e]=o.default.getClose(o.default.getLast(n[e]))})),u)}return e.prototype.getPortfolio=function(){return this.portfolio},e.prototype.getBalance=function(e){var t=this.portfolio[e];return t?n({},t):{asset:e,total:0,free:0}},e.prototype.getOrder=function(e){return this.orders[e]},e.prototype.getOpenOrders=function(){var e=this;return this.openOrderIds.map((function(t){return n({},e.orders[t])})).concat(this.ordersToPlace.map((function(e){return n({},e)})))},e.prototype.placeOrder=function(e){var t,r=n(n({price:null},e),{id:i(),status:"pending",foreignId:null,errorReason:null,executedPrice:null,createdAt:Date.now(),placedAt:null,closedAt:null,marketPrice:this.prices[e.symbol]});return this.ordersToPlace.push(r),this.orders=n(n({},this.orders),((t={})[r.id]=r,t)),n({},r)},e.prototype.cancelOrder=function(e){this.ordersToCancel.push(e)},e.prototype.getPortfolioValue=function(){var e=this,t=u.default.getQuoted(Object.keys(this.prices)[0]),r=this.getBalance(t).total;return Object.keys(this.prices).forEach((function(n){var o=u.default.getBase(n),i=e.getBalance(o);r+=o===t?i.total:i.total*e.prices[n]})),r},e.prototype.getPrice=function(e){return this.prices[e]},e}();t.default=a},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default=void 0;var n=u(r(5)),o=u(r(6));function u(e){return e&&e.__esModule?e:{default:e}}var i=function(e,t,r){const u=(e=e||{}).random||(e.rng||n.default)();if(u[6]=15&u[6]|64,u[8]=63&u[8]|128,t){r=r||0;for(let e=0;e<16;++e)t[r+e]=u[e];return t}return(0,o.default)(u)};t.default=i},function(e,t,r){"use strict";let n;Object.defineProperty(t,"__esModule",{value:!0}),t.default=function(){if(!n&&(n="undefined"!=typeof crypto&&crypto.getRandomValues&&crypto.getRandomValues.bind(crypto)||"undefined"!=typeof msCrypto&&"function"==typeof msCrypto.getRandomValues&&msCrypto.getRandomValues.bind(msCrypto),!n))throw new Error("crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported");return n(o)};const o=new Uint8Array(16)},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default=void 0;var n,o=(n=r(7))&&n.__esModule?n:{default:n};const u=[];for(let e=0;e<256;++e)u.push((e+256).toString(16).substr(1));var i=function(e,t=0){const r=(u[e[t+0]]+u[e[t+1]]+u[e[t+2]]+u[e[t+3]]+"-"+u[e[t+4]]+u[e[t+5]]+"-"+u[e[t+6]]+u[e[t+7]]+"-"+u[e[t+8]]+u[e[t+9]]+"-"+u[e[t+10]]+u[e[t+11]]+u[e[t+12]]+u[e[t+13]]+u[e[t+14]]+u[e[t+15]]).toLowerCase();if(!(0,o.default)(r))throw TypeError("Stringified UUID is invalid");return r};t.default=i},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default=void 0;var n,o=(n=r(8))&&n.__esModule?n:{default:n};var u=function(e){return"string"==typeof e&&o.default.test(e)};t.default=u},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default=void 0;t.default=/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i},function(e,t,r){"use strict";var n=this&&this.__spreadArray||function(e,t){for(var r=0,n=t.length,o=e.length;r<n;r++,o++)e[o]=t[r];return e};Object.defineProperty(t,"__esModule",{value:!0});var o=[],u=console,i={log:function(){for(var e=[],t=0;t<arguments.length;t++)e[t]=arguments[t];a("log",e),u.log.apply(u,e)},warn:function(){for(var e=[],t=0;t<arguments.length;t++)e[t]=arguments[t];a("warn",e),u.warn.apply(u,e)},error:function(){for(var e=[],t=0;t<arguments.length;t++)e[t]=arguments[t];a("error",e),u.error.apply(u,e)},getEntries:function(){return n([],o)},clear:function(){o=[]}};function a(e,t){var r=Date.now();o.push({id:Math.round(1e3*Math.random())+r,date:r,type:"log",message:t.map((function(e){return function(e){return"string"==typeof e?e:JSON.stringify(e,null,2)}(e)})).join(" ")})}t.default=i},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n=r(0),o=r(1);t.default={candles:n.default,symbols:o.default}}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/screens/botEditor/botWorker/botWorkerSource.ts");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "../lambdas/_common/utils/botUtils.ts":
+/*!********************************************!*\
+  !*** ../lambdas/_common/utils/botUtils.ts ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var candles_1 = __webpack_require__(/*! ./candles */ "../lambdas/_common/utils/candles.ts");
+var symbols_1 = __webpack_require__(/*! ./symbols */ "../lambdas/_common/utils/symbols.ts");
+exports.default = { candles: candles_1.default, symbols: symbols_1.default };
+
+
+/***/ }),
+
+/***/ "../lambdas/_common/utils/candles.ts":
+/*!*******************************************!*\
+  !*** ../lambdas/_common/utils/candles.ts ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function getLast(candles) {
+    return candles[candles.length - 1];
+}
+function getTime(candle) {
+    return candle[0];
+}
+function getOpen(candle) {
+    return candle[1];
+}
+function getClose(candle) {
+    return candle[2];
+}
+function getHigh(candle) {
+    return candle[3];
+}
+function getLow(candle) {
+    return candle[4];
+}
+function getVolume(candle) {
+    return candle[5];
+}
+function getMiddle(candle) {
+    return (getHigh(candle) + getLow(candle)) / 2;
+}
+function getAmplitude(candle) {
+    return (getHigh(candle) - getLow(candle)) / getLow(candle);
+}
+exports.default = {
+    getLast: getLast, getTime: getTime, getOpen: getOpen, getClose: getClose,
+    getHigh: getHigh, getLow: getLow, getVolume: getVolume, getMiddle: getMiddle,
+    getAmplitude: getAmplitude
+};
+
+
+/***/ }),
+
+/***/ "../lambdas/_common/utils/symbols.ts":
+/*!*******************************************!*\
+  !*** ../lambdas/_common/utils/symbols.ts ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function getBase(symbol) {
+    return symbol.split('/')[0];
+}
+function getQuoted(symbol) {
+    return symbol.split('/')[1];
+}
+exports.default = { getBase: getBase, getQuoted: getQuoted };
+
+
+/***/ }),
+
+/***/ "../lambdas/executor/Consoler.ts":
+/*!***************************************!*\
+  !*** ../lambdas/executor/Consoler.ts ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var entries = [];
+var ori = console;
+var cons = {
+    log: function () {
+        var messages = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            messages[_i] = arguments[_i];
+        }
+        addEntry('log', messages);
+        ori.log.apply(ori, messages);
+    },
+    warn: function () {
+        var messages = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            messages[_i] = arguments[_i];
+        }
+        addEntry('warn', messages);
+        ori.warn.apply(ori, messages);
+    },
+    error: function () {
+        var messages = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            messages[_i] = arguments[_i];
+        }
+        addEntry('error', messages);
+        ori.error.apply(ori, messages);
+    },
+    getEntries: function () {
+        return __spreadArray([], entries);
+    },
+    clear: function () {
+        entries = [];
+    }
+};
+exports.default = cons;
+function addEntry(type, messages) {
+    var date = Date.now();
+    entries.push({
+        id: Math.round(Math.random() * 1000) + date,
+        date: date,
+        type: 'log',
+        message: messages.map(function (m) { return stringify(m); }).join(' ')
+    });
+}
+function stringify(m) {
+    return typeof m === 'string' ?
+        m :
+        JSON.stringify(m, null, 2);
+}
+
+
+/***/ }),
+
+/***/ "../lambdas/executor/Trader.ts":
+/*!*************************************!*\
+  !*** ../lambdas/executor/Trader.ts ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var candles_1 = __webpack_require__(/*! ../_common/utils/candles */ "../lambdas/_common/utils/candles.ts");
+var symbols_1 = __webpack_require__(/*! ../_common/utils/symbols */ "../lambdas/_common/utils/symbols.ts");
+// @ts-ignore (needed for compile the bot worker)
+var uuid = __webpack_require__(/*! uuid/dist/v4 */ "../lambdas/node_modules/uuid/dist/v4.js").default;
+var Trader = /** @class */ (function () {
+    function Trader(portfolio, orders, candles) {
+        this.portfolio = portfolio;
+        this.orders = orders.items;
+        this.ordersToPlace = [];
+        this.ordersToCancel = [];
+        this.openOrderIds = orders.openOrderIds;
+        this.prices = getPrices(candles);
+    }
+    Trader.prototype.getPortfolio = function () {
+        return this.portfolio;
+    };
+    Trader.prototype.getBalance = function (asset) {
+        var balance = this.portfolio[asset];
+        return balance ? __assign({}, balance) :
+            { asset: asset, total: 0, free: 0 };
+    };
+    Trader.prototype.getOrder = function (id) {
+        return this.orders[id];
+    };
+    Trader.prototype.getOpenOrders = function () {
+        var _this = this;
+        return this.openOrderIds
+            .map(function (id) { return (__assign({}, _this.orders[id])); })
+            .concat(this.ordersToPlace.map(function (order) { return (__assign({}, order)); }));
+    };
+    Trader.prototype.placeOrder = function (orderInput) {
+        var _a;
+        var order = __assign(__assign({ price: null }, orderInput), { id: uuid(), status: 'pending', foreignId: null, errorReason: null, executedPrice: null, createdAt: Date.now(), placedAt: null, closedAt: null, marketPrice: this.prices[orderInput.symbol] });
+        this.ordersToPlace.push(order);
+        this.orders = __assign(__assign({}, this.orders), (_a = {}, _a[order.id] = order, _a));
+        return __assign({}, order);
+    };
+    Trader.prototype.cancelOrder = function (orderId) {
+        this.ordersToCancel.push(orderId);
+    };
+    Trader.prototype.getPortfolioValue = function () {
+        var _this = this;
+        var quotedAsset = symbols_1.default.getQuoted(Object.keys(this.prices)[0]);
+        var quotedBalance = this.getBalance(quotedAsset);
+        var total = quotedBalance.total;
+        Object.keys(this.prices).forEach(function (symbol) {
+            var asset = symbols_1.default.getBase(symbol);
+            var balance = _this.getBalance(asset);
+            if (asset === quotedAsset) {
+                total += balance.total;
+            }
+            else {
+                total += balance.total * _this.prices[symbol];
+            }
+        });
+        return total;
+    };
+    Trader.prototype.getPrice = function (symbol) {
+        return this.prices[symbol];
+    };
+    return Trader;
+}());
+exports.default = Trader;
+function getPrices(symbolCandles) {
+    var prices = {};
+    Object.keys(symbolCandles).forEach(function (symbol) {
+        prices[symbol] = candles_1.default.getClose(candles_1.default.getLast(symbolCandles[symbol]));
+    });
+    return prices;
+}
+
+
+/***/ }),
+
+/***/ "../lambdas/node_modules/uuid/dist/regex.js":
+/*!**************************************************!*\
+  !*** ../lambdas/node_modules/uuid/dist/regex.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "../lambdas/node_modules/uuid/dist/rng-browser.js":
+/*!********************************************************!*\
+  !*** ../lambdas/node_modules/uuid/dist/rng-browser.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = rng;
+// Unique ID creation requires a high quality random # generator. In the browser we therefore
+// require the crypto API and do not support built-in fallback to lower quality random number
+// generators (like Math.random()).
+let getRandomValues;
+const rnds8 = new Uint8Array(16);
+
+function rng() {
+  // lazy load so that environments that need to polyfill have a chance to do so
+  if (!getRandomValues) {
+    // getRandomValues needs to be invoked in a context where "this" is a Crypto implementation. Also,
+    // find the complete implementation of crypto (msCrypto) on IE11.
+    getRandomValues = typeof crypto !== 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto !== 'undefined' && typeof msCrypto.getRandomValues === 'function' && msCrypto.getRandomValues.bind(msCrypto);
+
+    if (!getRandomValues) {
+      throw new Error('crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported');
+    }
+  }
+
+  return getRandomValues(rnds8);
+}
+
+/***/ }),
+
+/***/ "../lambdas/node_modules/uuid/dist/stringify.js":
+/*!******************************************************!*\
+  !*** ../lambdas/node_modules/uuid/dist/stringify.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _validate = _interopRequireDefault(__webpack_require__(/*! ./validate.js */ "../lambdas/node_modules/uuid/dist/validate.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+const byteToHex = [];
+
+for (let i = 0; i < 256; ++i) {
+  byteToHex.push((i + 0x100).toString(16).substr(1));
+}
+
+function stringify(arr, offset = 0) {
+  // Note: Be careful editing this code!  It's been tuned for performance
+  // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
+  const uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase(); // Consistency check for valid UUID.  If this throws, it's likely due to one
+  // of the following:
+  // - One or more input array values don't map to a hex octet (leading to
+  // "undefined" in the uuid)
+  // - Invalid input values for the RFC `version` or `variant` fields
+
+  if (!(0, _validate.default)(uuid)) {
+    throw TypeError('Stringified UUID is invalid');
+  }
+
+  return uuid;
+}
+
+var _default = stringify;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "../lambdas/node_modules/uuid/dist/v4.js":
+/*!***********************************************!*\
+  !*** ../lambdas/node_modules/uuid/dist/v4.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _rng = _interopRequireDefault(__webpack_require__(/*! ./rng.js */ "../lambdas/node_modules/uuid/dist/rng-browser.js"));
+
+var _stringify = _interopRequireDefault(__webpack_require__(/*! ./stringify.js */ "../lambdas/node_modules/uuid/dist/stringify.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function v4(options, buf, offset) {
+  options = options || {};
+
+  const rnds = options.random || (options.rng || _rng.default)(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+
+
+  rnds[6] = rnds[6] & 0x0f | 0x40;
+  rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
+
+  if (buf) {
+    offset = offset || 0;
+
+    for (let i = 0; i < 16; ++i) {
+      buf[offset + i] = rnds[i];
+    }
+
+    return buf;
+  }
+
+  return (0, _stringify.default)(rnds);
+}
+
+var _default = v4;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "../lambdas/node_modules/uuid/dist/validate.js":
+/*!*****************************************************!*\
+  !*** ../lambdas/node_modules/uuid/dist/validate.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _regex = _interopRequireDefault(__webpack_require__(/*! ./regex.js */ "../lambdas/node_modules/uuid/dist/regex.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function validate(uuid) {
+  return typeof uuid === 'string' && _regex.default.test(uuid);
+}
+
+var _default = validate;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./src/screens/botEditor/botWorker/botWorkerSource.ts":
+/*!************************************************************!*\
+  !*** ./src/screens/botEditor/botWorker/botWorkerSource.ts ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable no-restricted-globals */
+var Trader_1 = __webpack_require__(/*! ../../../../../lambdas/executor/Trader */ "../lambdas/executor/Trader.ts");
+var Consoler_1 = __webpack_require__(/*! ../../../../../lambdas/executor/Consoler */ "../lambdas/executor/Consoler.ts");
+var botUtils_1 = __webpack_require__(/*! ../../../../../lambdas/_common/utils/botUtils */ "../lambdas/_common/utils/botUtils.ts");
+// WARNING: This line will be replaced by the bot source code. DO NOT UPDATE
+console.log("#BOT");
+self.onmessage = function (msg) {
+    var _a = msg.data, action = _a.action, input = _a.input;
+    if (action === 'init') {
+        var state = {};
+        var originalConsole = console;
+        // @ts-ignore
+        console = Consoler_1.default;
+        // @ts-ignore
+        initializeState(input, state);
+        // @ts-ignore
+        self.postMessage({
+            state: state || {},
+            logs: Consoler_1.default.getEntries()
+        });
+        Consoler_1.default.clear();
+        console = originalConsole;
+    }
+    else {
+        var trader = new Trader_1.default(input.portfolio, input.orders, input.candles);
+        trader.openOrderIds = input.openOrders;
+        var originalConsole = console;
+        // @ts-ignore
+        console = Consoler_1.default;
+        var state = __assign({}, input.state);
+        // @ts-ignore
+        onData({
+            candles: input.candles,
+            config: input.config,
+            trader: trader,
+            state: state,
+            utils: botUtils_1.default
+        });
+        // @ts-ignore
+        self.postMessage({
+            ordersToCancel: trader.ordersToCancel,
+            ordersToPlace: trader.ordersToPlace,
+            state: state,
+            logs: Consoler_1.default.getEntries()
+        });
+        Consoler_1.default.clear();
+        console = originalConsole;
+    }
+};
+function mock() {
+    // This is needed just to not have rogue files
+}
+exports.default = mock;
+
+
+/***/ })
+
+/******/ });
