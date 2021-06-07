@@ -5,7 +5,7 @@ import * as ts from "typescript";
 import { BotCandles, BotConfiguration, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio } from "../../../../../lambdas/lambda.types";
 import { ExchangeOrder } from "../../../../../lambdas/_common/exchanges/ExchangeAdapter";
 
-interface BotWorkerInput {
+export interface BotWorkerInput {
 	portfolio: Portfolio,
 	orders: {items: { [id: string]: ExchangeOrder }},
 	openOrders: string[],
