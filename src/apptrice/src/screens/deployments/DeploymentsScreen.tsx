@@ -28,8 +28,10 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 
 		return (
 			<ScreenWrapper title="Deployments" titleExtra={ this.renderCreateButton() } >
-				{ this.renderDeployments() }
-				{ this.renderCreateModal() }
+				<div>
+					{ this.renderDeployments() }
+					{ this.renderCreateModal() }
+				</div>
 			</ScreenWrapper>
 		);
 	}

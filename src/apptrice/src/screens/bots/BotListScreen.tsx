@@ -32,8 +32,10 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 		return (
 			<ScreenWrapper title="Bots"
 				titleExtra={ this.renderCreateButton() }>
-				{ this.renderBotList() }
-				{ this.renderCreateModal()}
+				<div>
+					{ this.renderBotList() }
+					{ this.renderCreateModal()}
+				</div>
 			</ScreenWrapper>
 		);
 	}

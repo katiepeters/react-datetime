@@ -25,12 +25,12 @@ const SupplierdoRunner: BotRunner = {
 		return exchange;
 	},
 
-	getAdapter( exchangeAccount: DbExchangeAccount ): ExchangeAdapter | void {
+	getAdapter( exchangeAccount: DbExchangeAccount ): ExchangeAdapter {
 		console.log('Get adapter', exchangeAccount);
 		const exchangeAdapter = exchanger.getAdapter( exchangeAccount );
 
 		if (!exchangeAdapter) {
-			console.error('Unknown adapter', exchangeAccount.provider );
+			throw new Error(`Unknown adapter ${exchangeAccount.provider}`);
 		}
 
 		return exchangeAdapter;
@@ -144,3 +144,5 @@ const SupplierdoRunner: BotRunner = {
 		});
 	}
 }
+
+export {SupplierdoRunner};

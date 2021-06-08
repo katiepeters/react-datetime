@@ -8,7 +8,7 @@ export interface BotInitializeStateResponse {
 }
 
 export interface RunnableBot {
-	prepare( source: string ): void,
+	prepare(source: string): Promise<void>
 	run( input: BotRunInput ): Promise<BotExecutorResult>
 }
 

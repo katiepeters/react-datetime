@@ -39,9 +39,11 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 
 	renderList(data: any) {
 		return (
-			<Table data={ data }
-				columns={ this.getColumns() }
-				disabledItems={ this.state.loadingItems } />
+			<div>
+				<Table data={ data }
+					columns={ this.getColumns() }
+					disabledItems={ this.state.loadingItems } />
+			</div>
 		);
 	}
 

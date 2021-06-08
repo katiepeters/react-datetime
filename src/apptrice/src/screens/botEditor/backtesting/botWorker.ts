@@ -2,21 +2,12 @@
 // @global self
 
 import * as ts from "typescript";
-import { BotCandles, BotConfiguration, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio } from "../../../../../lambdas/lambda.types";
-import { ExchangeOrder } from "../../../../../lambdas/_common/exchanges/ExchangeAdapter";
-
-export interface BotWorkerInput {
-	portfolio: Portfolio,
-	orders: {items: { [id: string]: ExchangeOrder }},
-	openOrders: string[],
-	state: BotState,
-	candles: BotCandles,
-	config: BotConfigurationExtra
-}
+import { BotConfiguration, BotExecutorResult, BotState } from "../../../../../lambdas/lambda.types";
+import { BotRunInput } from "../../../../../lambdas/_common/botRunner/BotRunner";
 
 export interface BotWorker {
 	initialize: (config: BotConfiguration) => Promise<BotState>,
-	execute: (options: BotWorkerInput) => Promise<BotExecutorResult>,
+	execute: (options: BotRunInput) => Promise<BotExecutorResult>,
 	terminate: () => void
 }
 
@@ -47,7 +38,7 @@ export function createBot( botSource:string, botWorkerSource: string ): BotWorke
 				worker.postMessage({action: 'init', input: config});
 			})
 		},
-		execute: async function (input: BotWorkerInput): Promise<BotExecutorResult>{
+		execute: async function (input: BotRunInput): Promise<BotExecutorResult>{
 			return new Promise( (resolve, reject) => {
 				worker.onmessage = function (result) {
 					worker.onmessage = null;

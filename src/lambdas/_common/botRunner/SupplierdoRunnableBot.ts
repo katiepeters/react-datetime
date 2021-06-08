@@ -1,11 +1,10 @@
-import { BotConfigurationExtra } from "../../lambda.types";
 import lambdaUtil from "../utils/lambda";
 import { BotRunInput, RunnableBot } from "./BotRunner";
 
-export class SupplierdoRunnableBot extends SupplierdoRunnable {
+export class SupplierdoRunnableBot implements RunnableBot {
 	source: string =  ''
 
-	prepare( source: string ){
+	async prepare( source: string ){
 		this.source = source;
 	}
 
