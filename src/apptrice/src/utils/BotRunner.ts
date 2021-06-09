@@ -1,7 +1,7 @@
 import { BotConfigurationExtra, BotExecutorResult, BotState, Portfolio } from "../../../lambdas/lambda.types";
 import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order } from "../../../lambdas/model.types";
+import { BotRunInput } from "../../../lambdas/_common/botRunner/BotRunner";
 import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
-import { BotWorkerInput } from "../screens/botEditor/backtesting/botWorker";
 
 export async function runBotIteration( deploymentId: string, runner: BotRunner ){
 	/*
@@ -74,7 +74,7 @@ interface BotInitializeStateResponse {
 interface RunnableBot {
 	prepare( source: string ): void,
 	initializeState(config: BotConfigurationExtra): Promise<BotInitializeStateResponse>
-	run( input: BotWorkerInput ): Promise<BotExecutorResult>
+	run( input: BotRunInput ): Promise<BotExecutorResult>
 }
 
 interface BotRunnerDeploymentUpdate {

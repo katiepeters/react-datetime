@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RunInterval } from '../../../../../lambdas/model.types';
 import InitialBalances, { Balances } from '../../../common/btSettings/InitialBalances';
 import {Button, InputGroup} from '../../../components';
 import ProgressBar from './ProgressBar';
@@ -11,7 +12,7 @@ interface BotToolsProps {
 export interface BacktestConfig {
 	baseAssets: string[],
 	quotedAsset: string,
-	runInterval: string
+	runInterval: RunInterval,
 	initialBalances: {[asset: string]: number}
 	startDate: number
 	endDate: number

@@ -164,6 +164,7 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 		orders = adapter.orders;
 		openOrderIds = adapter.openOrders;
 
+		/*
 		let results;
 		try {
 			results = await bot.execute({
@@ -208,6 +209,7 @@ async function runIterations(bot: BotWorker, state: BotState, { symbols, candles
 		});
 
 		console.log(Object.keys(orders).length);
+		*/
 	}
 
 	console.log('Portfolio', portfolio);

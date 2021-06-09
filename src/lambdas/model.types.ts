@@ -34,6 +34,8 @@ export interface DbBotInput {
 
 // BOT DEPLOYMENT
 
+export type RunInterval = '5m' | '10m' | '30m' | '1h' | '4h' | '1d';
+
 export interface Order extends OrderInput {
 	id: string
 	foreignId: string | null
@@ -63,7 +65,7 @@ export interface SimpleBotDeployment {
 	accountId: string
 	botId: string
 	exchangeAccountId: string
-	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	runInterval: RunInterval
 	symbols: string[]
 	active: boolean
 }
@@ -74,7 +76,7 @@ export interface DBBotDeployment extends TableItem {
 	botId: string
 	orders: DeploymentOrders
 	exchangeAccountId: string
-	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	runInterval: RunInterval
 	symbols: string[]
 	state: DBBotDeploymentState
 	logs: ConsoleEntry[]
@@ -86,7 +88,7 @@ export interface DBBotDeploymentRaw extends TableItem {
 	name: string
 	botId: string
 	exchangeAccountId: string
-	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	runInterval: RunInterval
 	symbols: string[]
 	active?: string
 }
@@ -97,7 +99,7 @@ export interface DBBotDeploymentInput {
 	name: string
 	botId: string
 	exchangeAccountId: string
-	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	runInterval: RunInterval
 	symbols: string[]
 	orders: DeploymentOrders
 	state?: DBBotDeploymentState
@@ -108,7 +110,7 @@ export interface DBBotDeploymentInput {
 export interface DBBotDeploymentUpdate {
 	name?: string
 	botId?: string
-	runInterval?: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
+	runInterval?: RunInterval
 	symbols?: string[]
 	orders?: DeploymentOrders
 	state?: DBBotDeploymentState
