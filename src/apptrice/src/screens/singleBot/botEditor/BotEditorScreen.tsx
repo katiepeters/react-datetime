@@ -128,13 +128,8 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 
 	_onRunBt = (config: BacktestConfig) => {
 		const botId = this.getBotId(this.props);
-		let { data } = botLoader.getData(botId);
-		let botData = {
-			botId,
-			source: data?.code
-		};
-
-		BtRunner.start(botData, config);
+		let { data: bot } = botLoader.getData(botId);
+		BtRunner.start(bot, config);
 	}
 
 	_onAbortBt = () => {

@@ -59,6 +59,7 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 	let symbols = getSymbols(options.baseAssets, options.quotedAsset);
 	let candles = await getAllCandles(symbols, options.runInterval, options.startDate, options.endDate);
 
+	/*
 	let {state, logs} = await bot.initialize({
 		// @ts-ignore
 		symbols, runInterval: options.runInterval, exchange: 'bitfinex'
@@ -76,6 +77,7 @@ async function prepareAndRun(botData: any, options: BacktestConfig){
 		updateBtStore({ status: 'completed' });
 	}
 	runningBot.terminate();
+	*/
 }
 
 

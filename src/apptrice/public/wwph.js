@@ -543,47 +543,37 @@ var botUtils_1 = __webpack_require__(/*! ../../../../../lambdas/_common/utils/bo
 // WARNING: This line will be replaced by the bot source code. DO NOT UPDATE
 console.log("#BOT");
 self.onmessage = function (msg) {
-    var _a = msg.data, action = _a.action, input = _a.input;
-    if (action === 'init') {
-        var state = {};
-        var originalConsole = console;
+    var input = msg.data.input;
+    var originalConsole = console;
+    // @ts-ignore
+    console = Consoler_1.default;
+    var state = __assign({}, input.state);
+    if (state.newState === 'stateNew') {
+        state = {};
         // @ts-ignore
-        console = Consoler_1.default;
-        // @ts-ignore
-        initializeState(input, state);
-        // @ts-ignore
-        self.postMessage({
-            state: state || {},
-            logs: Consoler_1.default.getEntries()
-        });
-        Consoler_1.default.clear();
-        console = originalConsole;
+        if (typeof initializeState === 'function') {
+            // @ts-ignore
+            initializeState(input.config, state);
+        }
     }
-    else {
-        var trader = new Trader_1.default(input.portfolio, input.orders, input.candles);
-        trader.openOrderIds = input.openOrders;
-        var originalConsole = console;
-        // @ts-ignore
-        console = Consoler_1.default;
-        var state = __assign({}, input.state);
-        // @ts-ignore
-        onData({
-            candles: input.candles,
-            config: input.config,
-            trader: trader,
-            state: state,
-            utils: botUtils_1.default
-        });
-        // @ts-ignore
-        self.postMessage({
-            ordersToCancel: trader.ordersToCancel,
-            ordersToPlace: trader.ordersToPlace,
-            state: state,
-            logs: Consoler_1.default.getEntries()
-        });
-        Consoler_1.default.clear();
-        console = originalConsole;
-    }
+    var trader = new Trader_1.default(input.portfolio, input.orders, input.candles);
+    // @ts-ignore
+    onData({
+        candles: input.candles,
+        config: input.config,
+        trader: trader,
+        state: state,
+        utils: botUtils_1.default
+    });
+    // @ts-ignore
+    self.postMessage({
+        ordersToCancel: trader.ordersToCancel,
+        ordersToPlace: trader.ordersToPlace,
+        state: state,
+        logs: Consoler_1.default.getEntries()
+    });
+    Consoler_1.default.clear();
+    console = originalConsole;
 };
 function mock() {
     // This is needed just to not have rogue files

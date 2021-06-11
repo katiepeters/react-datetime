@@ -1,3 +1,5 @@
+import { RunInterval } from "../../../../lambdas/model.types";
+
 const LS_KEY = "BT_CONFIGS";
 
 interface BacktestConfigs {
@@ -7,7 +9,7 @@ interface BacktestConfigs {
 export interface BtSettingsConfig {
 	baseAssets: string
 	quotedAsset: string
-	runInterval: string
+	runInterval: RunInterval
 	initialBalances: { [asset: string]: number },
 	testingTimeframe: string
 	startDate?: string

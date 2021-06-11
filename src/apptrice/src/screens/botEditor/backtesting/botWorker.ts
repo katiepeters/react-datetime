@@ -2,11 +2,10 @@
 // @global self
 
 import * as ts from "typescript";
-import { BotConfiguration, BotExecutorResult, BotState } from "../../../../../lambdas/lambda.types";
+import { BotExecutorResult } from "../../../../../lambdas/lambda.types";
 import { BotRunInput } from "../../../../../lambdas/_common/botRunner/BotRunner";
 
 export interface BotWorker {
-	initialize: (config: BotConfiguration) => Promise<BotState>,
 	execute: (options: BotRunInput) => Promise<BotExecutorResult>,
 	terminate: () => void
 }
@@ -23,21 +22,6 @@ export function createBot( botSource:string, botWorkerSource: string ): BotWorke
 	const worker = SrcWorker(workerSource);
 
 	return {
-		initialize: async function (config: BotConfiguration): Promise<BotState>{
-			return new Promise((resolve, reject) => {
-				worker.onmessage = function (result) {
-					worker.onmessage = null;
-					worker.onerror = null;
-					resolve(result.data || {});
-				};
-				worker.onerror = function (err) {
-					worker.onmessage = null;
-					worker.onerror = null;
-					reject(err);
-				}
-				worker.postMessage({action: 'init', input: config});
-			})
-		},
 		execute: async function (input: BotRunInput): Promise<BotExecutorResult>{
 			return new Promise( (resolve, reject) => {
 				worker.onmessage = function (result) {
@@ -51,7 +35,7 @@ export function createBot( botSource:string, botWorkerSource: string ): BotWorke
 					reject(err);
 				}
 
-				worker.postMessage( {action: 'run', input} );
+				worker.postMessage( {input} );
 			})
 		},
 		terminate: function(){

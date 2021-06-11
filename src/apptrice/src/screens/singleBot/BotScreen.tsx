@@ -1,14 +1,18 @@
 import * as React from 'react'
 import { ScreenProps } from '../../types'
 import BotDetailsScreen from './botDetails/BotDetailsScreen'
-import {MenuLinkList, SidebarLayout} from '../../components';
+import {SidebarLayout} from '../../components';
+import AppMenu from '../../AppMenu';
 
 export default class BotScreen extends React.Component<ScreenProps> {
 	render() {
 		let Subscreen = this.getSubscreen();
 
 		return (
-			<SidebarLayout sidebar={ this.renderMenu() }>
+			<SidebarLayout
+				sidebar={ this.renderMenu() }
+				sidebarWidth={65}
+				bgColor="#061725">
 				<Subscreen {...this.props} />
 			</SidebarLayout>
 		);
@@ -16,13 +20,21 @@ export default class BotScreen extends React.Component<ScreenProps> {
 
 	renderMenu() {
 		return (
-			<div style={{ background: '#082238', flex: 1}}>
-				<h2>Bot</h2>
-				<MenuLinkList
-					active={this.getActiveItem()}
-					items={this.getMenuItems()} />
-			</div>
+			<AppMenu
+				title="Bot"
+				items={ this.getItems() }
+				currentPath={ this.props.router.location.pathname } />
 		);
+	}
+
+	getItems() {
+		let id = this.props.router.location.params.id;
+
+		return [
+			{ name: 'Details', icon: 'percentage', link: `#/bots/${id}` },
+			{ name: 'Editor', icon: 'code', link: `#/bots/${id}/editor` },
+			{ name: 'Backtest', icon: 'chart-bar', link: `#/bots/${id}/backtesting` }
+		]
 	}
 
 	getSubscreen() {

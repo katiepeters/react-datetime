@@ -1,9 +1,10 @@
 import { BotRunInput, RunnableBot } from "../../../lambdas/_common/botRunner/BotRunner";
 import { BotWorker, createBot } from "../screens/botEditor/backtesting/botWorker";
 
-interface IBtRunnableBot extends RunnableBot {
+export interface IBtRunnableBot extends RunnableBot {
 	source: string
 	bot?: BotWorker
+	terminate(): void
 }
 
 const BtRunnableBot: IBtRunnableBot = {
@@ -29,6 +30,13 @@ const BtRunnableBot: IBtRunnableBot = {
 		}
 
 		return this.bot.execute( input );
+	},
+
+	terminate(){
+		if( this.bot ){
+			this.bot.terminate();
+			delete this.bot;
+		}
 	}
 }
 

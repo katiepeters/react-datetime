@@ -7,57 +7,46 @@ import botUtils from '../../../../../lambdas/_common/utils/botUtils';
 console.log("#BOT");
 
 self.onmessage = function (msg: any ){
-	let {action, input} = msg.data;
+	let {input} = msg.data;
 
-	if (action === 'init') {
-		let state = {};
+	const originalConsole = console;
+	// @ts-ignore
+	console = cons;
 
-		const originalConsole = console;
+	let state = { ...input.state };
+	if (state.newState === 'stateNew') {
+		state = {};
+
 		// @ts-ignore
-		console = cons;
-
-		// @ts-ignore
-		initializeState(input, state);
-		// @ts-ignore
-		self.postMessage({
-			state: state || {},
-			logs: cons.getEntries()
-		});
-
-		cons.clear();
-		console = originalConsole;
+		if( typeof initializeState === 'function' ) {
+			// @ts-ignore
+			initializeState(input.config, state);
+		}
 	}
-	else {
-		const trader = new Trader(input.portfolio, input.orders, input.candles);
-		trader.openOrderIds = input.openOrders;
+	
+	const trader = new Trader(input.portfolio, input.orders, input.candles);
 
-		const originalConsole = console;
-		// @ts-ignore
-		console = cons;
+	// @ts-ignore
+	onData({
+		candles: input.candles,
+		config: input.config,
+		trader,
+		state,
+		utils: botUtils
+	});
 
-		let state = { ...input.state };
+	// @ts-ignore
+	self.postMessage({
+		ordersToCancel: trader.ordersToCancel,
+		ordersToPlace: trader.ordersToPlace,
+		state: state,
+		logs: cons.getEntries()
+	});
 
-		// @ts-ignore
-		onData({
-			candles: input.candles,
-			config: input.config,
-			trader,
-			state,
-			utils: botUtils
-		});
-
-		// @ts-ignore
-		self.postMessage({
-			ordersToCancel: trader.ordersToCancel,
-			ordersToPlace: trader.ordersToPlace,
-			state: state,
-			logs: cons.getEntries()
-		});
-
-		cons.clear();
-		console = originalConsole;
-	}
+	cons.clear();
+	console = originalConsole;
 }
+
 
 export default function mock() {
 	// This is needed just to not have rogue files

@@ -65,6 +65,7 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 				<InputGroup name="runInterval" label="Execution runInterval">
 					<select name="runInterval"
 						value={this.state.runInterval}
+						// @ts-ignore
 						onChange={e => this.setState({ runInterval: e.target.value })}>
 						<option>5m</option>
 						<option>10m</option>

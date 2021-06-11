@@ -7,6 +7,7 @@ import { Balances } from "../common/btSettings/InitialBalances";
 import botLoader from "../screens/botEditor/bot.loader";
 import apiCacher from "../state/apiCacher";
 import quickStore from "../state/quickStore";
+import { BtRunnableBot, IBtRunnableBot } from "./BtRunnableBot";
 
 export interface BtBotRunnerConfig {
 	accountId: string,
@@ -33,6 +34,7 @@ export default class BtBotRunner implements BotRunner {
 	totalIterations: number = 0
 	candlePromise: Promise<any>
 	candles: BotCandles = {}
+	bot: IBtRunnableBot | undefined
 
 	constructor( config: BtBotRunnerConfig ){
 		this.deployment = {
@@ -111,11 +113,18 @@ export default class BtBotRunner implements BotRunner {
 	}
 
 	getBot( accountId: string, botId: string ){
-		const { data: bot } = botLoader.getData(accountId, botId);
+		if( this.bot ){
+			return Promise.resolve(this.bot);
+		}
+
+		const { data: bot} = botLoader.getData(botId);
 		if( !bot ){
 			throw new Error('bot_not_initialized');
 		}
-		return Promise.resolve( bot );
+
+		return BtRunnableBot.prepare(bot.code)
+			.then( () => BtRunnableBot )
+		;
 	}
 
 	updateDeployment( deployment: DBBotDeployment, update: BotRunnerDeploymentUpdate ) {

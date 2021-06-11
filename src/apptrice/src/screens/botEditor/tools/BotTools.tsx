@@ -23,7 +23,7 @@ export interface BacktestConfig {
 interface BotToolsState {
 	baseAssets: string
 	quotedAsset: string
-	runInterval: string
+	runInterval: RunInterval
 	initialBalances: Balances
 	testingTimeframe: string
 	startDate: string

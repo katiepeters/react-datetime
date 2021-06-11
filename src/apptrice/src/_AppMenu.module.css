@@ -23,10 +23,16 @@
 	color: #f390dd;
 }
 
+.links {
+	width: 100%;
+}
+
 .link {
-	display: block;
-	margin: 0 0 8px 16px;
-  padding: 10px 20px 10px 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0 0 8px 8px;
+  padding: 10px 14px 10px 10px;
 	text-align: center;
 	text-decoration: none;
 	border-top-left-radius: 4px;

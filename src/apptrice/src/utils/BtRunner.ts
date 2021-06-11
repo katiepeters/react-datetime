@@ -1,4 +1,3 @@
-import { BotWorker } from "../screens/botEditor/backtesting/botWorker";
 import { BacktestConfig } from "../screens/botEditor/tools/BotTools";
 import store from "../state/store"
 import {v4 as uuid} from 'uuid';
@@ -6,7 +5,7 @@ import { DbBot } from "../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
 import { runBotIteration } from "../../../lambdas/_common/botRunner/runBotIteration";
 
-let runningBot: BotWorker;
+let runner: BtBotRunner;
 const BtRunner = {
 	start( bot: DbBot, options: BacktestConfig ): string {
 		const btid = createRun( bot.id );
@@ -19,7 +18,9 @@ const BtRunner = {
 	abort(){
 		if (store.currentBackTesting.status === 'running') {
 			updateBtStore({ status: 'aborted' });
-			runningBot.terminate();
+			if( runner ){
+				runner?.bot?.terminate();
+			}
 		}
 	}
 }
@@ -28,7 +29,7 @@ export default BtRunner;
 
 
 async function prepareAndRun(bot: DbBot, options: BacktestConfig){
-	const runner = new BtBotRunner({
+	runner = new BtBotRunner({
 		accountId: bot.accountId,
 		botId: bot.id,
 		baseAssets: options.baseAssets,
@@ -49,7 +50,7 @@ async function prepareAndRun(bot: DbBot, options: BacktestConfig){
 	await runIterations( bot, runner );
 
 	updateBtStore({ status: 'completed' });
-	runningBot.terminate();
+	runner.bot?.terminate();
 }
 
 function createRun( botId: any ): string{
@@ -77,7 +78,8 @@ async function runIterations( bot: DbBot, runner: BtBotRunner ) {
 	const { accountId, id: botId } = bot;
 
 	while( runner.hasIterationsLeft() ){
-		runBotIteration( accountId, botId, runner );
+		console.log(`Iteration ${runner.iteration}`);
+		await runBotIteration( accountId, botId, runner );
 		runner.iteration++;
 	}
 }
