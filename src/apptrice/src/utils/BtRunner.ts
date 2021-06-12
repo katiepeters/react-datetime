@@ -1,9 +1,12 @@
 import { BacktestConfig } from "../screens/botEditor/tools/BotTools";
 import store from "../state/store"
 import {v4 as uuid} from 'uuid';
-import { DbBot } from "../../../lambdas/model.types";
+import { DbBot, DBBotDeployment, ExchangeAccountWithHistory } from "../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
 import { runBotIteration } from "../../../lambdas/_common/botRunner/runBotIteration";
+import quickStore from "../state/quickStore";
+import { BtUpdater } from "./BtUpdater";
+import { BtDeployment, BtExchange } from "./Bt.types";
 
 let runner: BtBotRunner;
 const BtRunner = {
@@ -16,8 +19,9 @@ const BtRunner = {
 	},
 
 	abort(){
-		if (store.currentBackTesting.status === 'running') {
-			updateBtStore({ status: 'aborted' });
+		const activeBt = quickStore.getActiveBt();
+		if ( activeBt && activeBt.status === 'running') {
+			BtUpdater.update({status: 'aborted'});
 			if( runner ){
 				runner?.bot?.terminate();
 			}
@@ -43,13 +47,22 @@ async function prepareAndRun(bot: DbBot, options: BacktestConfig){
 		exchange: 'bitfinex'
 	});
 
-	updateBtStore({ status: 'candles'});
+	BtUpdater.update({
+		status: 'candles'
+	});
 	await runner.getAllCandles();
 
-	updateBtStore({ status: 'running' });
+	BtUpdater.update({
+		status: 'running',
+		currentIteration: 0,
+		candles: runner.candles,
+		totalIterations: runner.totalIterations,
+		deployment: toBtDeployment( runner.deployment ),
+		exchange: toBtExchange( runner.exchange )
+	});
 	await runIterations( bot, runner );
 
-	updateBtStore({ status: 'completed' });
+	BtUpdater.update({ status: 'completed' });
 	runner.bot?.terminate();
 }
 
@@ -67,19 +80,35 @@ function createRun( botId: any ): string{
 	return btid;
 }
 
-function updateBtStore( update: any ){
-	store.currentBackTesting = {
-		...store.currentBackTesting,
-		...update
-	};
-}
-
 async function runIterations( bot: DbBot, runner: BtBotRunner ) {
 	const { accountId, id: botId } = bot;
 
 	while( runner.hasIterationsLeft() ){
 		console.log(`Iteration ${runner.iteration}`);
 		await runBotIteration( accountId, botId, runner );
+		BtUpdater.update({
+			currentIteration: 0,
+			deployment: toBtDeployment(runner.deployment),
+			exchange: toBtExchange(runner.exchange)
+		});
 		runner.iteration++;
 	}
+}
+
+function toBtDeployment( deployment: DBBotDeployment ): BtDeployment{
+	return {
+		logs: deployment.logs,
+		orders: deployment.orders,
+		runInterval: deployment.runInterval,
+		state: deployment.state,
+		symbols: deployment.symbols
+	};
+}
+
+function toBtExchange( exchange: ExchangeAccountWithHistory ): BtExchange{
+	return {
+		portfolioHistory: exchange.portfolioHistory,
+		fees: exchange.fees,
+		slippage: exchange.slippage
+	};
 }

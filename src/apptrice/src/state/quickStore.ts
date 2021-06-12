@@ -1,12 +1,15 @@
 import Emitter from 'eventemitter3';
 import { BotCandles, Orders } from '../../../lambdas/lambda.types';
 import { ConsoleEntry } from '../../../lambdas/model.types';
+import { BtActive } from '../utils/Bt.types';
 
 let emitter = new Emitter();
 let orders: Orders = {};
 let logs: ConsoleEntry[] = [];
 let changeTimer:any = false;
 let candles: BotCandles = {};
+
+let activeBt: BtActive | undefined;
 
 const quickStore = {
 	addChangeListener( clbk: () => void ){
@@ -61,6 +64,15 @@ const quickStore = {
 
 	getCandles(){
 		return candles;
+	},
+
+	getActiveBt(): BtActive | undefined {
+		return activeBt;
+	},
+
+	setActiveBt( bt: BtActive | undefined ){
+		activeBt = bt;
+		this.emitChange();
 	}
 }
 

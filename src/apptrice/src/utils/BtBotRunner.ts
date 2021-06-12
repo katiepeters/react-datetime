@@ -122,8 +122,12 @@ export default class BtBotRunner implements BotRunner {
 			throw new Error('bot_not_initialized');
 		}
 
+
 		return BtRunnableBot.prepare(bot.code)
-			.then( () => BtRunnableBot )
+			.then( () => {
+				this.bot = BtRunnableBot;
+				return this.bot;
+			})
 		;
 	}
 

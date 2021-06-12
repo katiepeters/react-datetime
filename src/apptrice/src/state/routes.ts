@@ -18,6 +18,12 @@ import DeploymentStateScreen from "../screens/singleDeployment/state/DeploymentS
 import DeploymentLogsScreen from "../screens/singleDeployment/logs/DeploymentLogsScreen";
 import DeploymentStatsScreen from "../screens/singleDeployment/stats/DeploymentStatsScreen";
 import DeploymentChartsScreen from "../screens/singleDeployment/charts/DeploymentChartsScreen";
+import BotBtScreen from "../screens/singleBot/botBt/BotBtScreen";
+import BtStats from "../screens/singleBot/botBt/sections/BtStats";
+import BtOrders from "../screens/singleBot/botBt/sections/BtOrders";
+import BtCharts from "../screens/singleBot/botBt/sections/BtCharts";
+import BtState from "../screens/singleBot/botBt/sections/BtState";
+import BtLogs from "../screens/singleBot/botBt/sections/BtLogs";
 
 const routes = [
 	{path: '/', cb: HomeScreen},
@@ -35,6 +41,13 @@ const routes = [
 		{path: '/:id', cb: BotScreen, children: [
 			{ path: '/details', cb: BotDetailsScreen },
 			{ path: '/editor', cb: BotEditorScreen },
+			{ path: '/backtesting', cb: BotBtScreen, children: [
+				{path: '/stats', cb: BtStats},
+				{path: '/charts', cb: BtCharts},
+				{path: '/orders', cb: BtOrders},
+				{path: '/state', cb: BtState},
+				{path: '/logs', cb: BtLogs},
+			]},
 			{ path: '*', cb: BotDetailsScreen },
 		]}
 	]},

@@ -1,7 +1,6 @@
 import { DBBotDeployment, DbExchangeAccount, DeploymentOrders } from "../../../lambdas/model.types";
 import { BotExecutorResult, Order } from "../../lambda.types";
 import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
-import { isNewDeployment } from "../utils/deploymentUtils";
 import { BotRunner, RunnableBot } from './BotRunner';
 
 export async function runBotIteration( accountId: string, deploymentId: string, runner: BotRunner ){
@@ -9,18 +8,6 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 	let exchange: DbExchangeAccount = await runner.getExchangeAccount( accountId, deployment.exchangeAccountId );
 	let adapter: ExchangeAdapter = runner.getAdapter( exchange );
 	let bot: RunnableBot = await runner.getBot( accountId, deployment.botId );
-
-	// This should be done in the thread actually running the bot
-	/*
-	if( isNewDeployment( deployment ) ){
-		let {state, logs} = await bot.initializeState({
-			symbols: deployment.symbols,
-			runInterval: deployment.runInterval,
-			exchange: exchange.provider
-		});
-		deployment = await runner.updateDeployment( deployment, {state, logs} );
-	}
-	*/
 
 	// First get candles (virtual exchanges will refresh its data)
 	const [ portfolio, candles ] = await Promise.all([
