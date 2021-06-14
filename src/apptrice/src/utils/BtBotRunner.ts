@@ -1,8 +1,8 @@
-import { ArrayCandle, BotCandles, Portfolio } from "../../../lambdas/lambda.types";
-import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, ExchangeAccountWithHistory, RunInterval } from "../../../lambdas/model.types";
+import { ArrayCandle, BotCandles, OrderInput, Portfolio } from "../../../lambdas/lambda.types";
+import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, ExchangeAccountWithHistory, Order, RunInterval } from "../../../lambdas/model.types";
 import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate } from "../../../lambdas/_common/botRunner/BotRunner";
 import VirtualAdapter from "../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
-import { ExchangeAdapter } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
+import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 import candles from "../../../lambdas/_common/utils/candles";
 import { Balances } from "../common/btSettings/InitialBalances";
 import botLoader from "../screens/botEditor/bot.loader";
@@ -183,6 +183,15 @@ export default class BtBotRunner implements BotRunner {
 		return adapter.cancelOrders( exchangeOrderIds ).then( () => {
 			return deploymentOrderIds;
 		});
+	}
+
+	placeOrders( adapter: VirtualAdapter, orders: Order[]): Promise<ExchangeOrder[]>{
+		orders.forEach( (order: Order) => {
+			// orders are created in the trader that doesn't know we are in
+			// backtesting, so update the creation date to say so
+			order.createdAt = adapter.lastDate;
+		});
+		return adapter.placeOrders(orders);
 	}
 
 	hasIterationsLeft() {

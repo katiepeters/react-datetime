@@ -1,8 +1,9 @@
+import { OrderInput } from "../../lambda.types";
 import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders } from "../../model.types";
 import BotDeploymentModel from "../dynamo/BotDeploymentModel"
 import BotModel from "../dynamo/BotModel";
 import ExchangeAccountModel from "../dynamo/ExchangeAccountModel";
-import { ExchangeAdapter } from "../exchanges/ExchangeAdapter";
+import { ExchangeAdapter, ExchangeOrder } from "../exchanges/ExchangeAdapter";
 import exchanger from "../exchanges/exchanger";
 import exchangeUtils from "../exchanges/exchangeUtils";
 import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate, CodeError, RunnableBot } from "./BotRunner";
@@ -142,6 +143,10 @@ const SupplierdoRunner: BotRunner = {
 		return adapter.cancelOrders( exchangeOrderIds ).then( () => {
 			return deploymentOrderIds;
 		});
+	},
+
+	placeOrders( adapter: ExchangeAdapter, orders: Order[]): Promise<ExchangeOrder[]>{
+		return adapter.placeOrders(orders);
 	}
 }
 

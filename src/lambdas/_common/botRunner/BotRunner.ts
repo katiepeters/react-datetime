@@ -1,4 +1,4 @@
-import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio } from "../../../lambdas/lambda.types";
+import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio, OrderInput } from "../../../lambdas/lambda.types";
 import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order } from "../../../lambdas/model.types";
 import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 
@@ -41,6 +41,7 @@ export interface BotRunner {
 	updateExchange( exchange: DbExchangeAccount, update: BotRunnerExchangeUpdate): Promise<DbExchangeAccount>,
 	setRunError( deployment: DBBotDeployment, error: any ): Promise<void>
 	cancelOrders( adapter: ExchangeAdapter, currentOrders: DeploymentOrders, ordersToCancel: string[] ): Promise<string[]>
+	placeOrders( adapter: ExchangeAdapter, ordersToPlace: Order[] ): Promise<ExchangeOrder[]>
 }
 
 export interface CodeErrorInput {
