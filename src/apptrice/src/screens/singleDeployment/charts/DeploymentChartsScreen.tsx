@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Orders } from '../../../../../lambdas/lambda.types';
 import { DBBotDeployment } from '../../../../../lambdas/model.types';
-import TabbedCharts from '../../../common/charts/TabbedCharts';
+import DeploymentCharts from '../../../common/charts/DeploymentCharts';
 import { Card, ScreenWrapper } from '../../../components';
 import { ScreenProps } from '../../../types';
 import deploymentLoader from '../deployment.loader';
@@ -29,7 +29,8 @@ export default class DeploymentChartsScreen extends React.Component<ScreenProps>
 		}
 
 		return (
-			<TabbedCharts
+			<DeploymentCharts
+				exchangeProvider="bitfinex"
 				deployment={ deployment } />
 		);
 	}

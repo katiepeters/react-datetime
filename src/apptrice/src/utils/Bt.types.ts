@@ -1,5 +1,6 @@
 import { ArrayCandle, BotCandles } from "../../../lambdas/lambda.types";
 import { ConsoleEntry, DBBotDeploymentState, DeploymentOrders, PortfolioHistoryItem, RunInterval } from "../../../lambdas/model.types";
+import { ScreenProps } from "../types";
 
 export interface BtDeployment {
 	logs: ConsoleEntry[]
@@ -10,6 +11,7 @@ export interface BtDeployment {
 }
 
 export interface BtExchange {
+	provider: 'bitfinex'
 	portfolioHistory: PortfolioHistoryItem[],
 	fees: number
 	slippage: number
@@ -18,7 +20,6 @@ export interface BtExchange {
 export interface BtStored {
 	accountId: string
 	botId: string
-	provider: 'bitfinex'
 	startDate: number
 	endDate: number
 	deployment: BtDeployment
@@ -55,4 +56,9 @@ export interface ActiveBtUpdate {
 	currentIteration?: number
 	candles?: BotCandles
 	status?: BtStatus
+}
+
+
+export interface BtSectionProps extends ScreenProps {
+	bt: BtActive
 }

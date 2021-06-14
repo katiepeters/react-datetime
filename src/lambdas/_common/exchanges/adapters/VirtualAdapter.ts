@@ -1,4 +1,4 @@
-import { Portfolio, ArrayCandle, Order, OrderInput, Balance } from "../../../lambda.types";
+import { Portfolio, ArrayCandle, Order, OrderInput, Balance, BotCandles } from "../../../lambda.types";
 import { DbExchangeAccount } from "../../../model.types";
 import ExchangeAccountModel from "../../dynamo/ExchangeAccountModel";
 import candles from "../../utils/candles";
@@ -18,7 +18,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	orders: {[id: string]: ExchangeOrder}
 	openOrders: string[]
 	lastDate: number
-	placeDate: number
+	closeDate: number
 	lastCandles: {[symbol: string]: ArrayCandle}
 
 	constructor(exchangeAccount: DbExchangeAccount) {
@@ -27,6 +27,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		this.portfolio = {};
 		this.orders = {};
 		this.lastDate = -1;
+		this.closeDate = -1;
 		this.lastCandles = {};
 		this.openOrders = [];
 	}
@@ -60,10 +61,22 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		let bfx = new BitfinexAdapter(this.exchangeAccount);
 		let data = await bfx.getCandles(options);
 
-		this.lastCandles[options.market] = candles.getLast(data);
-		this.lastDate = options.lastCandleAt;
-		this.updateOpenOrders();
+		this.updateCandlesData( options.market, data );
 		return data;
+	}
+
+	updateCandlesData( symbol: string, symbolCandles: ArrayCandle[] ){
+		const lastCandles = symbolCandles.slice(-2);
+		const lastDate = candles.getTime(lastCandles[1]);
+		const prevDate = candles.getTime(lastCandles[0]);
+
+		if( lastDate > this.lastDate ){
+			this.lastDate = lastDate;
+			this.closeDate = (lastDate + prevDate) / 2;
+		}
+
+		this.lastCandles[symbol] = lastCandles[1];
+		this.updateOpenOrders();
 	}
 
 	async placeOrders(orders: OrderInput[]): Promise<ExchangeOrder[]> {
@@ -72,7 +85,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	_placeOrder = (order: OrderInput): ExchangeOrder => {
-		let date = this.placeDate;
+		let date = this.lastDate;
 
 		if( !this.hasEnoughFunds(order) ){
 			let errorOrder: ExchangeOrder = {

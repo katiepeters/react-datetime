@@ -265,7 +265,7 @@ function getAdapter(iterationCandles: BotCandles, portfolio: Portfolio, orders: 
 			// The orders will be placed a bit later than the candle date,
 			// to see how the limit orders are placed and executed
 			let previousDate = candles.getTime(iterationCandles[asset].slice(-2)[0]);
-			adapter.placeDate = adapter.lastDate + ((adapter.lastDate - previousDate) / 2);
+			// adapter.placeDate = adapter.lastDate + ((adapter.lastDate - previousDate) / 2);
 		}
 	}
 

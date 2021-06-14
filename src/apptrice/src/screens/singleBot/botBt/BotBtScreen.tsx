@@ -2,6 +2,8 @@ import * as React from 'react'
 import { ScreenProps } from '../../../types';
 import styles from './_BotBtScreen.module.css';
 import { ScreenWrapper, Tabs, Tab } from '../../../components';
+import { BtActive } from '../../../utils/Bt.types';
+import BtStats from './sections/BtStats';
 
 export default class BotBtScreen extends React.Component<ScreenProps> {
 	render() {
@@ -28,6 +30,9 @@ export default class BotBtScreen extends React.Component<ScreenProps> {
 						<Tab id="logs">Logs</Tab>
 					</Tabs>
 				</div>
+				<div className={styles.subscreen}>
+					{ this.renderSubscreen(activeBt) }
+				</div>
 			</div>
 		)
 	}
@@ -38,11 +43,23 @@ export default class BotBtScreen extends React.Component<ScreenProps> {
 		);
 	}
 
+	renderSubscreen(activeBt: BtActive) {
+		const Screen = this.props.router.location.matches[3] || BtStats;
+		return (
+			<Screen
+				{ ...this.props }
+				bt={ activeBt } />
+		);
+	}
+
 	getActiveTab() {
-		return 'stats';
+		let {location} = this.props.router;
+		return location.pathname.split('/')[4] || 'stats';
 	}
 
 	_onChangeTab = (nextTab: string) => {
-		console.log( nextTab );
+		const {router} = this.props;
+		const url = `/bots/${router.location.params.id}/backtesting/${nextTab}`;
+		router.push( url );
 	}
 }

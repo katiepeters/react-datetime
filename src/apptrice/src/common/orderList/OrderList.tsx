@@ -13,7 +13,7 @@ export default class OrderList extends React.Component<OrderListProps> {
 		return (
 			<DynamicList
 				items={Object.keys(this.props.orders)}
-				defaultSize={47}
+				defaultSize={48}
 				renderItem={this._renderOrder} />
 		)
 	}

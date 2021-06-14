@@ -59,9 +59,9 @@ function getUpdatedOrdersFromExchange( adapter: ExchangeAdapter, orders: Deploym
 	let exchangeOrderIds: string[] = [];
 	
 	orders.openOrderIds.forEach( (orderId: string) => {
-		let exchangeOrderId =	orders.foreignIdIndex[orderId];
-		if( exchangeOrderId ){
-			exchangeOrderIds.push( exchangeOrderId );
+		let order =	orders.items[orderId];
+		if( order && order.foreignId ){
+			exchangeOrderIds.push( order.foreignId );
 		}
 	});
 
@@ -92,7 +92,7 @@ function getUpdatedOrdersFromExchange( adapter: ExchangeAdapter, orders: Deploym
 
 
 function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {
-	console.log('Mergin order, stored - exchange', storedOrder, exchangeOrder);
+	console.log(storedOrder.createdAt);
 	return {
 		...exchangeOrder,
 		id: storedOrder.id,

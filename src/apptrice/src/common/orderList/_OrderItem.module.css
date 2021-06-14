@@ -2,7 +2,10 @@
 	background: #233543;
 	width: 100%;
 	border: 1px solid #ffffff16;
-	align-items: center
+	border-bottom: 0;
+	display: flex;
+	align-items: center;
+	height: 48px;
 }
 
 .row:hover {
@@ -10,8 +13,20 @@
 }
 
 .cell {
-	padding: 8px;
+	padding: 0 8px;
 	vertical-align: middle;
+}
+
+.colorWrapper {
+	width: 24px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.dot {
+	width: 16px; height: 16px;
+	border-radius: 8px;
 }
 
 .label {
@@ -22,43 +37,50 @@
 }
 
 .direction_buy {
-	background: green;
+	text-transform: uppercase;
+	color: #3dc9b0;
 }
 
 .direction_sell {
-	background: red;
-}
-
-.type_market {
-	background: green;
-}
-
-.type_limit {
-	background: red;
-}
-
-.status_error {
-	background: red;
-}
-
-.status_completed {
-	background: green;
-}
-
-.status_pending {
-	background: yellow;
+	text-transform: uppercase;
+	color: #fb649b;
 }
 
 .mainInfo {
-
+	font-size: 15px;
+	line-height: 15px;
 }
 
 .secondaryInfo {
-	opacity: .9;
+	opacity: .8;
 	font-size: 14px;
-	margin-top: 4;
+	margin-top: 4px;
 }
 
-.column_id {
-	width: 130
+.column_symbol {
+	width: 90px;
+}
+
+.column_direction{ 
+	width: 60px;
+}
+
+.column_amount {
+	width: 100px;
+}
+
+.column_price {
+	width: 80px;
+}
+
+.column_status {
+	text-transform: capitalize;
+}
+
+.status_error, .status_cancelled {
+	color: #fb649b;
+}
+
+.status_completed {
+	color: #3dc9b0;
 }

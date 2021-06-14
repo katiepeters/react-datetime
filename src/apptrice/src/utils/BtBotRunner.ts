@@ -1,8 +1,9 @@
-import { BotCandles } from "../../../lambdas/lambda.types";
+import { ArrayCandle, BotCandles, Portfolio } from "../../../lambdas/lambda.types";
 import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, ExchangeAccountWithHistory, RunInterval } from "../../../lambdas/model.types";
 import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate } from "../../../lambdas/_common/botRunner/BotRunner";
 import VirtualAdapter from "../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
 import { ExchangeAdapter } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
+import candles from "../../../lambdas/_common/utils/candles";
 import { Balances } from "../common/btSettings/InitialBalances";
 import botLoader from "../screens/botEditor/bot.loader";
 import apiCacher from "../state/apiCacher";
@@ -27,7 +28,7 @@ export interface BtBotRunnerConfig {
 export default class BtBotRunner implements BotRunner {
 	deployment: DBBotDeployment
 	exchange: ExchangeAccountWithHistory
-	adapter: ExchangeAdapter
+	adapter: VirtualAdapter
 	startDate: number
 	endDate: number
 	iteration: number = 0
@@ -67,6 +68,7 @@ export default class BtBotRunner implements BotRunner {
 		}
 
 		this.adapter = new VirtualAdapter(this.exchange);
+		this.adapter.portfolio = createPortfolio(config.balances);
 
 		this.startDate = config.startDate;
 		this.endDate = config.endDate;
@@ -98,6 +100,7 @@ export default class BtBotRunner implements BotRunner {
 		let iterationCandles: BotCandles = {};
 		for (let asset in candles) {
 			iterationCandles[asset] = candles[asset].slice(iteration, iteration + 200);
+			this.adapter.updateCandlesData(asset, iterationCandles[asset]);
 		}
 		return Promise.resolve(iterationCandles);
 	}
@@ -185,6 +188,10 @@ export default class BtBotRunner implements BotRunner {
 	hasIterationsLeft() {
 		return this.iteration < this.totalIterations;
 	}
+
+	prepareNextIteration() {
+		this.iteration++;
+	}
 }
 
 
@@ -220,4 +227,16 @@ function add200Candles(start: number, runInterval: string) {
 function getTotalIterations(candles: BotCandles) {
 	let symbol = Object.keys(candles)[0];
 	return candles[symbol].length - 200;
+}
+
+function createPortfolio(initialBalances: {[asset: string]: number}) {
+	let portfolio: Portfolio = {};
+	Object.keys(initialBalances).forEach(asset => {
+		portfolio[asset] = {
+			asset,
+			free: initialBalances[asset],
+			total: initialBalances[asset]
+		};
+	});
+	return portfolio;
 }

@@ -7,6 +7,7 @@ import { runBotIteration } from "../../../lambdas/_common/botRunner/runBotIterat
 import quickStore from "../state/quickStore";
 import { BtUpdater } from "./BtUpdater";
 import { BtDeployment, BtExchange } from "./Bt.types";
+import { Portfolio } from "../../../lambdas/lambda.types";
 
 let runner: BtBotRunner;
 const BtRunner = {
@@ -108,6 +109,7 @@ function toBtDeployment( deployment: DBBotDeployment ): BtDeployment{
 function toBtExchange( exchange: ExchangeAccountWithHistory ): BtExchange{
 	return {
 		portfolioHistory: exchange.portfolioHistory,
+		provider: exchange.provider,
 		fees: exchange.fees,
 		slippage: exchange.slippage
 	};

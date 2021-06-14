@@ -24,7 +24,7 @@ export const BtUpdater = {
 			activeBt.status = data.status;
 		}
 
-		if( data.accountId || data.botId || data.provider || data.startDate || data.endDate || data.deployment || data.exchange ){
+		if( data.accountId || data.botId || data.provider || data.startDate || data.endDate || data.deployment ){
 			let dataUpdate: BtStored = { ...activeBt.data };
 
 			if (data.accountId) {
@@ -32,9 +32,6 @@ export const BtUpdater = {
 			}
 			if (data.botId) {
 				dataUpdate.botId = data.botId;
-			}
-			if (data.provider) {
-				dataUpdate.provider = data.provider;
 			}
 			if (data.startDate) {
 				dataUpdate.startDate = data.startDate;
@@ -95,7 +92,7 @@ export const BtUpdater = {
 			activeBt.data.deployment = deploymentUpdate;
 		}
 
-		if( data.portfolioHistory || data.fees || data.slippage ) {
+		if( data.portfolioHistory || data.fees || data.slippage || data.provider ) {
 			let exchangeUpdate: BtExchange = { ...activeBt.data.exchange };
 			if( data.portfolioHistory ){
 				exchangeUpdate.portfolioHistory = data.portfolioHistory;
@@ -105,6 +102,9 @@ export const BtUpdater = {
 			}
 			if (data.slippage) {
 				exchangeUpdate.slippage = data.slippage;
+			}
+			if(data.provider ){
+				exchangeUpdate.provider = data.provider;
 			}
 
 			activeBt.data.exchange = exchangeUpdate;
@@ -127,7 +127,6 @@ const defaultActiveBt: BtActive = {
 	data: {
 		accountId: 'init',
 		botId: 'init',
-		provider: 'bitfinex',
 		startDate: 0,
 		endDate: 0,
 		deployment: {
@@ -143,6 +142,7 @@ const defaultActiveBt: BtActive = {
 		},
 		exchange: {
 			portfolioHistory: [],
+			provider: 'bitfinex',
 			fees: 0,
 			slippage: 0
 		}
