@@ -6,12 +6,14 @@ const { ChartCanvas, Chart } = require('react-stockcharts');
 const { last, timeIntervalBarWidth } = require("react-stockcharts/lib/utils");
 const { XAxis, YAxis } = require('react-stockcharts/lib/axes');
 const { CandlestickSeries, BarSeries } = require('react-stockcharts/lib/series');
-const { CrossHairCursor } = require('react-stockcharts/lib/coordinates');
+const { CrossHairCursor, EdgeIndicator, MouseCoordinateX, MouseCoordinateY } = require('react-stockcharts/lib/coordinates');
 const { fitWidth } = require('react-stockcharts/lib/helper');
+const { OHLCTooltip } = require('react-stockcharts/lib/tooltip');
 
 const { scaleTime } = require('d3-scale');
 const { utcHour } = require('d3-time');
 const { format } = require('d3-format');
+const { timeFormat } = require('d3-time-format');
 
 
 export interface ChartCandle {
@@ -73,6 +75,29 @@ class TradingChart extends React.Component<TradingChartProps> {
 						width={timeIntervalBarWidth(utcHour)}
 						{...candleStyles} />
 					<OrderSeries orders={orders} candles={candles} />
+					<EdgeIndicator
+						itemType="last"
+						orient="right"
+						edgeAt="right"
+						yAccessor={ (d:any) => d.close }
+						lineStroke="#ffffff"
+						arrowWidth={0}
+						rectHeight={14}
+						fontSize={12} />
+					<MouseCoordinateX
+						at="bottom"
+						orient="bottom"
+						displayFormat={timeFormat("%Y-%m-%d")} />
+					<MouseCoordinateY
+						at="right"
+						orient="right"
+						displayFormat={format(".2f")}
+						arrowWidth={0}
+						rectHeight={14}
+						fontSize={12} />
+					<OHLCTooltip
+						origin={[0,0]}
+						textFill="#ffffff" />
 				</Chart>
 				<Chart id={2}
 					origin={(w: number, h: number) => [0, h - 100]}
@@ -81,8 +106,10 @@ class TradingChart extends React.Component<TradingChartProps> {
 					<BarSeries yAccessor={volumeAccessor}
 						fill={(d: any) => d.close > d.open ? "#6BA583" : "red"} />
 				</Chart>
-
-				<CrossHairCursor stroke="rgba(255,255,255,.5)" strokeDasharray="LongDashDot" />
+				<CrossHairCursor
+					stroke="rgba(255,255,255,.5)"
+					strokeDasharray="Dash"
+					strokeWidth={1} />
 			</ChartCanvas>
 		);
 	}
