@@ -1,13 +1,12 @@
-import { ArrayCandle, BotCandles, OrderInput, Portfolio } from "../../../lambdas/lambda.types";
-import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, ExchangeAccountWithHistory, Order, RunInterval } from "../../../lambdas/model.types";
-import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate } from "../../../lambdas/_common/botRunner/BotRunner";
-import VirtualAdapter from "../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
-import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
-import candles from "../../../lambdas/_common/utils/candles";
-import { Balances } from "../common/btSettings/InitialBalances";
-import botLoader from "../screens/botEditor/bot.loader";
-import apiCacher from "../state/apiCacher";
-import quickStore from "../state/quickStore";
+import { BotCandles, Portfolio } from "../../../../lambdas/lambda.types";
+import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, ExchangeAccountWithHistory, Order, RunInterval } from "../../../../lambdas/model.types";
+import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate } from "../../../../lambdas/_common/botRunner/BotRunner";
+import VirtualAdapter from "../../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
+import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
+import { Balances } from "../../common/btSettings/InitialBalances";
+import botLoader from "../../screens/singleBot/bot.loader";
+import apiCacher from "../../state/apiCacher";
+import quickStore from "../../state/quickStore";
 import { BtRunnableBot, IBtRunnableBot } from "./BtRunnableBot";
 
 export interface BtBotRunnerConfig {
@@ -74,9 +73,6 @@ export default class BtBotRunner implements BotRunner {
 		this.endDate = config.endDate;
 
 		this.candlePromise = this.getAllCandles();
-
-		quickStore.setOrders({});
-		quickStore.setLogs([]);
 	}
 
 	getDeployment( accountId: string, deploymentId: string ){
@@ -140,13 +136,6 @@ export default class BtBotRunner implements BotRunner {
 			...update
 		};
 
-		if( update.orders ){
-			quickStore.setOrders(update.orders.items);
-		}
-		if( update.logs ){
-			quickStore.setLogs(update.logs);
-		}
-
 		return Promise.resolve(this.deployment);
 	}
 
@@ -160,12 +149,14 @@ export default class BtBotRunner implements BotRunner {
 	}
 
 	setRunError( deployment: DBBotDeployment, error: any ){
+		/*
 		quickStore.appendLogs([{
 			id: -1,
 			type: 'error',
 			date: Date.now(),
 			message: error.message || error.toString()
 		}]);
+		*/
 		return Promise.resolve();
 	}
 

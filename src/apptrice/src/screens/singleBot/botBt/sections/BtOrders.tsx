@@ -3,7 +3,7 @@ import * as React from 'react'
 import { DeploymentOrders } from '../../../../../../lambdas/model.types';
 import OrderList from '../../../../common/orderList/OrderList';
 import { Card } from '../../../../components';
-import { BtSectionProps } from '../../../../utils/Bt.types'
+import { BtSectionProps } from '../../../../utils/backtest/Bt.types';
 import styles from './_BtOrders.module.css';
 
 export default class BtOrders extends React.Component<BtSectionProps> {

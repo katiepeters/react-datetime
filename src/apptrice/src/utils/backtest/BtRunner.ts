@@ -1,13 +1,12 @@
-import { BacktestConfig } from "../screens/botEditor/tools/BotTools";
-import store from "../state/store"
+import { BacktestConfig } from "../../common/btSettings/BotTools";
 import {v4 as uuid} from 'uuid';
-import { DbBot, DBBotDeployment, ExchangeAccountWithHistory } from "../../../lambdas/model.types";
+import { DbBot, DBBotDeployment, ExchangeAccountWithHistory } from "../../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
-import { runBotIteration } from "../../../lambdas/_common/botRunner/runBotIteration";
-import quickStore from "../state/quickStore";
+import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIteration";
+import quickStore from "../../state/quickStore";
 import { BtUpdater } from "./BtUpdater";
 import { BtDeployment, BtExchange } from "./Bt.types";
-import { Portfolio } from "../../../lambdas/lambda.types";
+import store from "../../state/store";
 
 let runner: BtBotRunner;
 const BtRunner = {

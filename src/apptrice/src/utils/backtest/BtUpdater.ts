@@ -1,4 +1,4 @@
-import quickStore from "../state/quickStore"
+import quickStore from "../../state/quickStore";
 import { ActiveBtUpdate, BtActive, BtDeployment, BtExchange, BtStored } from "./Bt.types"
 
 export const BtUpdater = {

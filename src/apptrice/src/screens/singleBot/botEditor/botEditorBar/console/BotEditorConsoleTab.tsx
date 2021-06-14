@@ -31,7 +31,10 @@ export default class BotEditorConsoleTab extends React.Component<BotEditorConsol
 
 	lastLogsCount: number = 0;
 	componentDidUpdate(prevProps: BotEditorConsoleTabProps) {
-		const count = this.props.quickStore.getLogs().length;
+		const bt = this.props.quickStore.getActiveBt();
+		const logs = bt?.data.deployment.logs || [];
+
+		const count = logs.length;
 		if ( count !== this.lastLogsCount && !this.props.active  ){
 			this.lastLogsCount = count;
 			this.setState({ activity: true });

@@ -14,6 +14,6 @@
     "moduleResolution": "Node"
   },
   "files": [
-    "apptrice/src/screens/botEditor/botWorker/botWorkerSource.ts"
+    "apptrice/src/utils/backtest/worker/botWorkerSource.ts"
   ]
 }

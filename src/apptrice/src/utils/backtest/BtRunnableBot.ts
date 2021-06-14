@@ -1,5 +1,5 @@
-import { BotRunInput, RunnableBot } from "../../../lambdas/_common/botRunner/BotRunner";
-import { BotWorker, createBot } from "../screens/botEditor/backtesting/botWorker";
+import { BotRunInput, RunnableBot } from "../../../../lambdas/_common/botRunner/BotRunner";
+import { BotWorker, createBot } from "./worker/botWorker";
 
 export interface IBtRunnableBot extends RunnableBot {
 	source: string

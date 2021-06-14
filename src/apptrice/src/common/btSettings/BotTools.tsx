@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { RunInterval } from '../../../../../lambdas/model.types';
-import InitialBalances, { Balances } from '../../../common/btSettings/InitialBalances';
-import {Button, InputGroup} from '../../../components';
+import { RunInterval } from '../../../../lambdas/model.types';
+import InitialBalances, { Balances } from './InitialBalances';
+import {Button, InputGroup} from '../../components';
 import ProgressBar from './ProgressBar';
 interface BotToolsProps {
 	onRun: (config: BacktestConfig) => void,

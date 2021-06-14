@@ -2,8 +2,8 @@ import * as React from 'react'
 import { ScreenProps } from '../../../types';
 import styles from './_BotBtScreen.module.css';
 import { ScreenWrapper, Tabs, Tab } from '../../../components';
-import { BtActive } from '../../../utils/Bt.types';
 import BtStats from './sections/BtStats';
+import { BtActive } from '../../../utils/backtest/Bt.types';
 
 export default class BotBtScreen extends React.Component<ScreenProps> {
 	render() {

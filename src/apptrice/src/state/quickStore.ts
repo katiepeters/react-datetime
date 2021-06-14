@@ -1,13 +1,10 @@
 import Emitter from 'eventemitter3';
 import { BotCandles, Orders } from '../../../lambdas/lambda.types';
 import { ConsoleEntry } from '../../../lambdas/model.types';
-import { BtActive } from '../utils/Bt.types';
+import { BtActive } from '../utils/backtest/Bt.types';
 
 let emitter = new Emitter();
-let orders: Orders = {};
-let logs: ConsoleEntry[] = [];
 let changeTimer:any = false;
-let candles: BotCandles = {};
 
 let activeBt: BtActive | undefined;
 
@@ -24,46 +21,6 @@ const quickStore = {
 			changeTimer = false;
 			emitter.emit('change');
 		});
-	},
-
-	getOrders(): Orders {
-		return orders;
-	},
-
-	setOrders( nextOrders: Orders ){
-		orders = { ...nextOrders};
-		this.emitChange();
-	},
-
-	appendOrders( nextOrders: Orders ){
-		orders = {
-			...orders,
-			...nextOrders
-		};
-		this.emitChange();
-	},
-
-	getLogs() {
-		return logs;
-	},
-
-	setLogs( nextLogs: ConsoleEntry[] ){
-		logs = [...nextLogs];
-		this.emitChange();
-	},
-
-	appendLogs( nextLogs: ConsoleEntry[]){
-		logs = [...logs, ...nextLogs];
-		this.emitChange();
-	},
-
-	setCandles( btCandles: BotCandles ){
-		candles = btCandles;
-		this.emitChange();
-	},
-
-	getCandles(){
-		return candles;
 	},
 
 	getActiveBt(): BtActive | undefined {

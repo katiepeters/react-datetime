@@ -1,7 +1,7 @@
 import * as React from 'react'
 import DeploymentCharts from '../../../../common/charts/DeploymentCharts';
 import { ScreenProps } from '../../../../types'
-import { BtActive } from '../../../../utils/Bt.types'
+import { BtActive } from '../../../../utils/backtest/Bt.types';
 
 interface BtChartsProps extends ScreenProps {
 	bt: BtActive

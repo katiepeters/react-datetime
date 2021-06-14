@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Button from '../../../../components/button/Button';
-import { BacktestConfig } from '../../../botEditor/tools/BotTools';
-import ProgressBar from '../../../botEditor/tools/ProgressBar';
+import { BacktestConfig } from '../../../../common/btSettings/BotTools';
 import styles from './_BotEditorBar.module.css';
 import BotEditorConsolePanel from './console/BotEditorConsolePanel';
 import BotEditorConsoleTab from './console/BotEditorConsoleTab';
@@ -10,6 +9,7 @@ import ProblemsTab, { CodeProblem } from './problems/ProblemsTab';
 import quickStore from '../../../../state/quickStore';
 import { Modal, ModalBox } from '../../../../components';
 import BtSettings from '../../../../common/btSettings/BtSettings';
+import ProgressBar from '../../../../common/btSettings/ProgressBar';
 
 interface BotEditorBarProps {
 	botId: string,

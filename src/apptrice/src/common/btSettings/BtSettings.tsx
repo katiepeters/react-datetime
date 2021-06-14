@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { InputGroup, Button } from '../../components';
-import { BacktestConfig } from '../../screens/botEditor/tools/BotTools';
+import { BacktestConfig } from './BotTools';
 import { getBtConfig, BtSettingsConfig, saveBtConfig } from './BtConfigStore';
 import InitialBalances from './InitialBalances';
 import styles from './_BtSettings.module.css';

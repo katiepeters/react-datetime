@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/screens/botEditor/botWorker/botWorkerSource.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/utils/backtest/worker/botWorkerSource.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -515,10 +515,10 @@ exports.default = _default;
 
 /***/ }),
 
-/***/ "./src/screens/botEditor/botWorker/botWorkerSource.ts":
-/*!************************************************************!*\
-  !*** ./src/screens/botEditor/botWorker/botWorkerSource.ts ***!
-  \************************************************************/
+/***/ "./src/utils/backtest/worker/botWorkerSource.ts":
+/*!******************************************************!*\
+  !*** ./src/utils/backtest/worker/botWorkerSource.ts ***!
+  \******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 

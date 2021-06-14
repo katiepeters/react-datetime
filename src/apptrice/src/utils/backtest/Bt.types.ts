@@ -1,6 +1,7 @@
-import { ArrayCandle, BotCandles } from "../../../lambdas/lambda.types";
-import { ConsoleEntry, DBBotDeploymentState, DeploymentOrders, PortfolioHistoryItem, RunInterval } from "../../../lambdas/model.types";
-import { ScreenProps } from "../types";
+
+import { BotCandles } from "../../../../lambdas/lambda.types";
+import { ConsoleEntry, DBBotDeploymentState, DeploymentOrders, PortfolioHistoryItem, RunInterval } from "../../../../lambdas/model.types";
+import { ScreenProps } from "../../types";
 
 export interface BtDeployment {
 	logs: ConsoleEntry[]

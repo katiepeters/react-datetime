@@ -1,6 +1,8 @@
-import store from '../../state/store'
-import apiCacher, { DbBot } from '../../state/apiCacher'
-import DataLoader, { DataLoaderConfig } from '../../utils/DataLoader'
+import { DbBot } from "../../../../lambdas/model.types";
+import apiCacher from "../../state/apiCacher";
+import store from "../../state/store";
+import DataLoader, { DataLoaderConfig } from "../../utils/DataLoader";
+
 
 const config: DataLoaderConfig<DbBot> = {
 	getFromCache(id: string): DbBot | undefined {

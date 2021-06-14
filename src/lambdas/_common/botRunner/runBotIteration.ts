@@ -90,9 +90,7 @@ function getUpdatedOrdersFromExchange( adapter: ExchangeAdapter, orders: Deploym
 	});
 }
 
-
 function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {
-	console.log(storedOrder.createdAt);
 	return {
 		...exchangeOrder,
 		id: storedOrder.id,
