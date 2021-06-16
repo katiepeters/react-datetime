@@ -119,3 +119,7 @@ export interface BotExecutorResult {
 	logs: ConsoleEntry[],
 	error?: string
 }
+
+export interface BotExecutorResultWithDate extends BotExecutorResult {
+	currentDate: number
+}

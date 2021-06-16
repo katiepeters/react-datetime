@@ -3,12 +3,14 @@ import { BotWorker, createBot } from "./worker/botWorker";
 
 export interface IBtRunnableBot extends RunnableBot {
 	source: string
+	currentDate: number
 	bot?: BotWorker
 	terminate(): void
 }
 
 const BtRunnableBot: IBtRunnableBot = {
 	source: 'null',
+	currentDate: Date.now(),
 
 	async prepare( source: string ){
 		const botWorkerSource = await getWorkerSource();
@@ -24,12 +26,15 @@ const BtRunnableBot: IBtRunnableBot = {
 		this.bot = bot;
 	},
 
-	run( input: BotRunInput ){
+	async run( input: BotRunInput ){
 		if( !this.bot ){
 			throw new Error('Running a bot not initialized');
 		}
 
-		return this.bot.execute( input );
+		return {
+			currentDate: this.currentDate,
+			...( await this.bot.execute(input) )
+		};
 	},
 
 	terminate(){

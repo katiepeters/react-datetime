@@ -1,4 +1,4 @@
-import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio, OrderInput } from "../../../lambdas/lambda.types";
+import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio, OrderInput, BotExecutorResultWithDate } from "../../../lambdas/lambda.types";
 import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order } from "../../../lambdas/model.types";
 import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 
@@ -9,7 +9,7 @@ export interface BotInitializeStateResponse {
 
 export interface RunnableBot {
 	prepare(source: string): Promise<void>
-	run( input: BotRunInput ): Promise<BotExecutorResult>
+	run( input: BotRunInput ): Promise<BotExecutorResultWithDate>
 }
 
 export interface BotRunInput {

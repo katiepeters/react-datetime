@@ -49,7 +49,7 @@ function renderOpening(ctx: any, xScale: any, yScale: any, order: Order) {
 	}
 
 	const styles = {
-		stroke: color,
+		stroke: 'white',
 		fill: color,
 		r: 2,
 		opacity: .5,
@@ -93,13 +93,16 @@ function renderClosing(ctx: any, xScale: any, yScale: any, order: Order) {
 	const Marker = getMarker(order);
 	const color = getColor(order.status, order.direction);
 
-	const styles = {
-		stroke: color,
+	let styles = {
+		stroke: order.status === 'cancelled' ? 'transparent' : 'white',
 		fill: color,
 		width: order.status === 'cancelled' ? 4 : 8,
-		opacity: order.status === 'cancelled' ? .1 : .5,
+		opacity: order.status === 'cancelled' ? .6 : 1,
 		strokeWidth: 1,
 	};
+	if( order.status === 'error' ){
+		styles.stroke = color;
+	}
 	const point = {
 		x: xScale(order.closedAt),
 		y: yScale(order.executedPrice || order.price)
@@ -125,22 +128,22 @@ function getMarker(order: any) {
 function getColor(status: string, direction: string) {
 	if (direction === 'buy') {
 		if (status === 'completed') {
-			return '#00cc00';
+			return '#38bb8b';
 		}
 		else if (status === 'placed') {
-			return '#00ff00';
+			return '#38bb8b';
 		}
-		return '#66cc66';
+		return '#38bb8b';
 	}
 
 	// sell
 	if (status === 'completed') {
-		return '#cc0000';
+		return '#f77694';
 	}
 	else if (status === 'placed') {
-		return '#ff0000';
+		return '#f77694';
 	}
-	return '#cc6666';
+	return '#f77694';
 }
 
 function getLastCandleTime(c: any[]) {

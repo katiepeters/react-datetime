@@ -113,6 +113,7 @@ export default class BtBotRunner implements BotRunner {
 
 	getBot( accountId: string, botId: string ){
 		if( this.bot ){
+			this.bot.currentDate = this.adapter.lastDate;
 			return Promise.resolve(this.bot);
 		}
 
@@ -125,6 +126,7 @@ export default class BtBotRunner implements BotRunner {
 		return BtRunnableBot.prepare(bot.code)
 			.then( () => {
 				this.bot = BtRunnableBot;
+				this.bot.currentDate = this.adapter.lastDate;
 				return this.bot;
 			})
 		;

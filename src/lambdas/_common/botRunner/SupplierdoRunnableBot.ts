@@ -8,10 +8,13 @@ export class SupplierdoRunnableBot implements RunnableBot {
 		this.source = source;
 	}
 
-	run( input: BotRunInput ) {
-		return lambdaUtil.invokeExecutor({
-			botSource: this.source,
-			...input,
-		})
+	async run( input: BotRunInput ) {
+		return {
+			currentDate: Date.now(),
+			...( await lambdaUtil.invokeExecutor({
+				botSource: this.source,
+				...input,
+			}))
+		};
 	}
 }

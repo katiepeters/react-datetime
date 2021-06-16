@@ -1,5 +1,5 @@
 import { DBBotDeployment, DbExchangeAccount, DeploymentOrders } from "../../../lambdas/model.types";
-import { BotExecutorResult, Order } from "../../lambda.types";
+import { BotExecutorResultWithDate, Order } from "../../lambda.types";
 import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 import { BotRunner, RunnableBot } from './BotRunner';
 
@@ -100,7 +100,7 @@ function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {
 	}
 }
 
-function mergeResultOrders( currentOrders: DeploymentOrders, result: BotExecutorResult, cancelledOrderIds: string[], placedOrders: ExchangeOrder[] ) {
+function mergeResultOrders( currentOrders: DeploymentOrders, result: BotExecutorResultWithDate, cancelledOrderIds: string[], placedOrders: ExchangeOrder[] ) {
 	const foreignIdIndex = { ...currentOrders.foreignIdIndex };
 	const items = { ...currentOrders.items };
 
@@ -110,7 +110,7 @@ function mergeResultOrders( currentOrders: DeploymentOrders, result: BotExecutor
 			items[ orderId ] = {
 				...items[orderId],
 				status: 'cancelled',
-				closedAt: Date.now()
+				closedAt: result.currentDate
 			}
 			closedOrdersIndex[ orderId ] = 1;
 		}

@@ -9,7 +9,9 @@ import styles from './_DeploymentCharts.module.css';
 interface DeploymentChartsProps {
 	deployment: BtDeployment,
 	exchangeProvider: 'bitfinex',
-	selector?: 'tabs' | 'dropdown'
+	selector?: 'tabs' | 'dropdown',
+	activeSymbol?: string,
+	onChange?: (activeSymbol: string) => any
 }
 
 export default class DeploymentCharts extends React.Component<DeploymentChartsProps> {
@@ -44,7 +46,7 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 		if( selector === 'dropdown' ){
 			return (
 				<select value={this.state.activeSymbol}
-					onChange={ (e:React.ChangeEvent<HTMLSelectElement>) => this.setState({activeSymbol: e.target.value})}>
+					onChange={ (e:React.ChangeEvent<HTMLSelectElement>) => this._onChange(e.target.value)}>
 					{deployment.symbols.map((symbol: string) => (
 						<option key={symbol} value={symbol}>{symbol}</option>
 					))}
@@ -54,7 +56,7 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 		else {
 			return (
 				<Tabs active={this.state.activeSymbol}
-					onChange={(activeSymbol: string) => this.setState({ activeSymbol })}>
+					onChange={ this._onChange }>
 					{deployment.symbols.map((symbol: string) => (
 						<Tab key={symbol} id={symbol}>{symbol}</Tab>
 					))}
@@ -66,6 +68,20 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 	getActiveSymbolOrders(orders: DeploymentOrders ): Order[] {
 		return getSymbolOrders( orders, this.state.activeSymbol );
 	}
+
+	getActiveSymbol(){
+		return this.props.activeSymbol || this.state.activeSymbol;
+	}
+
+	_onChange = (activeSymbol: string) => {
+		if( this.props.onChange ){
+			this.props.onChange(activeSymbol);
+		}
+		else {
+			this.setState({ activeSymbol });
+		}
+	}
+
 }
 
 const getSymbolOrders = memoizeOne( (orders: DeploymentOrders, symbol: string ) => {
