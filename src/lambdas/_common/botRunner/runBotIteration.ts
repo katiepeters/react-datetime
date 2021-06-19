@@ -6,7 +6,7 @@ import { BotRunner, RunnableBot } from './BotRunner';
 export async function runBotIteration( accountId: string, deploymentId: string, runner: BotRunner ){
 	let deployment: DBBotDeployment = await runner.getDeployment( accountId, deploymentId );
 	let exchange: DbExchangeAccount = await runner.getExchangeAccount( accountId, deployment.exchangeAccountId );
-	let adapter: ExchangeAdapter = runner.getAdapter( exchange );
+	let adapter: ExchangeAdapter = await runner.getAdapter( exchange );
 	let bot: RunnableBot = await runner.getBot( accountId, deployment.botId );
 
 	// First get candles (virtual exchanges will refresh its data)
@@ -49,7 +49,7 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 			logs: [ ...deployment.logs, ...result.logs ]
 		}),
 		runner.updateExchange( exchange, {
-			orders: exchange.orders,
+			orders: runner.getExchangeOrders( adapter ),
 			portfolio: await adapter.getPortfolio()
 		})
 	]);
@@ -68,26 +68,30 @@ function getUpdatedOrdersFromExchange( adapter: ExchangeAdapter, orders: Deploym
 	if( !exchangeOrderIds.length )
 		return Promise.resolve({ ...orders });
 
-	return adapter.getOrders( exchangeOrderIds ).then( (exchangeOrders: ExchangeOrder[]) => {
-		let {foreignIdIndex, items} = orders;
+	return adapter.getOrders( exchangeOrderIds )
+		.then( (exchangeOrders: ExchangeOrder[]) => {
+			let {foreignIdIndex, items} = orders;
 
-		let mergedOrders: DeploymentOrders = {
-			foreignIdIndex: {...foreignIdIndex},
-			items: {...items },
-			openOrderIds: []
-		}
-
-		exchangeOrders.forEach( exchangeOrder => {
-			let storedOrderId = foreignIdIndex[exchangeOrder.id];
-			let order = mergeOrder(items[storedOrderId], exchangeOrder);
-			mergedOrders.items[storedOrderId] = order;
-			if( order.status === 'placed' ){
-				mergedOrders.openOrderIds.push( storedOrderId );
+			let mergedOrders: DeploymentOrders = {
+				foreignIdIndex: {...foreignIdIndex},
+				items: {...items },
+				openOrderIds: []
 			}
-		});
 
-		return mergedOrders;
-	});
+			exchangeOrders.forEach( exchangeOrder => {
+				let storedOrderId = foreignIdIndex[exchangeOrder.id];
+				console.log( storedOrderId, items[storedOrderId], exchangeOrder);
+				let order = mergeOrder(items[storedOrderId], exchangeOrder);
+				mergedOrders.items[storedOrderId] = order;
+				if( order.status === 'placed' ){
+					mergedOrders.openOrderIds.push( storedOrderId );
+				}
+			});
+
+			return mergedOrders;
+		})
+	;
+
 }
 
 function mergeOrder( storedOrder: Order, exchangeOrder: ExchangeOrder ): Order {

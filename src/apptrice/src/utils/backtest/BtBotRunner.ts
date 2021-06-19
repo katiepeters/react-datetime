@@ -6,7 +6,6 @@ import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exch
 import { Balances } from "../../common/btSettings/InitialBalances";
 import botLoader from "../../screens/singleBot/bot.loader";
 import apiCacher from "../../state/apiCacher";
-import quickStore from "../../state/quickStore";
 import { BtRunnableBot, IBtRunnableBot } from "./BtRunnableBot";
 
 export interface BtBotRunnerConfig {
@@ -83,8 +82,12 @@ export default class BtBotRunner implements BotRunner {
 		return Promise.resolve( this.exchange );
 	}
 
+	getExchangeOrders() {
+		return this.adapter.orders;
+	}
+
 	getAdapter(){
-		return this.adapter;
+		return Promise.resolve(this.adapter);
 	}
 
 	getCandles( adapter: ExchangeAdapter, deployment: DBBotDeployment ){
@@ -121,7 +124,6 @@ export default class BtBotRunner implements BotRunner {
 		if( !bot ){
 			throw new Error('bot_not_initialized');
 		}
-
 
 		return BtRunnableBot.prepare(bot.code)
 			.then( () => {

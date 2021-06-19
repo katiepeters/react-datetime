@@ -3,7 +3,7 @@ import { DbExchangeAccount } from "../../../model.types";
 import ExchangeAccountModel from "../../dynamo/ExchangeAccountModel";
 import candles from "../../utils/candles";
 import symbols from "../../utils/symbols";
-import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeSymbols, ExchangeVirtualData, Ticker } from "../ExchangeAdapter";
+import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeOrders, ExchangeSymbols, ExchangeVirtualData, Ticker } from "../ExchangeAdapter";
 import BitfinexAdapter from "./BitfinexAdapter";
 import { v4 as uuid } from 'uuid';
 
@@ -15,7 +15,7 @@ export interface ExchangeAccountData {
 export default class VirtualAdapter implements ExchangeAdapter {
 	exchangeAccount: DbExchangeAccount
 	portfolio: Portfolio
-	orders: {[id: string]: ExchangeOrder}
+	orders: ExchangeOrders
 	openOrders: string[]
 	lastDate: number
 	closeDate: number

@@ -1,8 +1,8 @@
-import { OrderInput } from "../../lambda.types";
-import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders } from "../../model.types";
+import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order } from "../../model.types";
 import BotDeploymentModel from "../dynamo/BotDeploymentModel"
 import BotModel from "../dynamo/BotModel";
 import ExchangeAccountModel from "../dynamo/ExchangeAccountModel";
+import VirtualAdapter from "../exchanges/adapters/VirtualAdapter";
 import { ExchangeAdapter, ExchangeOrder } from "../exchanges/ExchangeAdapter";
 import exchanger from "../exchanges/exchanger";
 import exchangeUtils from "../exchanges/exchangeUtils";
@@ -26,12 +26,23 @@ const SupplierdoRunner: BotRunner = {
 		return exchange;
 	},
 
-	getAdapter( exchangeAccount: DbExchangeAccount ): ExchangeAdapter {
+ 	getExchangeOrders( adapter: ExchangeAdapter ){
+		if( adapter instanceof VirtualAdapter ){
+			return adapter.orders;
+		}
+	},
+
+	async getAdapter( exchangeAccount: DbExchangeAccount ): Promise<ExchangeAdapter> {
 		console.log('Get adapter', exchangeAccount);
 		const exchangeAdapter = exchanger.getAdapter( exchangeAccount );
 
 		if (!exchangeAdapter) {
 			throw new Error(`Unknown adapter ${exchangeAccount.provider}`);
+		}
+
+		if( exchangeAdapter instanceof VirtualAdapter ){
+			console.log('Hidratandoooo!!');
+			await exchangeAdapter.hydrate();
 		}
 
 		return exchangeAdapter;
@@ -76,6 +87,7 @@ const SupplierdoRunner: BotRunner = {
 			update
 		};
 
+		console.log( 'Updating deployment' );
 		await BotDeploymentModel.update( payload );
 
 		return {
@@ -85,21 +97,29 @@ const SupplierdoRunner: BotRunner = {
 	},
 
 	async updateExchange( exchange: DbExchangeAccount, update: BotRunnerExchangeUpdate ) {
-		let portfolioHistory = [
-			...(exchange.portfolioHistory || []),
-			{
-				date: Date.now(),
-				balances: update.portfolio || {}
-			}
+		let promises = [
+			ExchangeAccountModel.updatePortfolio(exchange.accountId, exchange.id, update.portfolio, true )
 		];
 
-		await ExchangeAccountModel.update(exchange.accountId, exchange.id, {portfolioHistory} );
+		if( update.orders ){
+			console.log('We are updating exchange orders too');
+			promises.push(
+				ExchangeAccountModel.updateOrders(exchange.accountId, exchange.id, update.orders )
+			);
+		}
 
-		const updated: DbExchangeAccount = {
-			...exchange,
-			portfolioHistory
-		};
-		return updated;
+		return Promise.all(promises).then( () => {
+			return {
+				...exchange,
+				portfolioHistory: [
+					...(exchange.portfolioHistory || []),
+					{
+						date: Date.now(),
+						balances: update.portfolio || {}
+					}
+				]
+			}
+		});
 	},
 
 	async setRunError( deployment: DBBotDeployment, error: any ){

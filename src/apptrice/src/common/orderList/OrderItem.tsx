@@ -122,7 +122,7 @@ export default class OrderItem extends React.PureComponent<OrderItemProps> {
 		return (
 			<div className={`${styles.cell} ${styles.column_price}`}>
 				<div className={`${styles.mainInfo}`}>
-					{order.price || order.marketPrice}
+					{formatPrice(order.price || order.marketPrice)}
 				</div>
 			</div>
 		);
@@ -179,5 +179,5 @@ function getSymbolColor(symbol: string) {
 }
 
 function formatPrice( price: number ){
-	return price.toString().slice(0,7);
+	return price.toString().slice(0, 9);
 }

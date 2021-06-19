@@ -1,6 +1,6 @@
-import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio, OrderInput, BotExecutorResultWithDate } from "../../../lambdas/lambda.types";
+import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio, OrderInput, BotExecutorResultWithDate, Orders } from "../../../lambdas/lambda.types";
 import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order } from "../../../lambdas/model.types";
-import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
+import { ExchangeAdapter, ExchangeOrder, ExchangeOrders } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 
 export interface BotInitializeStateResponse {
 	state: BotState,
@@ -27,14 +27,15 @@ export interface BotRunnerDeploymentUpdate {
 }
 
 export interface BotRunnerExchangeUpdate {
-	orders?: ExchangeOrder[],
-	portfolio?: Portfolio
+	orders?: ExchangeOrders,
+	portfolio: Portfolio
 }
 
 export interface BotRunner {
 	getDeployment( accountId: string, deploymentId: string ): Promise<DBBotDeployment>
 	getExchangeAccount( accountId: string, exchangeAccountId: string ): Promise<DbExchangeAccount>
-	getAdapter( exchange: DbExchangeAccount ): ExchangeAdapter
+	getExchangeOrders(adapter: ExchangeAdapter): ExchangeOrders | undefined
+	getAdapter( exchange: DbExchangeAccount ): Promise<ExchangeAdapter>
 	getCandles( adapter: ExchangeAdapter, deployment: DBBotDeployment ): Promise<BotCandles>
 	getBot( accountId: string, botId: string ): Promise<RunnableBot>
 	updateDeployment( deployment: DBBotDeployment, update: BotRunnerDeploymentUpdate ): Promise<DBBotDeployment>,

@@ -65,6 +65,7 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 
 	getColumns(): TableColumn<ExchangeAccountResponse>[] {
 		return [
+			{field: 'id'},
 			{field: 'name'},
 			{field: 'provider'},
 			{field: 'type'},

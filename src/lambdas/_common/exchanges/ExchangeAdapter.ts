@@ -22,6 +22,10 @@ export interface ExchangeOrder {
 	closedAt: number | null
 }
 
+export interface ExchangeOrders {
+	[id: string]: ExchangeOrder
+}
+
 export interface ExchangeCredentials {
 	key: string
 	secret: string
