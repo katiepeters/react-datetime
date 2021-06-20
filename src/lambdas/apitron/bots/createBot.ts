@@ -1,6 +1,8 @@
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 import { v4 as uuid } from 'uuid';
+import { DbBotInput } from "../../model.types";
+import { DbBotVersionCreateInput } from "../../_common/dynamo/BotVersionModel";
 
 const createBotHandler: MutationHandler = {
 	name: 'createBot',
@@ -18,16 +20,25 @@ const createBotHandler: MutationHandler = {
 
 	getMutations(input: MutationGetterInput): Mutation[] {
 		const {accountId, name, code} = input.body;
-		return [{
-			model: 'bot',
-			action: 'create',
-			data: {
+		const bot: DbBotInput = {
 				id: uuid(),
 				accountId,
 				name,
-				code
-			}
-		}];
+				versions: [
+					{ lastMinor: 0, available:[{number: 0, createdAt: Date.now()}] }
+				]
+		};
+		const version: DbBotVersionCreateInput = {
+			accountId,
+			botId: bot.id,
+			number: '0.0',
+			code
+		};
+
+		return [
+			{model: 'bot', action: 'create',	data: bot},
+			{model: 'botVersion', action: 'create', data: version}
+		];
 	},
 
 	getResponse(input: MutationResponseInput): ResponseResult {

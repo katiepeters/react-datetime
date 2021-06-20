@@ -9,6 +9,7 @@ export default {
 	},
 	async create(account: DBAccountInput): Promise<void> {
 		return await Db.put({
+			createdAt: Date.now(),
 			...account,
 			accountId: account.id,
 			resourceId: 'ACCOUNT'

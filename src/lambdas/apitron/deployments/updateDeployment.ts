@@ -1,3 +1,4 @@
+import { getActivatedDeployment, getDeactivatedDeployment, isActiveDeployment } from "../../_common/utils/deploymentUtils";
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 
@@ -27,19 +28,21 @@ const updateDeploymentHandler: MutationHandler = {
 
 	getMutations(input: MutationGetterInput): Mutation[] {
 		const {deployment} = input.context;
-		const {active, accountId} = input.body;
+		const {active} = input.body;
 
-		if( deployment.active === active ){
+		if( isActiveDeployment(deployment) === active ){
 			return [];
 		}
 
+		const updatedDeployment = active ?
+			getActivatedDeployment( deployment ) :
+			getDeactivatedDeployment( deployment )
+		;
+		
 		return [{
 			model: 'deployment',
-			action: active ? 'activate' : 'deactivate',
-			data: {
-				accountId,
-				deploymentId: input.params.deploymentId
-			}
+			action: 'create', // We completely replace the old object by the new one
+			data: updatedDeployment
 		}];
 	},
 

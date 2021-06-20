@@ -28,7 +28,6 @@ export interface CreateExchangeAccountInput {
 }
 
 export interface UpdateBotInput {
-	code?: string,
 	name?: string,
 }
 
@@ -40,6 +39,20 @@ export interface UpdateDeploymentInput {
 export interface CreateBotInput {
 	accountId: string,
 	name: string,
+	code: string
+}
+
+type VersionBumpType = 'minor' | 'major';
+export interface CreateBotVersionInput {
+	accountId: string
+	botId: string
+	// We receive what version bump type we need for the new version
+	type: VersionBumpType
+	// We might declare version code to clone, if not, it clones the last one
+	sourceNumber?: string
+}
+
+export interface UpdateBotVersionInput {
 	code: string
 }
 
@@ -107,6 +120,38 @@ const apiClient = {
 				return res;
 			})
 			;
+	},
+
+	///////////////
+	// BOT VERSIONS
+	///////////////
+
+	loadSingleBotVersion(accountId: string, botId: string, number: string) {
+		return axios.get(`${API_URL}/botVersion/${number}?accountId=${accountId}&botId=${accountId}`)
+			.then( res => {
+				console.log(res);
+				return res;
+			})
+		;
+	},
+
+	createBotVersion( input: CreateBotVersionInput ): Promise<AxiosResponse> {
+		return axios.post(`${API_URL}/botVersion`, input )
+			.then(res => {
+				console.log(res);
+				return res;
+			})
+		;
+	},
+
+	updateBotVersion( accountId: string, botId: string, number: string, code:string ) {
+		const update = {code};
+		return axios.patch(`${API_URL}/botVersion/${number}?accountId=${accountId}&botId=${accountId}`, update)
+			.then( res => {
+				console.log(res);
+				return res;
+			})
+		;
 	},
 
 

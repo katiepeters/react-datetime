@@ -11,7 +11,7 @@ import CreateDeploymentForm, { CreateDeploymentPayload } from './CreateDeploymen
 import { CreateExchangeAccountInput } from '../../state/apiClient';
 import arrayize from '../../../../lambdas/_common/utils/arrayize';
 import { Portfolio } from '../../../../lambdas/lambda.types';
-import priceLoader from '../../state/loaders/price.loader';
+import { isActiveDeployment } from '../../../../lambdas/_common/utils/deploymentUtils';
 
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {
@@ -97,7 +97,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	}
 
 	_renderActive = (item: DBBotDeployment) => {
-		return <span>{item.active ? 'Active' : 'Inactive'}</span>;
+		return <span>{isActiveDeployment(item) ? 'Active' : 'Inactive'}</span>;
 	}
 
 	_renderControls = (item: DBBotDeployment) => {
@@ -106,10 +106,11 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 			return <Spinner color="#fff" />;
 		}
 
+		const isActive = isActiveDeployment(item);
 		let buttons = [
 			{
-				label: item.active ? 'Deactivate' : 'Activate',
-				value: item.active ? 'deactivate' : 'activate'
+				label: isActive ? 'Deactivate' : 'Activate',
+				value: isActive ? 'deactivate' : 'activate'
 			},
 			{ label: 'Delete this deployment', value: 'delete' }
 		];
@@ -168,7 +169,6 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		}
 
 		return this.createDeployment( data );
-
 	}
 
 	createDeployment(data: CreateDeploymentPayload) {

@@ -9,7 +9,8 @@ export interface TableItem {
 // ACCOUNT
 export interface DBAccount extends TableItem {
 	id: string
-	resourceId: 'ACCOUNT'
+	resourceId: 'ACCOUNT',
+	createdAt: number
 }
 
 export interface DBAccountInput {
@@ -18,17 +19,37 @@ export interface DBAccountInput {
 
 
 // BOT
+export interface MinorVersion {
+	createdAt: number
+	number: number	
+}
+
+export interface VersionHistory {
+	lastMinor: number
+	available: MinorVersion[]
+}
+export type BotVersions = VersionHistory[];
 export interface DbBot extends TableItem {
 	id: string
 	name: string
-	code: string
+	versions: BotVersions
+	createdAt: number
 }
 
 export interface DbBotInput {
 	id: string
 	name: string
 	accountId: string
+	versions: BotVersions
+}
+
+// BOT VERSION
+export interface DbBotVersion extends TableItem {
+	botId: string,
+	number: string,
 	code: string
+	createdAt: number
+	updatedAt: number
 }
 
 
@@ -59,6 +80,10 @@ export interface DBBotDeploymentState {
 	[attribute: string]: any
 }
 
+type ActiveIntervalClosed = [number, number]
+type ActiveIntervalOpen = [number]
+type ActiveInterval = ActiveIntervalClosed | ActiveIntervalOpen
+
 export interface SimpleBotDeployment {
 	id: string
 	name: string
@@ -67,6 +92,8 @@ export interface SimpleBotDeployment {
 	exchangeAccountId: string
 	runInterval: RunInterval
 	symbols: string[]
+	createdAt: number
+	activeIntervals: ActiveInterval[]
 	active: boolean
 }
 
@@ -80,6 +107,8 @@ export interface DBBotDeployment extends TableItem {
 	symbols: string[]
 	state: DBBotDeploymentState
 	logs: ConsoleEntry[]
+	createdAt: number
+	activeIntervals: ActiveInterval[]
 	active: boolean
 }
 
@@ -90,6 +119,8 @@ export interface DBBotDeploymentRaw extends TableItem {
 	exchangeAccountId: string
 	runInterval: RunInterval
 	symbols: string[]
+	createdAt: number
+	activeIntervals: ActiveInterval[]
 	active?: string
 }
 
@@ -105,6 +136,8 @@ export interface DBBotDeploymentInput {
 	state?: DBBotDeploymentState
 	logs?: ConsoleEntry[]
 	active: boolean
+	createdAt?: number
+	activeIntervals?: ActiveInterval[]
 }
 
 export interface DBBotDeploymentUpdate {
@@ -130,7 +163,6 @@ export interface ConsoleEntry {
 	type: 'error' | 'warn' | 'log',
 	message: string
 }
-
 
 
 // EXCHANGE ACCOUNT

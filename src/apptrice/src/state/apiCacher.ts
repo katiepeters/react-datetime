@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios';
+import { getActivatedDeployment, getDeactivatedDeployment } from '../../../lambdas/_common/utils/deploymentUtils';
 import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput, CreateBotInput } from './apiClient';
 import store from './store';
 
@@ -136,6 +137,8 @@ const apiCacher = {
 			if( !res.data.error ){
 				store.deployments[res.data.id] = {
 					...input,
+					createdAt: Date.now(),
+					activeIntervals: [[Date.now()]],
 					id: res.data.id
 				}
 				let account = store.accounts[input.accountId];
@@ -154,11 +157,11 @@ const apiCacher = {
 		return apiClient.updateDeployment(deploymentId, payload)
 			.then( res => {
 				if( !res.data.error ){
-					store.deployments[deploymentId] = {
-						...(store.deployments[deploymentId] || {}),
-						id: deploymentId,
-						...payload
-					};
+					const current = store.deployments[deploymentId] || {id: deploymentId, activeIntervals:[]};
+					store.deployments[deploymentId] = payload.active ?
+						getActivatedDeployment( current ) : 
+						getDeactivatedDeployment( current )
+					;
 				}
 				return res;
 			})

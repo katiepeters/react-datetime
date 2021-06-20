@@ -85,7 +85,9 @@ const validators = {
 	provider: value => value === 'bitfinex',
 	providerType: value => value === 'real' || value === 'virtual',
 	portfolio: validatePortfolio,
-	pricesType: oneOf(['hourly', 'daily', 'weekly', 'monthly'])
+	pricesType: oneOf(['hourly', 'daily', 'weekly', 'monthly']),
+	botVersionType: oneOf(['minor', 'major']),
+	botVersion: validateBotVersion
 }
 
 function validateSymbols( symb ){
@@ -122,6 +124,18 @@ function validateBalance( balance: Balance ){
 	if (balance.total === undefined || typeof balance.total !== 'number' || balance.total < 0) return false;
 	if( balance.free > balance.total ) return false;
 	return true;
+}
+
+function validateBotVersion( version: string ){
+	if( !version || typeof version !== 'string' ) return false;
+
+	let parts = version.split('.');
+	if( parts.length !== 2 ) return;
+
+	return (
+		parseInt(parts[0], 10).toString() === parts[0] &&
+		parseInt(parts[1], 10 ).toString() === parts[1]
+	);
 }
 
 function oneOf( elements: any[] ){

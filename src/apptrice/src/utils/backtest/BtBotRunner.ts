@@ -52,7 +52,9 @@ export default class BtBotRunner implements BotRunner {
 			runInterval: config.runInterval,
 			state: {newState: 'stateNew'},
 			logs: [],
-			active: true
+			createdAt: Date.now(),
+			active: true,
+			activeIntervals: [[Date.now()]]
 		};
 
 		this.exchange = {

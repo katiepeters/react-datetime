@@ -23,6 +23,7 @@ export default {
 	},
 	async create(input: DbBotInput): Promise<void> {
 		let bot: DbBot = {
+			createdAt: Date.now(),
 			...input,
 			resourceId: `BOT#${input.id}`
 		};

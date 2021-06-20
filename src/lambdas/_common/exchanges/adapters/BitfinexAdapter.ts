@@ -1,7 +1,7 @@
 
 import { RESTv2 } from 'bfx-api-node-rest';
 import { Order as BfxOrder } from 'bfx-api-node-models';
-import { CandleQuery, ExchangeAdapter, ExchangeCredentials, ExchangeOrder, ExchangeSymbols, Ticker } from '../ExchangeAdapter';
+import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeSymbols, Ticker } from '../ExchangeAdapter';
 import { ArrayCandle, OrderInput, Portfolio } from '../../../lambda.types';
 import { DbExchangeAccount } from '../../../model.types';
 
@@ -171,7 +171,7 @@ function convertToExchangeOrder(rawOrder): ExchangeOrder {
 		type: bfxOrder.type.includes('LIMIT') ? 'limit' : 'market',
 		status,
 		errorReason: null,
-		direction: amount ? 'buy' : 'sell',
+		direction: amount > 0 ? 'buy' : 'sell',
 		amount: Math.abs(amount),
 		price: bfxOrder.price || null,
 		executedPrice: bfxOrder.priceAvg || null,

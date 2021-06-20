@@ -58,7 +58,6 @@ export default {
 		};
 	},
 
-
 	async create( input: DBBotDeploymentInput ){
 		const {id: deploymentId, accountId } = input;
 		let dbDeployment: DBBotDeploymentRaw = {
@@ -69,11 +68,14 @@ export default {
 			resourceId: `DEPLOYMENT#${input.id}`,
 			exchangeAccountId: input.exchangeAccountId,
 			runInterval: input.runInterval,
-			symbols: input.symbols
+			symbols: input.symbols,
+			createdAt: Date.now(),
+			activeIntervals: input.activeIntervals || []
 		};
 
 		if( input.active ){
 			dbDeployment.active = 'true';
+			dbDeployment.activeIntervals = input.activeIntervals || [[dbDeployment.createdAt]];
 		}
 
 		return await Promise.all([

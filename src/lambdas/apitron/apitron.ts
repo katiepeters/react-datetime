@@ -15,6 +15,8 @@ import { join } from 'path';
 import * as express from 'express';
 import * as serverless from 'serverless-http';
 import { DbExchangeAccount } from '../model.types';
+import BotVersionModel from '../_common/dynamo/BotVersionModel';
+import botVersionsAPI from './botVersions/botVersionsAPI';
 
 const app = express()
 
@@ -51,6 +53,7 @@ app.post('/tickerUpdater', function( req, res ){
 });
 
 botsAPI.initialize(app);
+botVersionsAPI.initialize(app);
 deploymentAPI.initialize(app);
 exchangesAPI.initialize(app);
 pricesAPI.initialize(app);
@@ -163,8 +166,17 @@ async function setTestData(event) {
 			name: 'Test bot',
 			accountId,
 			id: 'testBot',
-			code: readFileSync(join(__dirname, '../../../bots/testBot.ts'), 'utf8')
+			versions: [
+				{ lastMinor: 0, available: [{number: 0, createdAt: Date.now()}]}
+			]
 		});
+
+		await BotVersionModel.create({
+			accountId,
+			botId: 'testBot',
+			number: '0.0',
+			code: readFileSync(join(__dirname, '../../../bots/testBot.ts'), 'utf8')
+		})
 	}
 	else {
 		console.log('Test data was already there');

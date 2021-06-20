@@ -22,7 +22,6 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	lastCandles: {[symbol: string]: ArrayCandle}
 
 	constructor(exchangeAccount: DbExchangeAccount) {
-		console.log('Setting exchangeAccount', exchangeAccount);
 		this.exchangeAccount = exchangeAccount;
 		this.portfolio = {};
 		this.orders = {};
@@ -36,7 +35,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	// Backtracking set the portfolio and orders attributes directly
 	async hydrate() {
 		const { accountId, id: exchangeId } = this.exchangeAccount;
-		console.log('Hydrating', this.exchangeAccount);
+
 		let [portfolio, orders] = await Promise.all([
 			ExchangeAccountModel.getVirtualPorftolio(accountId, exchangeId),
 			ExchangeAccountModel.getVirtualOrders(accountId, exchangeId)
