@@ -10,6 +10,7 @@ const store = ors({
 	candles: {},
 	currentBackTesting: null,
 	exchangeAccounts: {},
+	botVersions: {}
 });
 
 // @ts-ignore

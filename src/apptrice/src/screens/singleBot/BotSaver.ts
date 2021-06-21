@@ -18,6 +18,7 @@ export default class BotSaver {
 	saveTimer: number | any
 	onSaveStart: () => void = () => { }
 	onSaveEnd: () => void = () => { }
+	version: string = ''
 
 	constructor( config: BotSaverConfig ) {
 		this.apiCacher = config.apiCacher;
@@ -46,14 +47,18 @@ export default class BotSaver {
 	}
 
 	_saveCode = () => {
-		const { apiCacher, accountId, botId, currentCode } = this;
+		const { apiCacher, accountId, botId, currentCode, version } = this;
 		this.saveTimer = 0;
 
 		this.onSaveStart();
-		apiCacher.updateBot( accountId, botId, {code:currentCode} )
+		apiCacher.updateBotVersion( accountId, botId, version, currentCode )
 			.then( () => {
 				this.onSaveEnd();
 			})
 		;
+	}
+
+	setVersion( version: string ){
+		this.version = version;
 	}
 }

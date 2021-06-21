@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { getActivatedDeployment, getDeactivatedDeployment } from '../../../lambdas/_common/utils/deploymentUtils';
-import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput, CreateBotInput } from './apiClient';
+import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput, CreateBotInput, CreateBotVersionInput } from './apiClient';
 import store from './store';
 
 export interface DbBot {
@@ -101,6 +101,65 @@ const apiCacher = {
 			})
 		;
 	},
+
+
+	///////////////
+	// BOT VERSIONS
+	///////////////
+
+	loadSingleBotVersion(accountId: string, botId: string, number: string) {
+		return apiClient.loadSingleBotVersion(accountId, botId, number)
+			.then( res => {
+				store.botVersions[`${botId}:${number}`] = {
+					...res.data
+				}
+				return res;
+			})
+		;
+	},
+
+	createBotVersion( input: CreateBotVersionInput ): Promise<AxiosResponse> {
+		return apiClient.createBotVersion(input)
+			.then(res => {
+				let {number, code} = res.data;
+				let numberParts = number.split('.');
+				let bot = store.bots[ input.botId ];
+				let major = bot.versions[numberParts[0]];
+				let minor = { createdAt: Date.now(), number: numberParts[1] };
+				bot.versions[numberParts[0]] = {
+					lastMinor: numberParts[1],
+					available: major ? 
+						[ ...major.available, minor ] :
+						[ minor ]
+				};
+
+				store.botVersions[`${input.botId}:${number}`] = {
+					accountId: input.accountId,
+					botId: input.botId,
+					number,
+					code,
+					createdAt: Date.now(),
+					updatedAt: Date.now()
+				}
+
+				return res;
+			})
+		;
+	},
+
+	updateBotVersion( accountId: string, botId: string, number: string, code:string ) {
+		return apiClient.updateBotVersion(accountId, botId, number, code)
+			.then( res => {
+				store.botVersions[`${botId}:${number}`] = {
+					...store.botVersions[`${botId}:${number}`],
+					updatedAt: Date.now(),
+					code
+				}
+				return res;
+			})
+		;
+	},
+
 
 	/////////////
 	// DEPLOYMENTS

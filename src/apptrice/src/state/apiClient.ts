@@ -127,7 +127,7 @@ const apiClient = {
 	///////////////
 
 	loadSingleBotVersion(accountId: string, botId: string, number: string) {
-		return axios.get(`${API_URL}/botVersion/${number}?accountId=${accountId}&botId=${accountId}`)
+		return axios.get(`${API_URL}/botVersions/${number}?accountId=${accountId}&botId=${botId}`)
 			.then( res => {
 				console.log(res);
 				return res;
@@ -136,7 +136,7 @@ const apiClient = {
 	},
 
 	createBotVersion( input: CreateBotVersionInput ): Promise<AxiosResponse> {
-		return axios.post(`${API_URL}/botVersion`, input )
+		return axios.post(`${API_URL}/botVersions`, input )
 			.then(res => {
 				console.log(res);
 				return res;
@@ -146,7 +146,7 @@ const apiClient = {
 
 	updateBotVersion( accountId: string, botId: string, number: string, code:string ) {
 		const update = {code};
-		return axios.patch(`${API_URL}/botVersion/${number}?accountId=${accountId}&botId=${accountId}`, update)
+		return axios.patch(`${API_URL}/botVersions/${number}?accountId=${accountId}&botId=${botId}`, update)
 			.then( res => {
 				console.log(res);
 				return res;

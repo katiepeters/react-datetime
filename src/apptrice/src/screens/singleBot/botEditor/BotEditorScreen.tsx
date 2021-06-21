@@ -8,28 +8,24 @@ import styles from './_BotEditorScreen.module.css';
 import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../../common/btSettings/BotTools';
 import BtRunner from '../../../utils/backtest/BtRunner';
+import botVersionLoader from '../botVersion.loader';
+import { BotVersions, DbBotVersion } from '../../../../../lambdas/model.types';
 
 class BotEditorScreen extends React.Component<ScreenProps> {
 	state = {
 		resources: false,
 		codeProblems: []
 	}
-
-	botSaver: BotSaver
-
-	constructor(props: ScreenProps) {
-		super(props);
-		this.botSaver = new BotSaver({
-			accountId: props.store.authenticatedId,
-			botId: this.getBotId(props),
-			apiCacher
-		})
-	}
+	currentBotVersion: string = ''
+	botSaver: BotSaver = new BotSaver({
+		accountId: this.props.store.authenticatedId,
+		botId: this.getBotId(this.props),
+		apiCacher
+	})
 
 	render() {
-		const botId = this.getBotId(this.props);
-		const { isLoading, data } = botLoader.getData(botId);
-		if (!this.state.resources || isLoading || !data) {
+		const version = this.getLastVersion();
+		if (!this.state.resources || !version ) {
 			return <span>Loading</span>;
 		}
 
@@ -39,7 +35,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 					<Editor
 						height="100%"
 						defaultLanguage="javascript"
-						defaultValue={data.code}
+						defaultValue={version.code}
 						theme="vs-dark"
 						options={ this.getEditorOptions() }
 						onMount={this._initializeEditor}
@@ -47,7 +43,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 				</div>
 				<div className={styles.bar}>
 					<BotEditorBar
-						botId={ botId }
+						botId={ version.botId }
 						codeProblems={this.state.codeProblems}
 						quickStore={this.props.quickStore}
 						currentBackTesting={this.props.store.currentBackTesting}
@@ -99,8 +95,8 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 			this.setState({codeProblems: markers});
 		});
 
-		const { data } = botLoader.getData(this.getBotId(this.props));
-		this.botSaver.currentCode = data ? data.code : '';
+		const version = this.getLastVersion();
+		this.botSaver.currentCode = version ? version.code : '';
 	}
 
 	_onCodeChange = (value: string | undefined, event: any) => {
@@ -120,6 +116,20 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 				resources: { theme, types }
 			})
 		});
+
+		this.checkSaverVersion();
+	}
+
+	componentDidUpdate() {
+		this.checkSaverVersion();
+	}
+
+	checkSaverVersion(){
+		let version = this.getLastVersion();
+		if( version && version.number !== this.currentBotVersion ){
+			this.botSaver.setVersion(version.number);
+			this.currentBotVersion = version.number;
+		}
 	}
 
 	getBotId(props: ScreenProps): string {
@@ -139,6 +149,21 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	_highlightLine = (line:number) => {
 		// TODO: Move editor and highlight line
 		// https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
+	}
+
+	getLastVersion(): DbBotVersion | undefined {
+		const botId = this.getBotId(this.props);
+		const { data: bot } = botLoader.getData(botId);
+		if( !bot ) return;
+
+		const { data: version } = botVersionLoader.getData(botId, this.getLastVersionNumber(bot.versions));
+		if( !version ) return;
+		return version;
+	}
+
+	getLastVersionNumber( versions: BotVersions ) {
+		const major = versions.length - 1;
+		return `${major}.${versions[major].lastMinor}`;
 	}
 }
 

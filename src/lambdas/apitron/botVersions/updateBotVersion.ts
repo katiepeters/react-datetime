@@ -10,7 +10,8 @@ const updateBotVersionHandler: MutationHandler = {
 		const { code } = body;
 
 		// Validate input
-		const input = {number, accountId, body, code };
+		const input = {number, accountId, botId, code };
+		console.log( number, accountId, botId );
 		let {error} = validateShape(input, {
 			accountId: 'string',
 			botId: 'string',
