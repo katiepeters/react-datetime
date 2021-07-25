@@ -1,6 +1,6 @@
 import { BacktestConfig } from "../../common/btSettings/BotTools";
 import {v4 as uuid} from 'uuid';
-import { DbBot, DBBotDeployment, ExchangeAccountWithHistory } from "../../../../lambdas/model.types";
+import { DbBot, DBBotDeployment, DbBotVersion, ExchangeAccountWithHistory } from "../../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
 import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIteration";
 import quickStore from "../../state/quickStore";
@@ -10,10 +10,10 @@ import store from "../../state/store";
 
 let runner: BtBotRunner;
 const BtRunner = {
-	start( bot: DbBot, options: BacktestConfig ): string {
+	start( bot: DbBot, version: DbBotVersion, options: BacktestConfig ): string {
 		const btid = createRun( bot.id );
 
-		prepareAndRun( bot, options );
+		prepareAndRun( bot, version, options );
 
 		return btid;
 	},
@@ -32,10 +32,11 @@ const BtRunner = {
 export default BtRunner;
 
 
-async function prepareAndRun(bot: DbBot, options: BacktestConfig){
+async function prepareAndRun(bot: DbBot, version: DbBotVersion, options: BacktestConfig){
 	runner = new BtBotRunner({
 		accountId: bot.accountId,
 		botId: bot.id,
+		versionNumber: version.number,
 		baseAssets: options.baseAssets,
 		quotedAsset: options.quotedAsset,
 		runInterval: options.runInterval,

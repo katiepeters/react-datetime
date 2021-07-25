@@ -65,6 +65,7 @@ export default {
 			name: input.name,
 			accountId,
 			botId: input.botId,
+			version: input.version,
 			resourceId: `DEPLOYMENT#${input.id}`,
 			exchangeAccountId: input.exchangeAccountId,
 			runInterval: input.runInterval,

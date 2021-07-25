@@ -5,12 +5,14 @@ import VirtualAdapter from "../../../../lambdas/_common/exchanges/adapters/Virtu
 import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
 import { Balances } from "../../common/btSettings/InitialBalances";
 import botLoader from "../../screens/singleBot/bot.loader";
+import botVersionLoader from "../../screens/singleBot/botVersion.loader";
 import apiCacher from "../../state/apiCacher";
 import { BtRunnableBot, IBtRunnableBot } from "./BtRunnableBot";
 
 export interface BtBotRunnerConfig {
 	accountId: string,
 	botId: string,
+	versionNumber: string,
 	baseAssets: string[],
 	quotedAsset: string,
 	runInterval: RunInterval,
@@ -42,6 +44,7 @@ export default class BtBotRunner implements BotRunner {
 			accountId: config.accountId,
 			resourceId: '',
 			botId: config.botId,
+			version: config.versionNumber,
 			orders: {
 				foreignIdIndex: {},
 				items: {},
@@ -116,18 +119,18 @@ export default class BtBotRunner implements BotRunner {
 		;
 	}
 
-	getBot( accountId: string, botId: string ){
+	getBot( accountId: string, botId: string, versionNumber: string ){
 		if( this.bot ){
 			this.bot.currentDate = this.adapter.lastDate;
 			return Promise.resolve(this.bot);
 		}
 
-		const { data: bot} = botLoader.getData(botId);
-		if( !bot ){
+		const { data: botVersion } = botVersionLoader.getData(botId, versionNumber);
+		if( !botVersion ){
 			throw new Error('bot_not_initialized');
 		}
 
-		return BtRunnableBot.prepare(bot.code)
+		return BtRunnableBot.prepare(botVersion.code)
 			.then( () => {
 				this.bot = BtRunnableBot;
 				this.bot.currentDate = this.adapter.lastDate;

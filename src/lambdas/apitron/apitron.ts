@@ -150,6 +150,7 @@ async function setTestData(event) {
 			name: 'Test deployment',
 			id: 'testDeployment',
 			botId: 'testBot',
+			version: '0.0',
 			orders: {
 				foreignIdIndex: {},
 				items: {},

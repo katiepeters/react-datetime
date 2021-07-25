@@ -10,11 +10,13 @@ const updateDeploymentHandler: MutationHandler = {
 		let {error} = validateShape(body, {
 			accountId: 'string',
 			active: 'boolean?',
+			version: 'string?',
 			name: 'string?'
 		});
+
 		if( error ) return {error: {...error, code: 'invalid_payload'}};
 
-		if( body.active === 'undefined' && (!body.name || !body.name.trim()) ){
+		if( body.active === 'undefined' && (!body.name || !body.name.trim()) && !body.version ){
 			return {error: {code: 'invalid_payload', reason: 'nothing to update'}};
 		} 
 
@@ -23,27 +25,47 @@ const updateDeploymentHandler: MutationHandler = {
 			return {error: {code: 'not_found', reason: 'deployment not found', status: 404}};
 		}
 
+		if( body.version ){
+			const version = await models.botVersion.getSingle(deployment.accountId, deployment.botId, body.version );
+			if( !version ){
+				return {error: {code: 'unknown_version'}};
+			}
+		}
+
 		return {context: {deployment}};
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {
 		const {deployment} = input.context;
-		const {active} = input.body;
+		const {active, name, version} = input.body;
 
-		if( isActiveDeployment(deployment) === active ){
-			return [];
+		let mutation;
+		if( active !== undefined && isActiveDeployment(deployment) === active ){
+			const updatedDeployment = active ?
+				getActivatedDeployment( deployment ) :
+				getDeactivatedDeployment( deployment )
+			;	
+			mutation = {
+				model: 'deployment',
+				action: 'create', // We completely replace the old object by the new one
+				data: updatedDeployment
+			};
 		}
 
-		const updatedDeployment = active ?
-			getActivatedDeployment( deployment ) :
-			getDeactivatedDeployment( deployment )
-		;
-		
-		return [{
-			model: 'deployment',
-			action: 'create', // We completely replace the old object by the new one
-			data: updatedDeployment
-		}];
+		if( name || version ){
+			if( !mutation ){
+				mutation = {
+					model: 'deployment',
+					action: 'update',
+					data: {}
+				}
+			}
+			
+			if( name ) mutation.data.name = name.trim();
+			if( version ) mutation.data.version = version;
+		}
+
+		return [mutation];
 	},
 
 	getResponse(input: MutationResponseInput): ResponseResult {

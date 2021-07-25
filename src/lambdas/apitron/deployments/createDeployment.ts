@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 interface CreateDeploymentInput {
 	name: string
 	accountId: string
+	version: string
 	botId: string
 	exchangeAccountId: string
 	runInterval: string
@@ -19,6 +20,7 @@ const createDeploymentHandler: MutationHandler = {
 			name: 'string',
 			accountId: 'string',
 			botId: 'string',
+			version: 'string',
 			active: 'boolean?',
 			exchangeAccountId: 'string',
 			runInterval: 'runInterval',
@@ -33,14 +35,13 @@ const createDeploymentHandler: MutationHandler = {
 		}
 
 		// Validate entities
-		let [account, bot, exchange] = await Promise.all([
-			models.account.getSingle(body.accountId),
-			models.bot.getSingle(body.accountId, body.botId),
-			models.exchangeAccount.getSingle(body.accountId, body.exchangeAccountId)
+		const {accountId, botId, version: versionNumber, exchangeAccountId} = body;
+		let [version, exchange] = await Promise.all([
+			models.botVersion.getSingle(accountId, botId, versionNumber),
+			models.exchangeAccount.getSingle(accountId, exchangeAccountId)
 		]);
 
-		if( !account ) return {error: {code: 'unknown_account'}};
-		if( !bot ) return {error: {code: 'unknonw_bot'}};
+		if( !version ) return {error: {code: 'unknown_version'}};
 		if( !exchange ) return {error: {code: 'unknown_exchange_account'}};
 
 		// No need of any special info for the context

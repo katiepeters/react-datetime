@@ -23,6 +23,7 @@ interface BotConfiguration {
 
 interface Trader {
 	getPortfolio(): Portfolio
+    getBalance(asset: string): Balance
 	getOrder(id: string): Order | void
     getOpenOrders(): Order[]
 	placeOrder(orderInput: OrderInput): Order

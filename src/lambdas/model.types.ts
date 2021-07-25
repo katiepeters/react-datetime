@@ -101,6 +101,7 @@ export interface DBBotDeployment extends TableItem {
 	id: string
 	name: string
 	botId: string
+	version: string
 	orders: DeploymentOrders
 	exchangeAccountId: string
 	runInterval: RunInterval
@@ -116,6 +117,7 @@ export interface DBBotDeploymentRaw extends TableItem {
 	id: string
 	name: string
 	botId: string
+	version: string
 	exchangeAccountId: string
 	runInterval: RunInterval
 	symbols: string[]
@@ -129,6 +131,7 @@ export interface DBBotDeploymentInput {
 	id: string
 	name: string
 	botId: string
+	version: string
 	exchangeAccountId: string
 	runInterval: RunInterval
 	symbols: string[]
@@ -143,6 +146,7 @@ export interface DBBotDeploymentInput {
 export interface DBBotDeploymentUpdate {
 	name?: string
 	botId?: string
+	version?: string
 	runInterval?: RunInterval
 	symbols?: string[]
 	orders?: DeploymentOrders

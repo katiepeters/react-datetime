@@ -7,7 +7,7 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 	let deployment: DBBotDeployment = await runner.getDeployment( accountId, deploymentId );
 	let exchange: DbExchangeAccount = await runner.getExchangeAccount( accountId, deployment.exchangeAccountId );
 	let adapter: ExchangeAdapter = await runner.getAdapter( exchange );
-	let bot: RunnableBot = await runner.getBot( accountId, deployment.botId );
+	let bot: RunnableBot = await runner.getBot( accountId, deployment.botId, deployment.version );
 
 	// First get candles (virtual exchanges will refresh its data)
 	const [ portfolio, candles ] = await Promise.all([

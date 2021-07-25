@@ -37,7 +37,7 @@ export interface BotRunner {
 	getExchangeOrders(adapter: ExchangeAdapter): ExchangeOrders | undefined
 	getAdapter( exchange: DbExchangeAccount ): Promise<ExchangeAdapter>
 	getCandles( adapter: ExchangeAdapter, deployment: DBBotDeployment ): Promise<BotCandles>
-	getBot( accountId: string, botId: string ): Promise<RunnableBot>
+	getBot( accountId: string, botId: string, versionNumber: string ): Promise<RunnableBot>
 	updateDeployment( deployment: DBBotDeployment, update: BotRunnerDeploymentUpdate ): Promise<DBBotDeployment>,
 	updateExchange( exchange: DbExchangeAccount, update: BotRunnerExchangeUpdate): Promise<DbExchangeAccount>,
 	setRunError( deployment: DBBotDeployment, error: any ): Promise<void>
