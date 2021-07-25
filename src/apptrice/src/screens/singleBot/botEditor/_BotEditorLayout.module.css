@@ -1,0 +1,40 @@
+.layout {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: row;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.main {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.mainTop {
+	display: flex;
+	flex-grow: 1;
+	min-height: 0;
+	overflow: hidden;
+	flex-shrink: 0;
+}
+
+.mainBottom {
+	display: flex;
+	flex-shrink: 0;
+	overflow: hidden;
+}
+
+.side {
+	display: flex;
+	flex-shrink: 0;
+	overflow: hidden;
+}
+
+.bar {
+	display: flex;
+	flex-shrink: 0;
+}
