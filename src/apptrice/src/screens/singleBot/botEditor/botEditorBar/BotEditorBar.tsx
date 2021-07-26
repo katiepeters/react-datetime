@@ -11,9 +11,11 @@ import { Modal, ModalBox } from '../../../../components';
 import BtSettings from '../../../../common/btSettings/BtSettings';
 import ProgressBar from '../../../../common/btSettings/ProgressBar';
 import BotEditorBarResizer from './BotEditorBarResizer';
+import VersionTab from './version/VersionTab';
+import { DbBotVersion } from '../../../../../../lambdas/model.types';
 
 interface BotEditorBarProps {
-	botId: string,
+	version: DbBotVersion,
 	codeProblems: CodeProblem[],
 	quickStore: typeof quickStore,
 	currentBackTesting?: any,
@@ -21,11 +23,6 @@ interface BotEditorBarProps {
 	onAbort: () => void
 	onHighlightLine: (line:number) => void
 }
-
-const tabComponents: {[any:string]: any} = {
-	problems: ProblemsTab,
-	console: BotEditorConsoleTab
-};
 
 const panelComponents: { [any: string]: any } = {
 	problems: ProblemsPanel,
@@ -61,17 +58,27 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 	}
 
 	renderTabs(){
-		return Object.keys( tabComponents ).map( key => {
-			let Tab: any = tabComponents[key];
-			return (
-				<Tab key={key}
-					id={key}
-					active={ key === this.state.currentTab }
+		const {version, codeProblems, quickStore} = this.props;
+		
+		return (
+			<div className={styles.tabs}>
+				<VersionTab
+					id="version"
+					active={ 'version' === this.state.currentTab }
 					onClick={ this._onTabPress }
-					problems={this.props.codeProblems }
+					version={ this.props.version } />
+				<ProblemsTab
+					id="problems"
+					active={ 'problems' === this.state.currentTab }
+					onClick={ this._onTabPress }
+					problems={this.props.codeProblems } />
+				<BotEditorConsoleTab
+					id="console"
+					active={ 'console' === this.state.currentTab }
+					onClick={ this._onTabPress }
 					quickStore={ this.props.quickStore } />
-			);
-		})
+			</div>
+		)
 	}
 
 	renderPanel(){
@@ -128,7 +135,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 				{ () => (
 					<ModalBox>
 						<BtSettings
-							botId={ this.props.botId}
+							botId={ this.props.version.botId}
 							isRunning={ this.isBtRunning() }
 							onRun={ this._onStartPressed }
 							onAbort={ this._onAbortBT } />

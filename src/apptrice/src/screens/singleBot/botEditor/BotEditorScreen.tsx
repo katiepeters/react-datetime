@@ -53,7 +53,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	renderBar(version: DbBotVersion) {
 		return (
 			<BotEditorBar
-				botId={ version.botId }
+				version={ version }
 				codeProblems={this.state.codeProblems}
 				quickStore={this.props.quickStore}
 				currentBackTesting={this.props.store.currentBackTesting}
