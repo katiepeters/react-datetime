@@ -55,7 +55,10 @@ const apiCacher = {
 				if (!res.data.error) {
 					const bot = {
 						id: res.data.id,
-						...input
+						...input,
+						versions: [
+							{ lastMinor: 0, available:[{number: 0, createdAt: Date.now()}] }
+						]
 					};
 
 					store.bots[bot.id] = bot;
@@ -66,6 +69,15 @@ const apiCacher = {
 							bot.id
 						];
 					}
+
+					store.botVersions[`${bot.id}:0.0`] = {
+						accountId: bot.accountId,
+						botId: bot.id,
+						number: '0.0',
+						code: '',
+						createdAt: Date.now(),
+						updatedAt: Date.now()
+					};
 				}
 				return res;
 			})
