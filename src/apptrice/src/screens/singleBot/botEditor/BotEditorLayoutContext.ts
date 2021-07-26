@@ -1,6 +1,11 @@
 import {createContext} from 'react';
 
-export default createContext({
+interface LayoutContext {
+	bottomHandlers: any,
+	sideHandlers: any
+}
+
+export default createContext<LayoutContext>({
 	bottomHandlers: {},
 	sideHandlers: {}
 });

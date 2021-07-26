@@ -10,6 +10,7 @@ import { BacktestConfig } from '../../../common/btSettings/BotTools';
 import BtRunner from '../../../utils/backtest/BtRunner';
 import botVersionLoader from '../botVersion.loader';
 import { BotVersions, DbBotVersion } from '../../../../../lambdas/model.types';
+import BotEditorLayout from './BotEditorLayout';
 
 class BotEditorScreen extends React.Component<ScreenProps> {
 	state = {
@@ -30,28 +31,35 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		}
 
 		return (
-			<div className={styles.wrapper}>
-				<div className={styles.editor}>
-					<Editor
-						height="100%"
-						defaultLanguage="javascript"
-						defaultValue={version.code}
-						theme="vs-dark"
-						options={ this.getEditorOptions() }
-						onMount={this._initializeEditor}
-						onChange={this._onCodeChange} />
-				</div>
-				<div className={styles.bar}>
-					<BotEditorBar
-						botId={ version.botId }
-						codeProblems={this.state.codeProblems}
-						quickStore={this.props.quickStore}
-						currentBackTesting={this.props.store.currentBackTesting}
-						onRun={ this._onRunBt }
-						onAbort={this._onAbortBt}
-						onHighlightLine={ this._highlightLine }/>
-				</div>
-			</div>
+			<BotEditorLayout
+				mainTop={ this.renderEditor(version) }
+				mainBottom={ this.renderBar(version) }
+				side={ <span /> } />
+		);
+	}
+
+	renderEditor(version: DbBotVersion) {
+		return (
+			<Editor
+				defaultLanguage="javascript"
+				defaultValue={version.code}
+				theme="vs-dark"
+				options={ this.getEditorOptions() }
+				onMount={this._initializeEditor}
+				onChange={this._onCodeChange} />
+		)
+	}
+
+	renderBar(version: DbBotVersion) {
+		return (
+			<BotEditorBar
+				botId={ version.botId }
+				codeProblems={this.state.codeProblems}
+				quickStore={this.props.quickStore}
+				currentBackTesting={this.props.store.currentBackTesting}
+				onRun={ this._onRunBt }
+				onAbort={this._onAbortBt}
+				onHighlightLine={ this._highlightLine }/>
 		);
 	}
 

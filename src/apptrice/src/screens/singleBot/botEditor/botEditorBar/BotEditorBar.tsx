@@ -10,6 +10,7 @@ import quickStore from '../../../../state/quickStore';
 import { Modal, ModalBox } from '../../../../components';
 import BtSettings from '../../../../common/btSettings/BtSettings';
 import ProgressBar from '../../../../common/btSettings/ProgressBar';
+import BotEditorBarResizer from './BotEditorBarResizer';
 
 interface BotEditorBarProps {
 	botId: string,
@@ -43,6 +44,9 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 				<div className={styles.tabsBar}>
 					<div className={styles.tabs}>
 						{this.renderTabs()}
+					</div>
+					<div className={styles.resizer}>
+						<BotEditorBarResizer />
 					</div>
 					<div className={styles.buttons}>
 						{this.renderBt()}
