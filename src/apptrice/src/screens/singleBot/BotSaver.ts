@@ -61,4 +61,8 @@ export default class BotSaver {
 	setVersion( version: string ){
 		this.version = version;
 	}
+
+	getVersion(){
+		return this.version;
+	}
 }

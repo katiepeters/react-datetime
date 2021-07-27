@@ -17,7 +17,12 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		resources: false,
 		codeProblems: []
 	}
+
+	// These doesn't need to be in the state
+	// because they don't trigger re-renders
 	currentBotVersion: string = ''
+	isBumpingVersion: boolean = false
+	bumpingCodeCache: string = ''
 	botSaver: BotSaver = new BotSaver({
 		accountId: this.props.store.authenticatedId,
 		botId: this.getBotId(this.props),
@@ -25,7 +30,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	})
 
 	render() {
-		const version = this.getLastVersion();
+		const version = this.getEditingVersion();
 		if (!this.state.resources || !version ) {
 			return <span>Loading</span>;
 		}
@@ -103,18 +108,30 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 			this.setState({codeProblems: markers});
 		});
 
-		const version = this.getLastVersion();
+		const version = this.getEditingVersion();
 		this.botSaver.currentCode = version ? version.code : '';
 	}
 
 	_onCodeChange = (value: string | undefined, event: any) => {
-		const version = this.getLastVersion();
+		if( !value ) return;
+
+		if( value && this.isBumpingVersion ){
+			this.bumpingCodeCache = value;
+			return;
+		}
+		
+		const version = this.getEditingVersion();
 		if( version?.isLocked ){
-			
+			this.isBumpingVersion = true;
+			this.bumpingCodeCache = value;
+			return this.bumpVersion();
 		}
-		if (value) {
-			this.botSaver.onCodeChange(value);
-		}
+
+		this.botSaver.onCodeChange(value);
+	}
+
+	bumpVersion(){
+		
 	}
 
 	componentDidMount() {
@@ -137,10 +154,9 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	}
 
 	checkSaverVersion(){
-		let version = this.getLastVersion();
-		if( version && version.number !== this.currentBotVersion ){
-			this.botSaver.setVersion(version.number);
-			this.currentBotVersion = version.number;
+		let version = this.getEditingVersionNumber();
+		if( version !== this.botSaver.getVersion() ){
+			this.botSaver.setVersion(version);
 		}
 	}
 
@@ -150,15 +166,15 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 
 	_onRunBt = (config: BacktestConfig) => {
 		const botId = this.getBotId(this.props);
-		const lastVersion = this.getLastVersion();
-		if( lastVersion ){
+		const version = this.getEditingVersion();
+		if( version ){
 			let { data: bot } = botLoader.getData(botId);
-			BtRunner.start(bot, lastVersion, config);
-			if( !lastVersion.isLocked ) {
+			BtRunner.start(bot, version, config);
+			if( !version.isLocked ) {
 				apiCacher.updateBotVersion(
 					this.props.store.authenticatedId,
 					botId,
-					lastVersion.number,
+					version.number,
 					{isLocked: true}
 				);
 			}
@@ -174,19 +190,28 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		// https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-line-and-inline-decorations
 	}
 
-	getLastVersion(): DbBotVersion | undefined {
+	getLastVersionNumber(): string | undefined {
 		const botId = this.getBotId(this.props);
 		const { data: bot } = botLoader.getData(botId);
 		if( !bot ) return;
 
-		const { data: version } = botVersionLoader.getData(botId, this.getLastVersionNumber(bot.versions));
-		if( !version ) return;
-		return version;
+		const major = bot.versions.length - 1;
+		return `${major}.${bot.versions[major].lastMinor}`;
 	}
 
-	getLastVersionNumber( versions: BotVersions ) {
-		const major = versions.length - 1;
-		return `${major}.${versions[major].lastMinor}`;
+	getEditingVersionNumber(){
+		return this.props.router.query.v ||
+			this.botSaver.getVersion() ||
+			this.getLastVersionNumber()
+		;
+	}
+
+	getEditingVersion(): DbBotVersion | null {
+		let number = this.getEditingVersionNumber;
+		if( !number ) return null;
+
+		const { data: version } = botVersionLoader.getData(this.getBotId(this.props), number);
+		return version;
 	}
 }
 
