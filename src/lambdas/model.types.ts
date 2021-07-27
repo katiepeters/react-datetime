@@ -45,9 +45,11 @@ export interface DbBotInput {
 
 // BOT VERSION
 export interface DbBotVersion extends TableItem {
-	botId: string,
-	number: string,
+	botId: string
+	number: string
 	code: string
+	isLocked: boolean
+	label: string
 	createdAt: number
 	updatedAt: number
 }

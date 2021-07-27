@@ -7,23 +7,27 @@ const updateBotVersionHandler: MutationHandler = {
 	async getContext({body, params, query, models}: MutationContextInput<any>): Promise<ContextResult> {
 		const {number} = params;
 		const { accountId, botId } = query;
-		const { code } = body;
+		const { code, isLocked, label } = body;
 
 		// Validate input
-		const input = {number, accountId, botId, code };
+		const input = {number, accountId, botId, code, isLocked, label };
 		console.log( number, accountId, botId );
+
 		let {error} = validateShape(input, {
 			accountId: 'string',
 			botId: 'string',
 			number: 'string',
-			code: 'string'
+			code: 'string?',
+			label: 'versionLabel?',
+			locked: 'lockedVersion?'
 		});
+
 		if( error ) return {error: {...error, code: 'invalid_payload'}};
 
-		const bot = await models.bot.getSingle(accountId, botId);
-		if( !bot ) return {error: {code: 'not_found', status: 404}};
+		const version = await models.botVersion.getSingle(accountId, botId, number);
+		if( !version ) return {error: {code: 'not_found', status: 404}};
 
-		if( !isEditableVersion(number, bot.versions) ){
+		if( code !== undefined && version.isLocked ){
 			return {error: {code: 'version_not_editable'}};
 		}
 
@@ -31,6 +35,7 @@ const updateBotVersionHandler: MutationHandler = {
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {
+		console.log(input.context);
 		return [
 			{model: 'botVersion', action: 'update', data: input.context}
 		];

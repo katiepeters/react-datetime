@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { getActivatedDeployment, getDeactivatedDeployment } from '../../../lambdas/_common/utils/deploymentUtils';
-import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput, CreateBotInput, CreateBotVersionInput } from './apiClient';
+import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput, CreateBotInput, CreateBotVersionInput, UpdateBotVersionInput } from './apiClient';
 import store from './store';
 
 export interface DbBot {
@@ -159,13 +159,13 @@ const apiCacher = {
 		;
 	},
 
-	updateBotVersion( accountId: string, botId: string, number: string, code:string ) {
-		return apiClient.updateBotVersion(accountId, botId, number, code)
+	updateBotVersion( accountId: string, botId: string, number: string, update: UpdateBotVersionInput ) {
+		return apiClient.updateBotVersion(accountId, botId, number, update)
 			.then( res => {
 				store.botVersions[`${botId}:${number}`] = {
 					...store.botVersions[`${botId}:${number}`],
 					updatedAt: Date.now(),
-					code
+					...update
 				}
 				return res;
 			})

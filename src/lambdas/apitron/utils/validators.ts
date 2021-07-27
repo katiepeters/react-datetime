@@ -87,7 +87,9 @@ const validators = {
 	portfolio: validatePortfolio,
 	pricesType: oneOf(['hourly', 'daily', 'weekly', 'monthly']),
 	botVersionType: oneOf(['minor', 'major']),
-	botVersion: validateBotVersion
+	botVersion: validateBotVersion,
+	lockedVersion: value => value === true,
+	versionLabel: value => typeof value === 'string' && value.length <= 20
 }
 
 function validateSymbols( symb ){

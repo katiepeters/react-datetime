@@ -8,6 +8,8 @@ export interface DbBotVersionCreateInput {
 	botId: string
 	number: string
 	code?: string
+	isLocked?: boolean
+	label?: string
 	createdAt?: number
 	updatedAt?: number
 }
@@ -16,14 +18,15 @@ export interface DbBotVersionUpdateInput {
 	accountId: string
 	botId: string
 	number: string
-	code: string
+	code?: string
+	isLocked?: boolean
+	label?: string
 }
 
 export interface DbBotVersionDeleteInput {
 	accountId: string
 	botId: string
 	number: string
-	code: string
 }
 
 export default {
@@ -36,6 +39,8 @@ export default {
 			code: '',
 			createdAt: Date.now(),
 			updatedAt: Date.now(),
+			isLocked: false,
+			label: '',
 			...input,
 			resourceId: `BOTVERSION#${input.botId}#${input.number}`
 		};
@@ -44,10 +49,24 @@ export default {
 	},
 
 	async update(input: DbBotVersionUpdateInput){
+		let update:any = {
+			updatedAt: Date.now()
+		};
+
+		if( input.code !== undefined ){
+			update.code = input.code
+		}
+		if( input.isLocked !== undefined ){
+			update.isLocked = input.isLocked
+		}
+		if( input.label !== undefined ){
+			update.label = input.label;
+		}
+
 		return await Db.update(
 			input.accountId,
 			`BOTVERSION#${input.botId}#${input.number}`,
-			{code: input.code, updatedAt: Date.now()}
+			update
 		);
 	},
 

@@ -4,9 +4,6 @@ import { CodeProblem } from './ProblemsTab';
 import styles from './_ProblemsPanel.module.css';
 
 interface ProblemsPanelProps {
-	id: string
-	active: boolean
-	onClick: (id: string) => void
 	problems: CodeProblem[]
 }
 

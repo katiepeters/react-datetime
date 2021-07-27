@@ -31,6 +31,12 @@ export interface UpdateBotInput {
 	name?: string,
 }
 
+export interface UpdateBotVersionInput {
+	label?: string
+	isLocked?: boolean
+	code?: string
+}
+
 export interface UpdateDeploymentInput {
 	accountId: string,
 	active: boolean
@@ -50,10 +56,6 @@ export interface CreateBotVersionInput {
 	type: VersionBumpType
 	// We might declare version code to clone, if not, it clones the last one
 	sourceNumber?: string
-}
-
-export interface UpdateBotVersionInput {
-	code: string
 }
 
 let API_URL: string;
@@ -144,8 +146,7 @@ const apiClient = {
 		;
 	},
 
-	updateBotVersion( accountId: string, botId: string, number: string, code:string ) {
-		const update = {code};
+	updateBotVersion( accountId: string, botId: string, number: string, update: UpdateBotVersionInput ) {
 		return axios.patch(`${API_URL}/botVersions/${number}?accountId=${accountId}&botId=${botId}`, update)
 			.then( res => {
 				console.log(res);

@@ -108,6 +108,10 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	}
 
 	_onCodeChange = (value: string | undefined, event: any) => {
+		const version = this.getLastVersion();
+		if( version?.isLocked ){
+			
+		}
 		if (value) {
 			this.botSaver.onCodeChange(value);
 		}
@@ -150,6 +154,14 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		if( lastVersion ){
 			let { data: bot } = botLoader.getData(botId);
 			BtRunner.start(bot, lastVersion, config);
+			if( !lastVersion.isLocked ) {
+				apiCacher.updateBotVersion(
+					this.props.store.authenticatedId,
+					botId,
+					lastVersion.number,
+					{isLocked: true}
+				);
+			}
 		}
 	}
 

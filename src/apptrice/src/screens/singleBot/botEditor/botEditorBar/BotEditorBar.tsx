@@ -12,7 +12,10 @@ import BtSettings from '../../../../common/btSettings/BtSettings';
 import ProgressBar from '../../../../common/btSettings/ProgressBar';
 import BotEditorBarResizer from './BotEditorBarResizer';
 import VersionTab from './version/VersionTab';
+import VersionPanel from './version/VersionPanel';
 import { DbBotVersion } from '../../../../../../lambdas/model.types';
+import { Console } from 'console';
+import ConsolePanel from '../../../../common/consolePanel/ConsolePanel';
 
 interface BotEditorBarProps {
 	version: DbBotVersion,
@@ -82,13 +85,16 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 	}
 
 	renderPanel(){
-		let Panel: any = panelComponents[this.state.currentTab];
-		return (
-			<Panel
-				problems={this.props.codeProblems}
-				quickStore={this.props.quickStore}
-				onHighlightLine={ this.props.onHighlightLine } />
-		);
+		const currentTab = this.state.currentTab;
+		if( currentTab === 'version' ){
+			return <VersionPanel version={ this.props.version } />
+		}
+		else if( currentTab === 'problems' ){
+			return <ProblemsPanel problems={ this.props.codeProblems} />
+		}
+		const activeBt = this.props.quickStore.getActiveBt();
+
+		return <ConsolePanel logs={activeBt?.data.deployment.logs || []} />;
 	}
 
 	renderBt() {
