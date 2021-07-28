@@ -1,10 +1,6 @@
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 
-interface UpdateBotInput {
-	code: string
-	name: string
-}
 
 const updateBotHandler: MutationHandler = {
 	name: 'updateBot',

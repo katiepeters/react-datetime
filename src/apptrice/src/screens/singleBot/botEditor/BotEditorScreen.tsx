@@ -131,7 +131,30 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	}
 
 	bumpVersion(){
-		
+		apiCacher.createBotVersion({
+			accountId: this.props.store.authenticatedId,
+			botId: this.getBotId(this.props),
+			type: 'minor',
+			sourceNumber: this.getEditingVersionNumber()
+		})
+		.then( res => {
+			let bumpedVersion = res.data.number;
+
+			this.isBumpingVersion = false;
+			this.botSaver.setVersion(bumpedVersion);
+			this.botSaver.onCodeChange(this.bumpingCodeCache);
+
+			const {router} = this.props;
+			const {query} = router.location;
+			if( query.v ){
+				this.props.router.replace({
+					query: {
+						...query,
+						v: bumpedVersion
+					}
+				});
+			}
+		})
 	}
 
 	componentDidMount() {
@@ -200,14 +223,14 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	}
 
 	getEditingVersionNumber(){
-		return this.props.router.query.v ||
+		return this.props.router.location.query.v ||
 			this.botSaver.getVersion() ||
 			this.getLastVersionNumber()
 		;
 	}
 
 	getEditingVersion(): DbBotVersion | null {
-		let number = this.getEditingVersionNumber;
+		let number = this.getEditingVersionNumber();
 		if( !number ) return null;
 
 		const { data: version } = botVersionLoader.getData(this.getBotId(this.props), number);

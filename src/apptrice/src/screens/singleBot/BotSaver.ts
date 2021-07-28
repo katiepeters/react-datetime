@@ -51,7 +51,7 @@ export default class BotSaver {
 		this.saveTimer = 0;
 
 		this.onSaveStart();
-		apiCacher.updateBotVersion( accountId, botId, version, currentCode )
+		apiCacher.updateBotVersion( accountId, botId, version, {code:currentCode} )
 			.then( () => {
 				this.onSaveEnd();
 			})

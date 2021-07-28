@@ -136,14 +136,16 @@ const apiCacher = {
 				let {number, code} = res.data;
 				let numberParts = number.split('.');
 				let bot = store.bots[ input.botId ];
-				let major = bot.versions[numberParts[0]];
-				let minor = { createdAt: Date.now(), number: numberParts[1] };
-				bot.versions[numberParts[0]] = {
-					lastMinor: numberParts[1],
-					available: major ? 
-						[ ...major.available, minor ] :
-						[ minor ]
-				};
+				if( bot ){
+					let major = bot.versions[numberParts[0]];
+					let minor = { createdAt: Date.now(), number: numberParts[1] };
+					bot.versions[numberParts[0]] = {
+						lastMinor: numberParts[1],
+						available: major ? 
+							[ ...major.available, minor ] :
+							[ minor ]
+					};
+				}
 
 				store.botVersions[`${input.botId}:${number}`] = {
 					accountId: input.accountId,

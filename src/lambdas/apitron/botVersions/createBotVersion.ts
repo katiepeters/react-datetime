@@ -50,7 +50,7 @@ const createBotVersionHandler: MutationHandler = {
 		let {type} = input.body;
 		
 		// Get updated versions array for the bot
-		const nextVersion = getNextVersion( bot.versions, type, sourceVersion);
+		const nextVersion = getNextVersion( bot.versions, type, sourceVersion.number);
 		const minor: MinorVersion = {
 			createdAt: Date.now(),
 			number: nextVersion[1]
@@ -76,8 +76,14 @@ const createBotVersionHandler: MutationHandler = {
 			code: sourceVersion.code
 		}
 
+		const botUpdate = {
+			accountId: bot.accountId,
+			botId: bot.id,
+			update: {versions}
+		};
+
 		return [
-			{model: 'bot', action: 'update', data: {versions}},
+			{model: 'bot', action: 'update', data: botUpdate},
 			{model: 'botVersion', action: 'create', data: version }
 		];
 	},
