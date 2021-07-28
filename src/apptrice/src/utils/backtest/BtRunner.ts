@@ -10,10 +10,10 @@ import store from "../../state/store";
 
 let runner: BtBotRunner;
 const BtRunner = {
-	start( bot: DbBot, version: DbBotVersion, options: BacktestConfig ): string {
-		const btid = createRun( bot.id );
+	start( version: DbBotVersion, options: BacktestConfig ): string {
+		const btid = createRun( version.botId );
 
-		prepareAndRun( bot, version, options );
+		prepareAndRun( version, options );
 
 		return btid;
 	},
@@ -32,10 +32,10 @@ const BtRunner = {
 export default BtRunner;
 
 
-async function prepareAndRun(bot: DbBot, version: DbBotVersion, options: BacktestConfig){
+async function prepareAndRun(version: DbBotVersion, options: BacktestConfig){
 	runner = new BtBotRunner({
-		accountId: bot.accountId,
-		botId: bot.id,
+		accountId: version.accountId,
+		botId: version.botId,
 		versionNumber: version.number,
 		baseAssets: options.baseAssets,
 		quotedAsset: options.quotedAsset,
@@ -61,7 +61,7 @@ async function prepareAndRun(bot: DbBot, version: DbBotVersion, options: Backtes
 		deployment: toBtDeployment( runner.deployment ),
 		exchange: toBtExchange( runner.exchange )
 	});
-	await runIterations( bot, runner );
+	await runIterations( version, runner );
 
 	BtUpdater.update({ status: 'completed' });
 	runner.bot?.terminate();
@@ -81,8 +81,8 @@ function createRun( botId: any ): string{
 	return btid;
 }
 
-async function runIterations( bot: DbBot, runner: BtBotRunner ) {
-	const { accountId, id: botId } = bot;
+async function runIterations( version: DbBotVersion, runner: BtBotRunner ) {
+	const { accountId, botId } = version;
 
 	while( runner.hasIterationsLeft() ){
 		console.log(`Iteration ${runner.iteration}`);

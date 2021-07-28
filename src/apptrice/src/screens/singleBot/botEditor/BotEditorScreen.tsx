@@ -191,8 +191,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		const botId = this.getBotId(this.props);
 		const version = this.getEditingVersion();
 		if( version ){
-			let { data: bot } = botLoader.getData(botId);
-			BtRunner.start(bot, version, config);
+			BtRunner.start(version, config);
 			if( !version.isLocked ) {
 				apiCacher.updateBotVersion(
 					this.props.store.authenticatedId,
