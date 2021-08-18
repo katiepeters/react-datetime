@@ -1,6 +1,6 @@
 import { BacktestConfig } from "../../common/btSettings/BotTools";
 import {v4 as uuid} from 'uuid';
-import { DbBot, DBBotDeployment, DbBotVersion, ExchangeAccountWithHistory } from "../../../../lambdas/model.types";
+import { DBBotDeployment, DbBotVersion, DbExchangeAccount } from "../../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
 import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIteration";
 import quickStore from "../../state/quickStore";
@@ -106,7 +106,7 @@ function toBtDeployment( deployment: DBBotDeployment ): BtDeployment{
 	};
 }
 
-function toBtExchange( exchange: ExchangeAccountWithHistory ): BtExchange{
+function toBtExchange( exchange: DbExchangeAccount ): BtExchange{
 	return {
 		portfolioHistory: exchange.portfolioHistory,
 		provider: exchange.provider,

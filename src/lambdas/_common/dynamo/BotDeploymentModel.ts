@@ -1,4 +1,4 @@
-import { DBBotDeploymentRaw, DBBotDeployment, DBBotDeploymentInput, DBBotDeploymentUpdate, SimpleBotDeployment } from '../../model.types';
+import { DBBotDeploymentRaw, DBBotDeployment, DBBotDeploymentInput, DBBotDeploymentUpdate, SimpleBotDeployment, DBBotDeploymentWithHistory } from '../../model.types';
 import s3Helper from '../utils/s3';
 import { DBModel } from './db';
 
@@ -33,10 +33,11 @@ export default {
 		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
 		if( !entry ) return;
 
-		let [ logs, state, orders ] = await Promise.all([
+		let [ logs, state, orders, history ] = await Promise.all([
 			getLogs(accountId, deploymentId),
 			getState(accountId, deploymentId),
-			getOrders(accountId, deploymentId)
+			getOrders(accountId, deploymentId),
+			getPortfolioHistory(accountId, deploymentId)
 		]);
 
 		return {
@@ -55,6 +56,27 @@ export default {
 		return {
 			...entry,
 			active: entry.active ? true : false
+		};
+	},
+
+	async getSingleWithHistory(accountId: string, deploymentId: string): Promise<DBBotDeploymentWithHistory | void> {
+		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
+		if( !entry ) return;
+
+		let [ logs, state, orders, history ] = await Promise.all([
+			getLogs(accountId, deploymentId),
+			getState(accountId, deploymentId),
+			getOrders(accountId, deploymentId),
+			getPortfolioHistory(accountId, deploymentId)
+		]);
+
+		return {
+			...entry,
+			active: entry.active ? true : false,
+			orders: orders ? JSON.parse(orders) : defaultOrders,
+			state: JSON.parse(state || '{}'),
+			logs: JSON.parse(logs || '[]'),
+			portfolioHistory: JSON.parse(history || '[]')
 		};
 	},
 
@@ -79,11 +101,19 @@ export default {
 			dbDeployment.activeIntervals = input.activeIntervals || [[dbDeployment.createdAt]];
 		}
 
+		const portfolioHistory = [
+			{
+				date: Date.now(),
+				balances: input.portfolioWithPrices
+			}
+		]
+
 		return await Promise.all([
 			Db.put(dbDeployment),
 			saveLogs(accountId, deploymentId, JSON.stringify(input.logs || [])),
 			saveState(accountId, deploymentId, JSON.stringify(input.state || [])),
 			saveOrders(accountId, deploymentId, JSON.stringify(input.orders || defaultOrders)),
+			savePortfolioHistory(accountId, deploymentId, JSON.stringify(portfolioHistory))
 		]);
 	},
 
@@ -108,6 +138,21 @@ export default {
 			promises.push( saveState(accountId, deploymentId, JSON.stringify(update.state)) );
 		}
 
+		if(update.portfolioWithPrices) {
+			const portfolioHistoryRaw = await getPortfolioHistory(accountId, deploymentId);
+			const history = [
+				...JSON.parse( portfolioHistoryRaw || '[]'),
+				{
+					date: Date.now(),
+					balances: update.portfolioWithPrices
+				}
+			];
+
+			promises.push(
+				savePortfolioHistory(accountId, deploymentId, JSON.stringify(history))
+			);
+		}
+
 		return await Promise.all( promises );
 	},
 
@@ -117,6 +162,7 @@ export default {
 			delLogs(accountId, deploymentId),
 			delOrders(accountId, deploymentId),
 			delState(accountId, deploymentId),
+			delPortfolioHistory(accountId, deploymentId)
 		]
 		// @ts-ignore
 		return await Promise.all(promises);
@@ -147,6 +193,9 @@ function getStateFileName(accountId: string, deploymentId: string) {
 function getOrdersFileName(accountId: string, deploymentId: string) {
 	return `${accountId}/de-${deploymentId}/orders`;
 }
+function getPortfolioHistoryFileName(accountId: string, deploymentId: string) {
+	return `${accountId}/des-${deploymentId}/portfolioHistory`;
+}
 
 function getLogs( accountId: string, deploymentId: string ){
 	return s3Helper.botState.getContent( getLogsFileName(accountId, deploymentId) );
@@ -156,6 +205,9 @@ function getState(accountId: string, deploymentId: string) {
 } 
 function getOrders(accountId: string, deploymentId: string) {
 	return s3Helper.botState.getContent(getOrdersFileName(accountId, deploymentId));
+}
+function getPortfolioHistory(accountId: string, deploymentId: string) {
+	return s3Helper.botState.getContent(getPortfolioHistoryFileName(accountId, deploymentId));
 }
 
 function saveLogs(accountId: string, deploymentId: string, logs: string) {
@@ -167,6 +219,9 @@ function saveState(accountId: string, deploymentId: string, state: string) {
 function saveOrders(accountId: string, deploymentId: string, orders: string) {
 	return s3Helper.botState.setContent(getOrdersFileName(accountId, deploymentId), orders);
 }
+function savePortfolioHistory(accountId: string, deploymentId: string, portfolioHistory: string) {
+	return s3Helper.botState.setContent(getPortfolioHistoryFileName(accountId, deploymentId), portfolioHistory);
+}
 
 function delLogs(accountId: string, deploymentId: string) {
 	return s3Helper.botState.delObject(getLogsFileName(accountId, deploymentId));
@@ -176,4 +231,7 @@ function delState(accountId: string, deploymentId: string) {
 }
 function delOrders(accountId: string, deploymentId: string) {
 	return s3Helper.botState.delObject(getOrdersFileName(accountId, deploymentId));
+}
+function delPortfolioHistory(accountId: string, deploymentId: string) {
+	return s3Helper.botState.delObject(getPortfolioHistoryFileName(accountId, deploymentId));
 }

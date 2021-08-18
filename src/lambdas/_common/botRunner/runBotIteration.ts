@@ -1,7 +1,8 @@
-import { DBBotDeployment, DbExchangeAccount, DeploymentOrders } from "../../../lambdas/model.types";
-import { BotExecutorResultWithDate, Order } from "../../lambda.types";
+import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, PortfolioWithPrices } from "../../../lambdas/model.types";
+import { ArrayCandle, BotCandles, BotExecutorResultWithDate, Order, Portfolio } from "../../lambda.types";
 import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 import { BotRunner, RunnableBot } from './BotRunner';
+import candles from "../utils/candles";
 
 export async function runBotIteration( accountId: string, deploymentId: string, runner: BotRunner ){
 	let deployment: DBBotDeployment = await runner.getDeployment( accountId, deploymentId );
@@ -10,7 +11,7 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 	let bot: RunnableBot = await runner.getBot( accountId, deployment.botId, deployment.version );
 
 	// First get candles (virtual exchanges will refresh its data)
-	const [ portfolio, candles ] = await Promise.all([
+	let [ portfolio, candles ] = await Promise.all([
 		adapter.getPortfolio(),
 		runner.getCandles( adapter, deployment )
 	]);
@@ -40,17 +41,21 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 	const cancelledOrders = await runner.cancelOrders( adapter, deployment.orders, result.ordersToCancel );
 	const placedOrders = await runner.placeOrders( adapter, result.ordersToPlace );
 	const updatedOrders = mergeResultOrders( deployment.orders, result, cancelledOrders, placedOrders );
-
+	
+	// refresh the portfolio after setting the orders
+	portfolio = await adapter.getPortfolio();
+	
 	// Save results
 	await Promise.all([
 		runner.updateDeployment( deployment, {
 			orders: updatedOrders,
 			state: result.state,
-			logs: [ ...deployment.logs, ...result.logs ]
+			logs: [ ...deployment.logs, ...result.logs ],
+			portfolioWithPrices: getPortfolioWithPrices( portfolio, deployment, candles )
 		}),
 		runner.updateExchange( exchange, {
 			orders: runner.getExchangeOrders( adapter ),
-			portfolio: await adapter.getPortfolio()
+			portfolio
 		})
 	]);
 }
@@ -136,3 +141,26 @@ function mergeResultOrders( currentOrders: DeploymentOrders, result: BotExecutor
 	}
 }
 
+function getPortfolioWithPrices( portfolio: Portfolio, deployment: DBBotDeployment, allCandles: BotCandles ): PortfolioWithPrices {
+	const symbols = deployment.symbols;
+	const queryAsset = symbols[0].split('/')[1];
+	
+	let portfolioWithPrices: PortfolioWithPrices = {};
+	for( let asset in portfolio ){
+		
+		if( asset === queryAsset ){
+			portfolioWithPrices[asset] = {
+				...portfolio[asset],
+				price: 1
+			}
+		}
+		else {
+			portfolioWithPrices[asset] = {
+				...portfolio[asset],
+				price: candles.getClose(candles.getLast(allCandles[`${asset}/${queryAsset}`]))
+			}
+		}
+	}
+
+	return portfolioWithPrices;
+}

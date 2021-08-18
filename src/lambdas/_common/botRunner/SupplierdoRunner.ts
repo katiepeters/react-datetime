@@ -98,11 +98,11 @@ const SupplierdoRunner: BotRunner = {
 
 	async updateExchange( exchange: DbExchangeAccount, update: BotRunnerExchangeUpdate ) {
 		let promises = [
-			ExchangeAccountModel.updatePortfolio(exchange.accountId, exchange.id, update.portfolio, true )
+			ExchangeAccountModel.updatePortfolio(exchange.accountId, exchange.id, update.portfolio )
 		];
 
 		if( update.orders ){
-			console.log('We are updating exchange orders too');
+			console.log('We are updating exchange orders');
 			promises.push(
 				ExchangeAccountModel.updateOrders(exchange.accountId, exchange.id, update.orders )
 			);

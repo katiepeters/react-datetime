@@ -58,7 +58,8 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 		data.push({
 			asset: 'Total',
 			free: 0,
-			total: 0
+			total: 0,
+			price: 0
 		});
 
 		return data;

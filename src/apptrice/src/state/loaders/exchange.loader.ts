@@ -7,7 +7,7 @@ import store from "../store";
 const config: DataLoaderConfig<DbExchangeAccount> = {
 	getFromCache(exchangeId: string): DbExchangeAccount | undefined {
 		let exchange = store.exchangeAccounts[exchangeId];
-		if (exchange && exchange.portfolioHistory){
+		if (exchange){
 			return exchange;
 		}
 	},

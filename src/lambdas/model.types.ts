@@ -1,4 +1,4 @@
-import { Portfolio } from "./lambda.types";
+import { Balance, Portfolio } from "./lambda.types";
 
 export interface TableItem {
 	accountId: string
@@ -115,6 +115,10 @@ export interface DBBotDeployment extends TableItem {
 	active: boolean
 }
 
+export interface DBBotDeploymentWithHistory extends DBBotDeployment {
+	portfolioHistory: PortfolioHistoryItem[]
+}
+
 export interface DBBotDeploymentRaw extends TableItem {
 	id: string
 	name: string
@@ -138,6 +142,7 @@ export interface DBBotDeploymentInput {
 	runInterval: RunInterval
 	symbols: string[]
 	orders: DeploymentOrders
+	portfolioWithPrices: PortfolioWithPrices
 	state?: DBBotDeploymentState
 	logs?: ConsoleEntry[]
 	active: boolean
@@ -154,6 +159,7 @@ export interface DBBotDeploymentUpdate {
 	orders?: DeploymentOrders
 	state?: DBBotDeploymentState
 	logs?: ConsoleEntry[]
+	portfolioWithPrices?: PortfolioWithPrices
 }
 
 export interface OrderInput {
@@ -179,16 +185,19 @@ export interface DbExchangeAccount extends TableItem {
 	type: 'real' | 'virtual'
 	key?: string
 	secret?: string
-	portfolioHistory?: PortfolioHistoryItem[]
 }
 
 export interface PortfolioHistoryItem {
 	date: number
-	balances: Portfolio
+	balances: PortfolioWithPrices
 }
 
-export interface ExchangeAccountWithHistory extends DbExchangeAccount {
-	portfolioHistory: PortfolioHistoryItem[]
+export interface PortfolioWithPrices {
+	[asset: string]: BalanceWithPrice
+}
+
+export interface BalanceWithPrice extends Balance {
+	price: number
 }
 
 export interface CreateExchangeAccountInput {

@@ -1,5 +1,5 @@
 import { DBModel } from './db';
-import { DbExchangeAccount, DbExchangeAccountInput, ExchangeAccountWithHistory, PortfolioHistoryItem } from '../../model.types';
+import { DbExchangeAccount, DbExchangeAccountInput } from '../../model.types';
 import s3Helper from '../utils/s3';
 import { Portfolio } from '../../lambda.types';
 import { ExchangeOrder } from '../exchanges/ExchangeAdapter';
@@ -7,7 +7,7 @@ import arrayize from '../utils/arrayize';
 
 const Db = new DBModel<DbExchangeAccount>();
 
-interface DeleteExchangeAccountInput {
+ interface DeleteExchangeAccountInput {
 	accountId: string
 	exchangeAccountId: string
 	deleteExtra?: boolean
@@ -16,18 +16,6 @@ interface DeleteExchangeAccountInput {
 export default {
 	async getSingle(accountId: string, exchangeId: string): Promise<DbExchangeAccount | void> {
 		return await Db.getSingle(accountId, `EXCHANGE#${exchangeId}`);
-	},
-
-	async getSingleWithHistory( accountId: string, exchangeId: string ): Promise<ExchangeAccountWithHistory | void> {
-		let dbExchange = await this.getSingle( accountId, exchangeId );
-		if( !dbExchange ) return;
-
-		let history = await getPortfolioHistory(accountId, exchangeId);
-
-		return {
-			...dbExchange,
-			portfolioHistory: JSON.parse(history || '[]')
-		}
 	},
 
 	async getVirtualPorftolio( accountId: string, exchangeId: string ): Promise<Portfolio> {
@@ -46,26 +34,8 @@ export default {
 		return {};
 	},
 
-	async updatePortfolio( accountId: string, exchangeId: string, portfolio: Portfolio, updateLast: boolean ){
-		let historyRaw = await getPortfolioHistory(accountId, exchangeId);
-		let history: PortfolioHistoryItem[] = JSON.parse(historyRaw || '[]');
-		history.push({
-			date: Date.now(),
-			balances: portfolio
-		});
-
-		let promises = [
-			savePortfolioHistory(accountId, exchangeId, JSON.stringify(history) )
-		];
-
-		if( updateLast ){
-			promises.push(
-				saveLastPortfolio(accountId, exchangeId, JSON.stringify(portfolio) )
-			);
-		}
-
-		await Promise.all( promises );
-
+	async updatePortfolio( accountId: string, exchangeId: string, portfolio: Portfolio ){
+		await saveLastPortfolio(accountId, exchangeId, JSON.stringify(portfolio) );
 		return {error: false};
 	},
 
@@ -86,19 +56,9 @@ export default {
 			resourceId: `EXCHANGE#${exchangeId}`
 		};
 		
-		console.log('Createing exchange and portfolio history');
-		let history: PortfolioHistoryItem[] = [];
-		if( account.initialBalances ){
-			history.push({
-				date: Date.now(),
-				balances: account.initialBalances
-			});
-		}
-		let promises = [
-			Db.put(exchange),
-			savePortfolioHistory(
-				accountId, exchangeId, JSON.stringify( history )
-			)
+		console.log('Createing exchange');
+		let promises: Promise<any>[] = [
+			Db.put(exchange)
 		];
 
 		if (account.type === 'virtual') {
@@ -116,9 +76,8 @@ export default {
 		return await Db.update(accountId, `EXCHANGE#${exchangeId}`, update);
 	},
 	async delete({accountId, exchangeAccountId, deleteExtra}: DeleteExchangeAccountInput){
-		let promises = [
-			Db.del(accountId, `EXCHANGE#${exchangeAccountId}`),
-			delPortfolioHistory(accountId, exchangeAccountId)
+		let promises: Promise<any>[] = [
+			Db.del(accountId, `EXCHANGE#${exchangeAccountId}`)
 		];
 
 		if( deleteExtra ){
@@ -132,12 +91,8 @@ export default {
 	}
 }
 
-
 function getLastPortfolioFileName(accountId: string, exchangeId: string) {
 	return `${accountId}/ex-${exchangeId}/lastPortfolio`;
-}
-function getPortfolioHistoryFileName(accountId: string, exchangeId: string) {
-	return `${accountId}/ex-${exchangeId}/portfolioHistory`;
 }
 function getOrdersFileName(accountId: string, exchangeId: string) {
 	return `${accountId}/ex-${exchangeId}/orders`;
@@ -146,9 +101,6 @@ function getOrdersFileName(accountId: string, exchangeId: string) {
 function getLastPortfolio(accountId: string, exchangeId: string) {
 	return s3Helper.botState.getContent(getLastPortfolioFileName(accountId, exchangeId));
 }
-function getPortfolioHistory(accountId: string, exchangeId: string) {
-	return s3Helper.botState.getContent(getPortfolioHistoryFileName(accountId, exchangeId));
-}
 function getOrders(accountId: string, exchangeId: string) {
 	return s3Helper.botState.getContent(getOrdersFileName(accountId, exchangeId));
 }
@@ -156,18 +108,12 @@ function getOrders(accountId: string, exchangeId: string) {
 function saveLastPortfolio(accountId: string, exchangeId: string, logs: string) {
 	return s3Helper.botState.setContent(getLastPortfolioFileName(accountId, exchangeId), logs);
 }
-function savePortfolioHistory(accountId: string, exchangeId: string, state: string) {
-	return s3Helper.botState.setContent(getPortfolioHistoryFileName(accountId, exchangeId), state);
-}
 function saveOrders(accountId: string, exchangeId: string, orders: string) {
 	return s3Helper.botState.setContent(getOrdersFileName(accountId, exchangeId), orders);
 }
 
 function delLastPortfolio(accountId: string, exchangeId: string) {
 	return s3Helper.botState.delObject(getLastPortfolioFileName(accountId, exchangeId));
-}
-function delPortfolioHistory(accountId: string, exchangeId: string) {
-	return s3Helper.botState.delObject(getPortfolioHistoryFileName(accountId, exchangeId));
 }
 function delOrders(accountId: string, exchangeId: string) {
 	return s3Helper.botState.delObject(getOrdersFileName(accountId, exchangeId));

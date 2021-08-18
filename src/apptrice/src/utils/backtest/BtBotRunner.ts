@@ -1,5 +1,5 @@
 import { BotCandles, Portfolio } from "../../../../lambdas/lambda.types";
-import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, ExchangeAccountWithHistory, Order, RunInterval } from "../../../../lambdas/model.types";
+import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order, RunInterval } from "../../../../lambdas/model.types";
 import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate } from "../../../../lambdas/_common/botRunner/BotRunner";
 import VirtualAdapter from "../../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
 import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
@@ -27,7 +27,7 @@ export interface BtBotRunnerConfig {
 
 export default class BtBotRunner implements BotRunner {
 	deployment: DBBotDeployment
-	exchange: ExchangeAccountWithHistory
+	exchange: DbExchangeAccount
 	adapter: VirtualAdapter
 	startDate: number
 	endDate: number
@@ -151,7 +151,14 @@ export default class BtBotRunner implements BotRunner {
 	updateExchange( exchange: DbExchangeAccount, update: BotRunnerExchangeUpdate ) {
 		this.exchange = {
 			...this.exchange,
-			...update
+			...update,
+			portfolioHistory: [
+				...(this.exchange.portfolioHistory || []),
+				{
+					date: this.adapter.lastDate,
+					balances: update.portfolio || {}
+				}
+			]
 		}
 
 		return Promise.resolve(this.exchange);

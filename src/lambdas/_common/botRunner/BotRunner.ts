@@ -1,5 +1,5 @@
 import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio, OrderInput, BotExecutorResultWithDate, Orders } from "../../../lambdas/lambda.types";
-import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order } from "../../../lambdas/model.types";
+import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order, PortfolioWithPrices } from "../../../lambdas/model.types";
 import { ExchangeAdapter, ExchangeOrder, ExchangeOrders } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 
 export interface BotInitializeStateResponse {
@@ -23,11 +23,12 @@ export interface BotRunInput {
 export interface BotRunnerDeploymentUpdate {
 	state?: BotState,
 	orders?: DeploymentOrders,
-	logs?: ConsoleEntry[]
+	logs?: ConsoleEntry[],
+	portfolioWithPrices?: PortfolioWithPrices
 }
 
 export interface BotRunnerExchangeUpdate {
-	orders?: ExchangeOrders,
+	orders?: ExchangeOrders
 	portfolio: Portfolio
 }
 
