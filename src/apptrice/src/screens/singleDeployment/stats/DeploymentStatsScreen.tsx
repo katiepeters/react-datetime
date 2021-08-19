@@ -25,7 +25,7 @@ export default class DeploymentStatsScreen extends React.Component<ScreenProps> 
 		}
 
 		let { data: exchange } = exchangeLoader.getData(deployment.exchangeAccountId);
-		if (!exchange || !exchange.portfolioHistory) {
+		if (!exchange) {
 			return <Card>Loading...</Card>;
 		}
 

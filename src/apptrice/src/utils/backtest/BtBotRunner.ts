@@ -1,10 +1,10 @@
 import { BotCandles, Portfolio } from "../../../../lambdas/lambda.types";
-import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order, RunInterval } from "../../../../lambdas/model.types";
+import { DBBotDeployment, DBBotDeploymentWithHistory, DbExchangeAccount, DeploymentOrders, Order, PortfolioWithPrices, RunInterval } from "../../../../lambdas/model.types";
 import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate } from "../../../../lambdas/_common/botRunner/BotRunner";
 import VirtualAdapter from "../../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
 import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
+import candles from "../../../../lambdas/_common/utils/candles";
 import { Balances } from "../../common/btSettings/InitialBalances";
-import botLoader from "../../screens/singleBot/bot.loader";
 import botVersionLoader from "../../screens/singleBot/botVersion.loader";
 import apiCacher from "../../state/apiCacher";
 import { BtRunnableBot, IBtRunnableBot } from "./BtRunnableBot";
@@ -26,7 +26,7 @@ export interface BtBotRunnerConfig {
 
 
 export default class BtBotRunner implements BotRunner {
-	deployment: DBBotDeployment
+	deployment: DBBotDeploymentWithHistory
 	exchange: DbExchangeAccount
 	adapter: VirtualAdapter
 	startDate: number
@@ -38,6 +38,8 @@ export default class BtBotRunner implements BotRunner {
 	bot: IBtRunnableBot | undefined
 
 	constructor( config: BtBotRunnerConfig ){
+		const portfolio = createPortfolio(config.balances);
+
 		this.deployment = {
 			id: 'btDeployment',
 			name: 'BT Deployment',
@@ -57,7 +59,8 @@ export default class BtBotRunner implements BotRunner {
 			logs: [],
 			createdAt: Date.now(),
 			active: true,
-			activeIntervals: [[Date.now()]]
+			activeIntervals: [[config.startDate]],
+			portfolioHistory: [] // Fist item will be loaded when we get the candles
 		};
 
 		this.exchange = {
@@ -66,17 +69,18 @@ export default class BtBotRunner implements BotRunner {
 			resourceId: '',
 			name: 'BT Exchange',
 			provider: config.exchange,
-			type: 'virtual',
-			portfolioHistory: []
+			type: 'virtual'
 		}
 
 		this.adapter = new VirtualAdapter(this.exchange);
-		this.adapter.portfolio = createPortfolio(config.balances);
+		this.adapter.portfolio = portfolio;
 
 		this.startDate = config.startDate;
 		this.endDate = config.endDate;
 
-		this.candlePromise = this.getAllCandles();
+		this.candlePromise = this.getAllCandles().then( () => {
+			return this.setInitialPortfolio( config );
+		});
 	}
 
 	getDeployment( accountId: string, deploymentId: string ){
@@ -139,11 +143,21 @@ export default class BtBotRunner implements BotRunner {
 		;
 	}
 
-	updateDeployment( deployment: DBBotDeployment, update: BotRunnerDeploymentUpdate ) {
+	updateDeployment( deployment: DBBotDeployment, {portfolioWithPrices, ...update}: BotRunnerDeploymentUpdate ) {
 		this.deployment = {
 			...this.deployment,
 			...update
 		};
+
+		if( portfolioWithPrices ){
+			this.deployment.portfolioHistory = [
+				...this.deployment.portfolioHistory,
+				{
+					date: this.adapter.lastDate,
+					balances: portfolioWithPrices
+				}
+			]
+		}
 
 		return Promise.resolve(this.deployment);
 	}
@@ -207,6 +221,28 @@ export default class BtBotRunner implements BotRunner {
 
 	prepareNextIteration() {
 		this.iteration++;
+	}
+
+	setInitialPortfolio( config:BtBotRunnerConfig ) {
+		return this.getCandles(this.adapter, this.deployment).then( iterationCandles => {
+			let portfolioWithPrices: PortfolioWithPrices = {};
+			for (let asset in config.balances) {
+				let assetCandles = iterationCandles[`${asset}/${config.quotedAsset}`];
+				let balance = config.balances[asset];
+				portfolioWithPrices[asset] = {
+					asset,
+					total: balance,
+					free: balance,
+					price: asset === config.quotedAsset 
+						? 1
+						: candles.getClose(candles.getLast(assetCandles))
+				};
+			}
+			this.deployment.portfolioHistory = [{
+				date: config.startDate - 1,
+				balances: portfolioWithPrices
+			}];
+		})
 	}
 }
 

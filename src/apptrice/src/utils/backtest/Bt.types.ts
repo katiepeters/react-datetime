@@ -9,11 +9,11 @@ export interface BtDeployment {
 	runInterval: RunInterval
 	state: DBBotDeploymentState
 	symbols: string[]
+	portfolioHistory: PortfolioHistoryItem[]
 }
 
 export interface BtExchange {
 	provider: 'bitfinex'
-	portfolioHistory: PortfolioHistoryItem[],
 	fees: number
 	slippage: number
 }

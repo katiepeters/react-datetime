@@ -71,7 +71,7 @@ export const BtUpdater = {
 		}
 
 
-		if (data.logs || data.orders || data.runInterval || data.state || data.symbols) {
+		if (data.logs || data.orders || data.runInterval || data.state || data.symbols || data.portfolioHistory) {
 			let deploymentUpdate: BtDeployment = { ...activeBt.data.deployment };
 			if (data.logs) {
 				deploymentUpdate.logs = data.logs;
@@ -88,15 +88,15 @@ export const BtUpdater = {
 			if (data.symbols) {
 				deploymentUpdate.symbols = data.symbols;
 			}
+			if( data.portfolioHistory ){
+				deploymentUpdate.portfolioHistory = data.portfolioHistory;
+			}
 
 			activeBt.data.deployment = deploymentUpdate;
 		}
 
 		if( data.portfolioHistory || data.fees || data.slippage || data.provider ) {
 			let exchangeUpdate: BtExchange = { ...activeBt.data.exchange };
-			if( data.portfolioHistory ){
-				exchangeUpdate.portfolioHistory = data.portfolioHistory;
-			}
 			if (data.fees) {
 				exchangeUpdate.fees = data.fees;
 			}
@@ -138,10 +138,10 @@ const defaultActiveBt: BtActive = {
 			},
 			runInterval: '1h',
 			state: {},
-			symbols: []
+			symbols: [],
+			portfolioHistory: [],
 		},
 		exchange: {
-			portfolioHistory: [],
 			provider: 'bitfinex',
 			fees: 0,
 			slippage: 0

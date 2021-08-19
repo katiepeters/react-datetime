@@ -96,19 +96,19 @@ async function runIterations( version: DbBotVersion, runner: BtBotRunner ) {
 	}
 }
 
-function toBtDeployment( deployment: DBBotDeployment ): BtDeployment{
+function toBtDeployment( deployment: DBBotDeployment ): BtDeployment {
 	return {
 		logs: deployment.logs,
 		orders: deployment.orders,
 		runInterval: deployment.runInterval,
 		state: deployment.state,
-		symbols: deployment.symbols
+		symbols: deployment.symbols,
+		portfolioHistory: deployment.portfolioHistory
 	};
 }
 
 function toBtExchange( exchange: DbExchangeAccount ): BtExchange{
 	return {
-		portfolioHistory: exchange.portfolioHistory,
 		provider: exchange.provider,
 		fees: exchange.fees,
 		slippage: exchange.slippage

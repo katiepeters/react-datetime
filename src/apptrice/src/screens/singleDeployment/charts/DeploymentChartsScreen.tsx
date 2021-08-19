@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Orders } from '../../../../../lambdas/lambda.types';
-import { DBBotDeployment } from '../../../../../lambdas/model.types';
+import { DBBotDeployment, DBBotDeploymentWithHistory } from '../../../../../lambdas/model.types';
 import DeploymentCharts from '../../../common/charts/DeploymentCharts';
 import { Card, ScreenWrapper } from '../../../components';
 import { ScreenProps } from '../../../types';
@@ -23,7 +23,7 @@ export default class DeploymentChartsScreen extends React.Component<ScreenProps>
 		)
 	}
 
-	renderContent(deployment?: DBBotDeployment) {
+	renderContent(deployment?: DBBotDeploymentWithHistory) {
 		if (!deployment ){
 			return <Card>Loading...</Card>
 		}
