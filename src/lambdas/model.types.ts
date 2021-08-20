@@ -28,11 +28,10 @@ export interface VersionHistory {
 	lastMinor: number
 	available: MinorVersion[]
 }
-export type BotVersions = VersionHistory[];
 export interface DbBot extends TableItem {
 	id: string
 	name: string
-	versions: BotVersions
+	versions: VersionHistory[]
 	createdAt: number
 }
 
@@ -40,7 +39,7 @@ export interface DbBotInput {
 	id: string
 	name: string
 	accountId: string
-	versions: BotVersions
+	versions: VersionHistory[]
 }
 
 // BOT VERSION

@@ -9,7 +9,7 @@ import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../../common/btSettings/BotTools';
 import BtRunner from '../../../utils/backtest/BtRunner';
 import botVersionLoader from '../botVersion.loader';
-import { BotVersions, DbBotVersion } from '../../../../../lambdas/model.types';
+import { DbBotVersion } from '../../../../../lambdas/model.types';
 import BotEditorLayout from './BotEditorLayout';
 
 class BotEditorScreen extends React.Component<ScreenProps> {

@@ -7,7 +7,8 @@ const store = {
 	bots: {},
 	candles: {},
 	exchangeAccounts: {},
-	botVersions: {}
+	botVersions: {},
+	transientData: {}
 };
 
 // @ts-ignore

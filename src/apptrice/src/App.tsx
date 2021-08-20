@@ -8,6 +8,8 @@ import store from './state/store';
 import localStore from './state/localStore';
 import apiClient from './state/apiClient';
 import DataLoader from './utils/DataLoader';
+import lorese from './state/dataManager';
+import { LoreseProvider } from './state/ReactLorese';
 
 class App extends React.Component {
   constructor(props: any) {
@@ -20,16 +22,18 @@ class App extends React.Component {
 
     return (
       <div>
-        <SidebarLayout sidebar={this.renderMenu()}
-          sidebarWidth={65}
-          bgColor="#082238">
-          <CurrentScreen
-            quickStore={quickStore}
-            store={store}
-            router={router}
-            localStore={localStore} />
-        </SidebarLayout>
-        <Toaster />
+        <LoreseProvider lorese={lorese}>
+          <SidebarLayout sidebar={this.renderMenu()}
+            sidebarWidth={65}
+            bgColor="#082238">
+            <CurrentScreen
+              quickStore={quickStore}
+              store={store}
+              router={router}
+              localStore={localStore} />
+          </SidebarLayout>
+          <Toaster />
+        </LoreseProvider>
       </div>
     );
   }
