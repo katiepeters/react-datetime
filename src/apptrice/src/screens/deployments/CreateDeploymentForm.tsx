@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { DbExchangeAccount } from '../../../../lambdas/model.types';
+import { DbBot, DbExchangeAccount } from '../../../../lambdas/model.types';
 import InitialBalances, {Balances} from '../../common/btSettings/InitialBalances';
 import { Button, Controls, InputGroup } from '../../components';
 import Toaster from '../../components/toaster/Toaster';
-import { DbBot } from '../../state/apiCacher';
-import exchangeListLoader from '../../state/loaders/exchangeList.loader';
 import { FormErrors } from '../../types';
-import botListLoader from '../bots/botList.loader';
+import {botListLoader} from '../../state/lorese/loaders/botListLoader';
+import {exchangeListLoader} from '../../state/lorese/loaders/exchangeListLoader';
 import styles from './_CreateDeploymentForm.module.css';
+import { getBot } from '../../state/lorese/selectors/bot.selectors';
 
 export interface CreateDeploymentPayload {
 	accountId: string
@@ -30,6 +30,7 @@ interface CreateDeploymentFormProps {
 interface CreateDeploymentState {
 	name: string,
 	botId: string,
+	botVersion: string,
 	exchangeAccountId: string,
 	runInterval: string,
 	baseAssets: string,
@@ -44,6 +45,7 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 	state: CreateDeploymentState = {
 		name: '',
 		botId: '',
+		botVersion: '',
 		exchangeAccountId: '',
 		runInterval: '1h',
 		baseAssets: '',
@@ -56,10 +58,10 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 
 	dataLoaded = false;
 	render() {
-		let {accountId} = this.props;
-		let { data: bots } = botListLoader.getData(accountId);
-		let { data: exchanges } = exchangeListLoader.getData(accountId);
-
+		let accountId = this.props.accountId;
+		let { data: bots } = botListLoader(accountId);
+		let { data: exchanges } = exchangeListLoader(accountId);
+		
 		if( !bots || !exchanges ){
 			return <span>Loading...</span>;
 		} 
@@ -89,6 +91,14 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 						name="botId"
 						label="Select a bot">
 							{ this.renderBotSelector(bots) }
+					</InputGroup>
+				</div>
+
+				<div className={styles.inputWrapper}>
+					<InputGroup
+						name="botVersion"
+						label="Select a bot version">
+							{ this.renderBotVersionSelector() }
 					</InputGroup>
 				</div>
 
@@ -161,7 +171,31 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		return (
 			<select name="botId"
 				value={this.state.botId}
-				onChange={e => this.setState({ botId: e.target.value })}>
+				onChange={ this._onBotSelect }>
+				{ options }
+			</select>
+		);
+	}
+
+	renderBotVersionSelector() {
+		let bot = getBot( this.state.botId );
+		if( !bot ) return;
+		let options: any[] = [];
+		bot.versions.forEach( (v,major) => {
+			if( v ){
+				v.available.forEach( minor => {
+					let version = `${major}.${minor.number}`;
+					options.push(
+						<option key={version} value={version}>{version}</option>
+					);
+				})
+			}
+		});
+
+		return (
+			<select name="botVersion"
+				value={this.state.botVersion}
+				onChange={ e => this.setState({botVersion: e.target.value}) }>
 				{ options }
 			</select>
 		);
@@ -224,11 +258,11 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		}
 
 		const symbols = this.getSymbols();
-		const {botId, exchangeAccountId, runInterval, name} = this.state;
+		const {botId, botVersion, exchangeAccountId, runInterval, name} = this.state;
 		const payload = {
 			accountId: this.props.accountId,
 			name,
-			botId, exchangeAccountId, runInterval,
+			botId, botVersion, exchangeAccountId, runInterval,
 			symbols,
 			active: true,
 			exchange: this.state.exchange,
@@ -242,6 +276,28 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 				200
 			);
 		});
+	}
+
+	_onBotSelect = (e: any) => {
+		const botId = e.target.value;
+		const bot = getBot(botId);
+		if( !bot ) return;
+
+		this.setState({
+			botId,
+			botVersion: this.getLastBotVersion(bot)
+		})
+	}
+
+	getLastBotVersion( bot: DbBot ){
+		let versions = bot.versions;
+		let i = versions.length;
+		while( i-- > 0 ){
+			if( versions[i] ){
+				return `${i}.${versions[i].lastMinor}`;
+			}
+		}
+		return '';
 	}
 
 	getValidationErrors() {
@@ -318,13 +374,22 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		if( !this.dataLoaded ) return;
 		if( !this.state.botId ){
 			const {accountId} = this.props;
-			let { data: bots } = botListLoader.getData(accountId);
-			let { data: exchanges } = exchangeListLoader.getData(accountId);
+			let { data: bots } = botListLoader(accountId);
+			let { data: exchanges } = exchangeListLoader(accountId);
 
 			if( bots && exchanges ){
 				console.log('Setting state');
+				const botId = bots.length ? bots[0].id : '';
+				let botVersion = '';
+				if( botId ){
+					const bot = getBot(botId);
+					if( bot ){
+						botVersion = this.getLastBotVersion(bot);
+					}
+				}
 				this.setState({
-					botId: bots.length ? bots[0].id : '',
+					botId,
+					botVersion,
 					exchangeAccountId: exchanges.length ? exchanges[0].id : ''
 				});
 			}

@@ -1,4 +1,3 @@
-import { BotVersions, VersionHistory } from "../../model.types";
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 
@@ -47,13 +46,6 @@ const updateBotVersionHandler: MutationHandler = {
 			data: {number: input.body.versionNumber}
 		};
 	}
-}
-
-
-function isEditableVersion( number: string, versions: BotVersions ) {
-	let parts = number.split('.');
-	let major: VersionHistory = versions[parts[0]];
-	return major && major.lastMinor === parseInt(parts[1]);
 }
 
 export default updateBotVersionHandler;

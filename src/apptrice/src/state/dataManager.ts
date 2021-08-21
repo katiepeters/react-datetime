@@ -1,26 +1,27 @@
-import { DbBot, DBBotDeployment, DBBotDeploymentWithHistory, DbBotVersion, DbExchangeAccount } from '../../../lambdas/model.types';
+import { DbBot, DBBotDeploymentWithHistory, DbBotVersion, DbExchangeAccount, SimpleBotDeployment } from '../../../lambdas/model.types';
 import lorese from './Lorese';
 
-interface Account {
+export interface StoreAccount {
 	id: string,
 	bots?: string[],
 	deployments?: string[],
 	exchangeAccounts?: string[]
 }
 
-interface Store {
+export type StoreBotDeployment = SimpleBotDeployment | DBBotDeploymentWithHistory;
+export interface Store {
 	authenticatedId: string
 	accounts: {
-		[id: string]: Account
+		[id: string]: StoreAccount
 	},
 	deployments: {
-		[id: string]: Partial<DBBotDeploymentWithHistory>
+		[id: string]: StoreBotDeployment
 	},
 	bots: {
-		[id:string]: Partial<DbBot>
+		[id:string]: DbBot
 	},
 	exchangeAccounts: {
-		[id:string]: Partial<DbExchangeAccount>
+		[id:string]: DbExchangeAccount
 	},
 	botVersions: {
 		[id:string]: Partial<DbBotVersion>

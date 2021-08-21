@@ -1,17 +1,18 @@
 import * as React from 'react'
 import styles from './_DeploymentsScreen.module.css';
-import deploymentsLoader from './deployments.loader';
 import { ScreenProps } from '../../types';
 import { Button, ButtonList, DropDownButton, ScreenWrapper, Spinner, Table, Card, Modal, ModalBox } from '../../components';
-import { DBBotDeployment } from '../../../../lambdas/model.types';
 import { TableColumn } from '../../components/table/Table';
-import apiCacher from '../../state/apiCacher';
+import apiCacher from '../../state/apiCacherLorese';
 import Toaster from '../../components/toaster/Toaster';
 import CreateDeploymentForm, { CreateDeploymentPayload } from './CreateDeploymentForm';
 import { CreateExchangeAccountInput } from '../../state/apiClient';
 import arrayize from '../../../../lambdas/_common/utils/arrayize';
 import { Portfolio } from '../../../../lambdas/lambda.types';
 import { isActiveDeployment } from '../../../../lambdas/_common/utils/deploymentUtils';
+import { deploymentListLoader } from '../../state/lorese/loaders/deploymentList.loader';
+import { getAuthenticatedId } from '../../state/lorese/selectors/account.selectors';
+import { SimpleBotDeployment } from '../../../../lambdas/model.types';
 
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {
@@ -46,8 +47,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	}
 
 	renderDeployments() {
-		const { data, isLoading } = deploymentsLoader.getData(this.props.store.authenticatedId);
-
+		const { data, isLoading } = deploymentListLoader(getAuthenticatedId() || '');
 		if( isLoading || !data ) return 'Loading...';
 
 		return (
@@ -57,7 +57,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 				columns={ this.getColumns() }
 				disabledItems={ this.state.loadingItems }
 				noElementsMessage={ this.renderNoElements() }
-				onRowClick={ (item: DBBotDeployment) => this.props.router.push(`/deployments/${item.id}`)}
+				onRowClick={ (item: SimpleBotDeployment) => this.props.router.push(`/deployments/${item.id}`)}
 			/>
 		);
 	}
@@ -86,7 +86,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		)
 	}
 
-	getColumns(): TableColumn<DBBotDeployment>[] {
+	getColumns(): TableColumn<SimpleBotDeployment>[] {
 		return [
 			{ field: 'id' },
 			{ field: 'name' },
@@ -96,11 +96,11 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		];
 	}
 
-	_renderActive = (item: DBBotDeployment) => {
+	_renderActive = (item: SimpleBotDeployment) => {
 		return <span>{isActiveDeployment(item) ? 'Active' : 'Inactive'}</span>;
 	}
 
-	_renderControls = (item: DBBotDeployment) => {
+	_renderControls = (item: SimpleBotDeployment) => {
 		// @ts-ignore
 		if (this.state.loadingItems[item.id]) {
 			return <Spinner color="#fff" />;
@@ -126,7 +126,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		);
 	}
 
-	_onExchangeAction = (item: DBBotDeployment, action: string) => {
+	_onExchangeAction = (item: SimpleBotDeployment, action: string) => {
 		const {authenticatedId} = this.props.store;
 		if( action === 'activate' ){
 			this.setState({loadingItems: {[item.id]: true}});

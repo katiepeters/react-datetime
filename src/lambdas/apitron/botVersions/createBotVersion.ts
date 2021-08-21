@@ -1,4 +1,4 @@
-import { BotVersions, MinorVersion, VersionHistory } from "../../model.types";
+import { MinorVersion, VersionHistory } from "../../model.types";
 import { DbBotVersionCreateInput } from "../../_common/dynamo/BotVersionModel";
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
@@ -97,7 +97,7 @@ const createBotVersionHandler: MutationHandler = {
 	}
 }
 
-function getNextVersion(versions: BotVersions, type: VersionBumpType, baseVersion?: string ): [number,number]{
+function getNextVersion(versions: VersionHistory[], type: VersionBumpType, baseVersion?: string ): [number,number]{
 	if( type === 'major' ){
 		return updateMajor(versions);
 	}
@@ -108,19 +108,19 @@ function getNextVersion(versions: BotVersions, type: VersionBumpType, baseVersio
 	return updateMinor( baseVersion, versions );
 }
 
-function getLastVersion( versions: BotVersions ){
+function getLastVersion( versions: VersionHistory[] ){
 	let major = versions.length - 1;
 	let minor = versions[major].lastMinor;
 	return `${major}.${minor}`;
 }
 
-function updateMinor( baseVersion: string, versions: BotVersions ): [number,number]{
+function updateMinor( baseVersion: string, versions: VersionHistory[] ): [number,number]{
 	let parts = baseVersion.split('.');
 	let lastMinor = versions[ parts[0] ].lastMinor;
 	return [parseInt(parts[0],10), lastMinor + 1];
 }
 
-function updateMajor( versions: BotVersions ): [number,number]{
+function updateMajor( versions: VersionHistory[] ): [number,number]{
 	return [versions.length, 0];
 }
 

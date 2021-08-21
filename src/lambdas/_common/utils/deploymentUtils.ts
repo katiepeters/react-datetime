@@ -1,14 +1,14 @@
-import { DBBotDeployment } from "../../model.types";
+import { DBBotDeployment, SimpleBotDeployment } from "../../model.types";
 
 export function isNewDeployment( deployment: DBBotDeployment ){
 	return deployment.state?.newState === 'stateNew';
 }
 
-export function isActiveDeployment( {active}: DBBotDeployment ): boolean{
+export function isActiveDeployment( {active}: SimpleBotDeployment ): boolean{
 	return active;
 }
 
-export function getActivatedDeployment( currentDeployment: Partial<DBBotDeployment> ): Partial<DBBotDeployment>{
+export function getActivatedDeployment<T extends DBBotDeployment | SimpleBotDeployment>( currentDeployment: T ): T{
 	let activeIntervals = [...(currentDeployment.activeIntervals||[])];
 	let [lastActiveInterval] = activeIntervals.slice(-1);
 	if( !lastActiveInterval || lastActiveInterval.length === 2 ){
@@ -22,7 +22,7 @@ export function getActivatedDeployment( currentDeployment: Partial<DBBotDeployme
 	return currentDeployment;
 }
 
-export function getDeactivatedDeployment( currentDeployment: Partial<DBBotDeployment> ){
+export function getDeactivatedDeployment<T extends DBBotDeployment | SimpleBotDeployment>( currentDeployment: T ){
 	let activeIntervals = [...(currentDeployment.activeIntervals||[])];
 	let [lastActiveInterval] = activeIntervals.slice(-1);
 	if( lastActiveInterval && lastActiveInterval.length === 1 ){

@@ -1,8 +1,8 @@
 type ReducerInput<ST,ARG> = (store: ST, arg: ARG) => ST;
 type ReducerOutput<ARG> = (arg: ARG) => void;
 
-type SelectorInput<ST,ARG,RET> = (store: ST, arg: ARG) => RET | void;
-type SelectorOutput<ARG,RET> = (arg: ARG) => RET | void;
+type SelectorInput<ST,ARG,RET> = (store: ST, arg: ARG) => RET;
+type SelectorOutput<ARG,RET> = (arg: ARG) => RET;
 
 interface LoaderInput<ST,INP> {
 	selector: (store: ST, arg: INP) => any
@@ -65,14 +65,14 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 					isLoading: true,
 					error: null,
 					promise: promise,
-					data: undefined,
+					data: config.selector(store, input),
 					retry: tryLoad
 				});
 
 				promise
 					.then( () => {
 						loadCache.set(input, {
-							isLoading: true,
+							isLoading: false,
 							error: null,
 							promise: promise,
 							data: config.selector(store, input),
@@ -87,6 +87,8 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 							data: undefined,
 							retry: tryLoad
 						});
+					})
+					.finally( () => {
 						emitChange();
 					})
 				;

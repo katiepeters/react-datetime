@@ -228,5 +228,4 @@ export interface ExchangeAccountResponse {
 	provider: string
 	type: string
 	key: string
-	portfolioHistory?: PortfolioHistoryItem[]
 }
