@@ -42,7 +42,7 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 	}
 
 	renderBotList() {
-		const { authenticatedId } = this.props.store;
+		const { authenticatedId } = this.props;
 		const { isLoading, data } = botListLoader(authenticatedId);
 		if (isLoading || !data) {
 			return <span>Loading...</span>;
@@ -95,7 +95,7 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 	getBot( botId?: string ){
 		if( !botId ) return;
 
-		const { authenticatedId } = this.props.store;
+		const { authenticatedId } = this.props;
 		const { data } = botListLoader(authenticatedId);
 		if( !data ) return;
 
@@ -154,7 +154,7 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 
 	_createBot = ({name}: BotEditPayload) => {
 		let bot = {
-			accountId: this.props.store.authenticatedId,
+			accountId: this.props.authenticatedId,
 			name: name,
 			code: `
 `
@@ -172,7 +172,7 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 
 	_updateBot = ({name}: BotEditPayload) => {
 		const {editingBotId = ''} = this.state;
-		const {authenticatedId} = this.props.store;
+		const {authenticatedId} = this.props;
 
 		this.setState({loadingItems: {[editingBotId]: true}});
 		return apiCacher.updateBot( authenticatedId, editingBotId, {name} )
@@ -188,7 +188,7 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 
 	deleteBot( botId: string ) {
 		this.setState({ loadingItems: { [botId]: true } });
-		return apiCacher.deleteBot(this.props.store.authenticatedId, botId)
+		return apiCacher.deleteBot(this.props.authenticatedId, botId)
 			.then(res => {
 				this.setState({
 					loadingItems: {}

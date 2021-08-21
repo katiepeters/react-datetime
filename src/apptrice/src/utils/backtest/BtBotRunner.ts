@@ -5,8 +5,8 @@ import VirtualAdapter from "../../../../lambdas/_common/exchanges/adapters/Virtu
 import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
 import candles from "../../../../lambdas/_common/utils/candles";
 import { Balances } from "../../common/btSettings/InitialBalances";
-import botVersionLoader from "../../screens/singleBot/botVersion.loader";
 import apiCacher from "../../state/apiCacher";
+import { botVersionLoader } from "../../state/lorese/loaders/botVersion.loader";
 import { BtRunnableBot, IBtRunnableBot } from "./BtRunnableBot";
 
 export interface BtBotRunnerConfig {
@@ -129,7 +129,7 @@ export default class BtBotRunner implements BotRunner {
 			return Promise.resolve(this.bot);
 		}
 
-		const { data: botVersion } = botVersionLoader.getData(botId, versionNumber);
+		const { data: botVersion } = botVersionLoader({accountId, botId, versionNumber});
 		if( !botVersion ){
 			throw new Error('bot_not_initialized');
 		}

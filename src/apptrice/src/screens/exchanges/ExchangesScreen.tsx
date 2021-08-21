@@ -3,9 +3,9 @@ import { ExchangeAccountResponse } from '../../../../lambdas/model.types';
 import { Button, ButtonList, DropDownButton, Modal, ModalBox, ScreenWrapper, Spinner, Table } from '../../components';
 import { TableColumn } from '../../components/table/Table';
 import Toaster from '../../components/toaster/Toaster';
-import apiCacher from '../../state/apiCacher';
+import apiCacher from '../../state/apiCacherLorese';
 import { CreateExchangeAccountInput } from '../../state/apiClient';
-import exchangeListLoader from '../../state/loaders/exchangeList.loader';
+import { exchangeListLoader } from '../../state/lorese/loaders/exchangeListLoader';
 import { ScreenProps } from '../../types';
 import CreateExchangeForm, {CreateExchangePayload} from './CreateExchangeForm';
 import styles from './_ExchangesScreen.module.css';
@@ -21,7 +21,7 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 	}
 
 	render() {
-		let { data, isLoading, error } = exchangeListLoader.getData(this.props.store.authenticatedId);
+		let { data, isLoading, error } = exchangeListLoader(this.props.authenticatedId);
 		return (
 			<ScreenWrapper title="API accounts" titleExtra={ this.renderCreateButton() }>
 				{ data ? this.renderList(data) : 'Loading...' }
@@ -95,7 +95,7 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 	_onExchangeAction = (item: ExchangeAccountResponse, action: string) => {
 		if( action === 'delete' ){
 			this.setState({loadingItems: {[item.id]: true}});
-			apiCacher.deleteExchangeAccount(this.props.store.authenticatedId, item.id)
+			apiCacher.deleteExchangeAccount(this.props.authenticatedId, item.id)
 				.then( res => {
 					this.setState({ loadingItems: {} });
 					if( !res.data?.error ){
@@ -109,7 +109,7 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 	_onCreateExchange = (exchange: CreateExchangePayload ) => {
 		let payload: CreateExchangeAccountInput = {
 			name: exchange.name,
-			accountId: this.props.store.authenticatedId,
+			accountId: this.props.authenticatedId,
 			provider: exchange.provider,
 			type: 'real',
 			key: exchange.key,

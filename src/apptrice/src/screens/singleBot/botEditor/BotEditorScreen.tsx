@@ -2,7 +2,7 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import { ScreenProps } from '../../../types';
 import BotSaver from '../BotSaver';
-import apiCacher from '../../../state/apiCacher';
+import apiCacher from '../../../state/apiCacher.old';
 import styles from './_BotEditorScreen.module.css';
 import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../../common/btSettings/BotTools';
@@ -61,7 +61,6 @@ class BotEditorScreen extends React.Component<BotScreenProps> {
 				version={ version }
 				codeProblems={this.state.codeProblems}
 				quickStore={this.props.quickStore}
-				currentBackTesting={this.props.store.currentBackTesting}
 				onRun={ this._onRunBt }
 				onAbort={this._onAbortBt}
 				onHighlightLine={ this._highlightLine }/>

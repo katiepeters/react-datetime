@@ -1,6 +1,5 @@
 import * as React from 'react'
-import {DbBot} from '../../state/apiCacher'
-
+import { DbBot } from '../../../../lambdas/model.types';
 interface BotItemProps {
 	bot: DbBot
 }

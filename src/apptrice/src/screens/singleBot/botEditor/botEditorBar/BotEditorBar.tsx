@@ -20,7 +20,6 @@ interface BotEditorBarProps {
 	version: StoreBotVersion,
 	codeProblems: CodeProblem[],
 	quickStore: typeof quickStore,
-	currentBackTesting?: any,
 	onRun: (config: BacktestConfig) => void,
 	onAbort: () => void
 	onHighlightLine: (line:number) => void
@@ -126,9 +125,12 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 
 	renderProgress() {
 		if (!this.isBtRunning()) return;
+		const activeBt = this.props.quickStore.getActiveBt();
+		const progress = activeBt ?
+			activeBt.currentIteration / activeBt.totalIterations * 100 : 
+			0
+		;
 
-		const { currentBackTesting } = this.props;
-		const progress = currentBackTesting.iteration / currentBackTesting.totalIterations * 100;
 		return (
 			<ProgressBar progress={progress} />
 		);
@@ -162,7 +164,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 
 
 	isBtRunning(): boolean {
-		return this.props.currentBackTesting?.status === 'running' || false;
+		return this.props.quickStore.getActiveBt()?.status === 'running' || false;
 	}
 
 	_showBtModal = () => {

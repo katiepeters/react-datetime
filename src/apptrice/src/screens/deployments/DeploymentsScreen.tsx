@@ -77,7 +77,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 				{() => (
 					<ModalBox>
 						<CreateDeploymentForm
-							accountId={this.props.store.authenticatedId}
+							accountId={this.props.authenticatedId}
 							onClose={() => this.setState({ createModalOpen: false })}
 							onCreate={this._onCreateDeployment} />
 					</ModalBox>
@@ -127,7 +127,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 	}
 
 	_onExchangeAction = (item: SimpleBotDeployment, action: string) => {
-		const {authenticatedId} = this.props.store;
+		const {authenticatedId} = this.props;
 		if( action === 'activate' ){
 			this.setState({loadingItems: {[item.id]: true}});
 			apiCacher.updateDeployment( item.id, {active: true, accountId: authenticatedId})

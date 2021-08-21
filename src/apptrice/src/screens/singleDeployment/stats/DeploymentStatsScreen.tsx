@@ -2,13 +2,12 @@ import * as React from 'react'
 import symbols from '../../../../../lambdas/_common/utils/symbols';
 import { Card, ScreenWrapper } from '../../../components';
 import exchangeLoader from '../../../state/loaders/exchange.loader';
-import { ScreenProps } from '../../../types';
-import deploymentLoader from '../deployment.loader';
+import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
 import PortfolioHistoryWidget from './widgets/PortfolioHistoryWidget';
 import PortfolioWidget from './widgets/PortfolioWidget';
 import ReturnsWidget from './widgets/ReturnsWidget';
 
-export default class DeploymentStatsScreen extends React.Component<ScreenProps> {
+export default class DeploymentStatsScreen extends React.Component<SingleDeploymentScreenProps> {
 	render() {
 
 		return (
@@ -19,11 +18,7 @@ export default class DeploymentStatsScreen extends React.Component<ScreenProps> 
 	}
 
 	renderContent() {
-		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId());
-		if (!deployment) {
-			return <Card>Loading...</Card>;
-		}
-
+		const {deployment} = this.props;
 		let { data: exchange } = exchangeLoader.getData(deployment.exchangeAccountId);
 		if (!exchange) {
 			return <Card>Loading...</Card>;
