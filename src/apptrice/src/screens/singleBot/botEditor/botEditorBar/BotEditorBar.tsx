@@ -13,12 +13,11 @@ import ProgressBar from '../../../../common/btSettings/ProgressBar';
 import BotEditorBarResizer from './BotEditorBarResizer';
 import VersionTab from './version/VersionTab';
 import VersionPanel from './version/VersionPanel';
-import { DbBotVersion } from '../../../../../../lambdas/model.types';
-import { Console } from 'console';
 import ConsolePanel from '../../../../common/consolePanel/ConsolePanel';
+import { StoreBotVersion } from '../../../../state/dataManager';
 
 interface BotEditorBarProps {
-	version: DbBotVersion,
+	version: StoreBotVersion,
 	codeProblems: CodeProblem[],
 	quickStore: typeof quickStore,
 	currentBackTesting?: any,

@@ -3,17 +3,16 @@ import { Orders } from '../../../../../lambdas/lambda.types';
 import { DBBotDeployment, DBBotDeploymentWithHistory } from '../../../../../lambdas/model.types';
 import DeploymentCharts from '../../../common/charts/DeploymentCharts';
 import { Card, ScreenWrapper } from '../../../components';
-import { ScreenProps } from '../../../types';
-import deploymentLoader from '../deployment.loader';
+import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
 import styles from './_DeploymentChartsScreen.module.css';
 
-export default class DeploymentChartsScreen extends React.Component<ScreenProps> {
+export default class DeploymentChartsScreen extends React.Component<SingleDeploymentScreenProps> {
 	state = {
 		activeTab: ''
 	}
 
 	render() {
-		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
+		const {deployment} = this.props;
 		let symbols = this.getSymbols( deployment );
 
 		return (
@@ -23,11 +22,7 @@ export default class DeploymentChartsScreen extends React.Component<ScreenProps>
 		)
 	}
 
-	renderContent(deployment?: DBBotDeploymentWithHistory) {
-		if (!deployment ){
-			return <Card>Loading...</Card>
-		}
-
+	renderContent(deployment: DBBotDeploymentWithHistory) {
 		return (
 			<DeploymentCharts
 				exchangeProvider="bitfinex"
@@ -39,8 +34,7 @@ export default class DeploymentChartsScreen extends React.Component<ScreenProps>
 		return this.props.router.location.params.id;
 	}
 
-	getSymbols(deployment?: DBBotDeployment): Orders | undefined {
-		if (!deployment) return;
+	getSymbols(deployment: DBBotDeployment): Orders | undefined {
 		// @ts-ignore
 		return deployment.symbols.flatten ?
 		// @ts-ignore

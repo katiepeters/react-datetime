@@ -3,17 +3,27 @@ import { ScreenProps } from '../../types'
 import BotDetailsScreen from './botDetails/BotDetailsScreen'
 import {SidebarLayout} from '../../components';
 import AppMenu from '../../AppMenu';
+import { botLoader } from '../../state/lorese/loaders/bot.loader';
+import { getAuthenticatedId } from '../../state/lorese/selectors/account.selectors';
 
 export default class BotScreen extends React.Component<ScreenProps> {
 	render() {
 		let Subscreen = this.getSubscreen();
+		let {isLoading, data: bot} = botLoader({
+			accountId: getAuthenticatedId(),
+			botId: this.getBotId()
+		});
+
+		if( isLoading || !bot ){
+			return <div>Loading...</div>;
+		}
 
 		return (
 			<SidebarLayout
 				sidebar={ this.renderMenu() }
 				sidebarWidth={65}
 				bgColor="#061725">
-				<Subscreen {...this.props} />
+				<Subscreen {...this.props} bot={bot} />
 			</SidebarLayout>
 		);
 	}
@@ -60,5 +70,9 @@ export default class BotScreen extends React.Component<ScreenProps> {
 				return 'backtesting';
 		}
 		return 'details';
+	}
+
+	getBotId(): string {
+		return this.props.router.location.params.id;
 	}
 }

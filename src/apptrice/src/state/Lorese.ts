@@ -57,11 +57,12 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 		},
 		loader: function<INP,RET>( config: LoaderInput<ST,INP> ): LoaderFunction<INP,RET> {
 			const isValid = config.isValid || (() => true);
-			const loadCache = new Map<INP,LoaderOutput<INP,RET>>();
+			const loadCache = new Map<string,LoaderOutput<INP,RET>>();
 			
 			function loadData(input: INP, cached: RET | void) {
+				const key = JSON.stringify(input);
 				let promise = config.load(input);
-				loadCache.set(input, {
+				loadCache.set(key, {
 					isLoading: true,
 					error: null,
 					promise: promise,
@@ -71,7 +72,7 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 
 				promise
 					.then( () => {
-						loadCache.set(input, {
+						loadCache.set(key, {
 							isLoading: false,
 							error: null,
 							promise: promise,
@@ -80,7 +81,7 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 						});
 					})
 					.catch( err => {
-						loadCache.set(input, {
+						loadCache.set(key, {
 							isLoading: false,
 							error: err,
 							promise: promise,
@@ -95,7 +96,8 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 			}
 
 			function tryLoad( input: INP ){
-				let loaded = loadCache.get(input);
+				const key = JSON.stringify(input);
+				let loaded = loadCache.get(key);
 				const cached = config.selector(store, input);
 
 				const isValidLoad = loaded && (
@@ -118,13 +120,13 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 						retry: tryLoad,
 						promise: Promise.resolve(cached)
 					}
-					loadCache.set(input, loaded);
+					loadCache.set(key, loaded);
 					return loaded;
 				}
 
 				// The data is not loaded, load it
 				loadData(input);
-				loaded = loadCache.get(input);
+				loaded = loadCache.get(key);
 
 				if( !loaded ) throw new Error('Load not cached');
 

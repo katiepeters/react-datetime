@@ -1,13 +1,14 @@
 
 import { AxiosResponse } from 'axios';
 import * as React from 'react'
+import { DbBot } from '../../../../lambdas/model.types';
 import { Button, ButtonList, DropDownButton, Modal, ModalBox, ScreenWrapper, Spinner, Table } from '../../components';
 import { TableColumn } from '../../components/table/Table';
 import Toaster from '../../components/toaster/Toaster';
-import apiCacher, { DbBot } from '../../state/apiCacher';
+import apiCacher from '../../state/apiCacherLorese';
+import { botListLoader } from '../../state/lorese/loaders/botListLoader';
 import { ScreenProps } from '../../types'
 import BotEditForm, {BotEditPayload} from './BotEditForm';
-import botListLoader from './botList.loader';
 import styles from './_BotListScreen.module.css';
 
 interface BotListScreenState {
@@ -41,8 +42,8 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 	}
 
 	renderBotList() {
-		const { authenticatedId: accountId } = this.props.store;
-		const { isLoading, data } = botListLoader.getData(accountId);
+		const { authenticatedId } = this.props.store;
+		const { isLoading, data } = botListLoader(authenticatedId);
 		if (isLoading || !data) {
 			return <span>Loading...</span>;
 		}
@@ -94,8 +95,8 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 	getBot( botId?: string ){
 		if( !botId ) return;
 
-		const { authenticatedId: accountId } = this.props.store;
-		const { data } = botListLoader.getData(accountId);
+		const { authenticatedId } = this.props.store;
+		const { data } = botListLoader(authenticatedId);
 		if( !data ) return;
 
 		return data.find((bot: DbBot) => bot.id === botId);

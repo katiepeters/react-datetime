@@ -104,7 +104,9 @@ const apiCacher = {
 									number: '0.0',
 									code: '',
 									createdAt: Date.now(),
-									updatedAt: Date.now()
+									updatedAt: Date.now(),
+									isLocked: false,
+									label: ''
 								}
 							}
 						};
@@ -223,7 +225,9 @@ const apiCacher = {
 								number,
 								code,
 								createdAt: Date.now(),
-								updatedAt: Date.now()
+								updatedAt: Date.now(),
+								isLocked: false,
+								label: ''
 							}
 						}
 					};

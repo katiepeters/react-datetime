@@ -8,6 +8,17 @@ export interface StoreAccount {
 	exchangeAccounts?: string[]
 }
 
+export interface StoreBotVersion {
+	accountId: string
+	botId: string
+	number: string
+	code: string
+	isLocked: boolean
+	label: string
+	createdAt: number
+	updatedAt: number
+}
+
 export type StoreBotDeployment = SimpleBotDeployment | DBBotDeploymentWithHistory;
 export interface Store {
 	authenticatedId: string
@@ -24,7 +35,7 @@ export interface Store {
 		[id:string]: DbExchangeAccount
 	},
 	botVersions: {
-		[id:string]: Partial<DbBotVersion>
+		[id:string]: StoreBotVersion
 	},
 	transientData: {
 		currentBt: any,

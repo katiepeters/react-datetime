@@ -262,7 +262,8 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		const payload = {
 			accountId: this.props.accountId,
 			name,
-			botId, botVersion, exchangeAccountId, runInterval,
+			botId, exchangeAccountId, runInterval,
+			version: botVersion,
 			symbols,
 			active: true,
 			exchange: this.state.exchange,

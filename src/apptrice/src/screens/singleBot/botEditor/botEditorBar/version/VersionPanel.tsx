@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
-import { DbBotVersion } from '../../../../../../../lambdas/model.types';
+import React, { Component } from 'react';
+import { StoreBotVersion } from '../../../../../state/dataManager';
 
 interface VersionPanelProps {
-	version: DbBotVersion
+	version: StoreBotVersion
 }
 export default class VersionPanel extends Component<VersionPanelProps> {
 

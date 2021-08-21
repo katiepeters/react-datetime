@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { DbBot } from '../../../../lambdas/model.types';
 import { Button, Controls, InputGroup } from '../../components';
 import Toaster from '../../components/toaster/Toaster';
-import { DbBot } from '../../state/apiCacher';
 import { FormErrors } from '../../types';
 import styles from './_BotEditForm.module.css';
 

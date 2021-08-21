@@ -160,7 +160,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 				.then( (exchangeId: string) => {
 					// @ts-ignore
 					let payload: CreateDeploymentPayload = arrayize(data).filterKeys(
-						['accountId', 'name', 'botId', 'symbols', 'active', 'runInterval']
+						['accountId', 'name', 'botId', 'version', 'symbols', 'active', 'runInterval']
 					);
 					payload.exchangeAccountId = exchangeId;
 					return this.createDeployment(payload);

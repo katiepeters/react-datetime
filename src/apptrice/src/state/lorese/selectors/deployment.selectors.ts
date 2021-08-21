@@ -2,16 +2,22 @@ import memoizeOne from 'memoize-one'
 import lorese, { Store, StoreBotDeployment } from '../../dataManager';
 const {selector} = lorese;
 
-const getAccountListSelector = (store: Store, accountId: string): StoreBotDeployment[] | void => {
+export const getDeploymentListSelector = (store: Store, accountId: string): StoreBotDeployment[] | void => {
 	const account = store.accounts[accountId];
 	if( !account || !account.deployments ) return;
 
-	return accountListMemo( account.deployments, store.deployments );
+	return deploymentListMemo( account.deployments, store.deployments );
 }
-const getAccountList = selector<string,StoreBotDeployment[] | void>(getAccountListSelector);
 
-const accountListMemo = memoizeOne( (ids, deployments ) => {
+export const getDeploymentList = selector<string,StoreBotDeployment[] | void>(getDeploymentListSelector);
+
+const deploymentListMemo = memoizeOne( (ids, deployments ) => {
 	return ids.map( (id:string) => deployments[id] )
 });
 
-export {getAccountList, getAccountListSelector};
+export function getDeploymentSelector(store: Store, deploymentId: string){
+	return store.deployments[deploymentId];
+}
+
+export const getDeployment = selector<string,StoreBotDeployment|void>( getDeploymentSelector );
+

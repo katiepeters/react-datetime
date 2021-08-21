@@ -15,9 +15,10 @@ export const getAccountBots = selector<string,DbBot[]|void>( getAccountBotsSelec
 
 export const getBotList = selector<string,DbBot[]|void>( (store) => getAccountBotsSelector(store, getAuthenticatedId()) );
 
-export const getBot = selector<string, DbBot|void>( (store, botId) => {
+export function getBotSelector(store: Store, botId: string): DbBot | void {
 	return store.bots[botId];
-})
+}
+export const getBot = selector<string, DbBot|void>( getBotSelector );
 
 const getAccountBotsMemo = memoizeOne( (ids, bots) => {
 	return ids.map( (id:string) => bots[id] );

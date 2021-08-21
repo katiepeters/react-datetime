@@ -2,17 +2,17 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import { ScreenProps } from '../../../types';
 import BotSaver from '../BotSaver';
-import botLoader from '../bot.loader';
 import apiCacher from '../../../state/apiCacher';
 import styles from './_BotEditorScreen.module.css';
 import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../../common/btSettings/BotTools';
 import BtRunner from '../../../utils/backtest/BtRunner';
-import botVersionLoader from '../botVersion.loader';
-import { DbBotVersion } from '../../../../../lambdas/model.types';
 import BotEditorLayout from './BotEditorLayout';
+import { BotScreenProps } from '../BotScreenProps';
+import { botVersionLoader } from '../../../state/lorese/loaders/botVersion.loader';
+import { StoreBotVersion } from '../../../state/dataManager';
 
-class BotEditorScreen extends React.Component<ScreenProps> {
+class BotEditorScreen extends React.Component<BotScreenProps> {
 	state = {
 		resources: false,
 		codeProblems: []
@@ -24,8 +24,8 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	isBumpingVersion: boolean = false
 	bumpingCodeCache: string = ''
 	botSaver: BotSaver = new BotSaver({
-		accountId: this.props.store.authenticatedId,
-		botId: this.getBotId(this.props),
+		accountId: this.props.bot.accountId,
+		botId: this.props.bot.id,
 		apiCacher
 	})
 
@@ -43,7 +43,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		);
 	}
 
-	renderEditor(version: DbBotVersion) {
+	renderEditor(version: StoreBotVersion) {
 		return (
 			<Editor
 				defaultLanguage="javascript"
@@ -55,7 +55,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		)
 	}
 
-	renderBar(version: DbBotVersion) {
+	renderBar(version: StoreBotVersion) {
 		return (
 			<BotEditorBar
 				version={ version }
@@ -131,9 +131,10 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	}
 
 	bumpVersion(){
+		const {id: botId, accountId} = this.props.bot;
 		apiCacher.createBotVersion({
-			accountId: this.props.store.authenticatedId,
-			botId: this.getBotId(this.props),
+			accountId,
+			botId,
 			type: 'minor',
 			sourceNumber: this.getEditingVersionNumber()
 		})
@@ -188,13 +189,13 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	}
 
 	_onRunBt = (config: BacktestConfig) => {
-		const botId = this.getBotId(this.props);
+		const {bot: botId, accountId} = this.props.bot;
 		const version = this.getEditingVersion();
 		if( version ){
 			BtRunner.start(version, config);
 			if( !version.isLocked ) {
 				apiCacher.updateBotVersion(
-					this.props.store.authenticatedId,
+					accountId,
 					botId,
 					version.number,
 					{isLocked: true}
@@ -213,10 +214,7 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 	}
 
 	getLastVersionNumber(): string | undefined {
-		const botId = this.getBotId(this.props);
-		const { data: bot } = botLoader.getData(botId);
-		if( !bot ) return;
-
+		const {bot} = this.props;
 		const major = bot.versions.length - 1;
 		return `${major}.${bot.versions[major].lastMinor}`;
 	}
@@ -228,11 +226,12 @@ class BotEditorScreen extends React.Component<ScreenProps> {
 		;
 	}
 
-	getEditingVersion(): DbBotVersion | null {
-		let number = this.getEditingVersionNumber();
-		if( !number ) return null;
+	getEditingVersion(): StoreBotVersion | undefined {
+		let versionNumber = this.getEditingVersionNumber();
+		if( !versionNumber ) return;
 
-		const { data: version } = botVersionLoader.getData(this.getBotId(this.props), number);
+		const {id: botId, accountId} = this.props.bot;
+		const { data: version } = botVersionLoader({accountId, botId, versionNumber});
 		return version;
 	}
 }

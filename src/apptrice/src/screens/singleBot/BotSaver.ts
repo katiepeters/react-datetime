@@ -1,4 +1,4 @@
-import apiCacher from "../../state/apiCacher";
+import apiCacher from "../../state/apiCacherLorese";
 
 const SAVE_TIMEOUT = 2000;
 

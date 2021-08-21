@@ -1,16 +1,14 @@
 import * as React from 'react'
-import { Orders } from '../../../../../lambdas/lambda.types';
-import { DBBotDeployment } from '../../../../../lambdas/model.types';
+import { DeploymentOrders } from '../../../../../lambdas/model.types';
 import OrderList from '../../../common/orderList/OrderList';
 import { Card, ScreenWrapper } from '../../../components';
-import { ScreenProps } from '../../../types';
-import deploymentLoader from '../deployment.loader';
+import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
 import styles from './_DeploymentOrdersScreen.module.css';
 
-export default class DeploymentOrdersScreen extends React.Component<ScreenProps> {
+export default class DeploymentOrdersScreen extends React.Component<SingleDeploymentScreenProps> {
 	render() {
-		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
-		let orders = this.getOrders( deployment );
+		const {orders} = this.props.deployment;
+		
 		return (
 			<ScreenWrapper title={this.renderTitle(orders)}>
 				{ this.renderList(orders) }
@@ -18,41 +16,22 @@ export default class DeploymentOrdersScreen extends React.Component<ScreenProps>
 		)
 	}
 
-	renderList(orders?: Orders) {
-		if( !orders ){
-			return <Card>Loading...</Card>;
-		}
-
+	renderList(orders: DeploymentOrders) {
 		if( !Object.keys(orders).length ){
 			return <Card>No orders.</Card>;
 		}
 
 		return (
 			<OrderList
-				orders={orders} />
+				orders={orders.items} />
 		);
 	}
 
-	renderTitle(orders?: Orders) {
-		if (!orders) {
-			return 'Orders'
-		}
-
+	renderTitle(orders: DeploymentOrders) {
 		let count = Object.keys(orders).length;
 		return count ?
 			`${count} orders` :
 			'Orders'
 		;
-	}
-
-	getDeploymentId() {
-		return this.props.router.location.params.id;
-	}
-
-	getOrders(deployment?: DBBotDeployment): Orders | undefined {
-		if( !deployment ) return;
-		let {items} = deployment.orders;
-		// @ts-ignore
-		return items.flatten ? items.flatten() : items;
 	}
 }

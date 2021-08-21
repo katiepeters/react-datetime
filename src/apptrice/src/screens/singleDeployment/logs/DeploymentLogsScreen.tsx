@@ -1,18 +1,16 @@
 import * as React from 'react'
-import { ConsoleEntry, DBBotDeployment } from '../../../../../lambdas/model.types';
 import ConsolePanel from '../../../common/consolePanel/ConsolePanel';
 import { Card, ScreenWrapper } from '../../../components';
-import { ScreenProps } from '../../../types';
-import deploymentLoader from '../deployment.loader';
+import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
 import styles from './_DeploymentLogsScreen.module.css';
 
-export default class DeploymentLogsScreen extends React.Component<ScreenProps> {
+export default class DeploymentLogsScreen extends React.Component<SingleDeploymentScreenProps> {
 	render() {
-		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
-		let logs = this.getLogs( deployment );
+		const {deployment} = this.props;
+		
 		return (
 			<ScreenWrapper title="logs">
-				{ this.renderLogs(logs) }
+				{ this.renderLogs(deployment.logs) }
 			</ScreenWrapper>
 		)
 	}
@@ -30,12 +28,5 @@ export default class DeploymentLogsScreen extends React.Component<ScreenProps> {
 
 	getDeploymentId() {
 		return this.props.router.location.params.id;
-	}
-
-	getLogs(deployment?: DBBotDeployment): ConsoleEntry[] | undefined {
-		if( !deployment ) return;
-		let logs = deployment.logs;
-		// @ts-ignore
-		return logs.flatten ? logs.flatten() : logs;
 	}
 }

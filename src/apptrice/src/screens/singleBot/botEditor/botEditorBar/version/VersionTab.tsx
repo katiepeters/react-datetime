@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { DbBotVersion } from '../../../../../../../lambdas/model.types';
+import { StoreBotVersion } from '../../../../../state/dataManager';
 import EditorTab from '../../components/EditorTab';
 
 interface VersionTabProps {
 	id: string
 	active: boolean
 	onClick: (id: string) => void
-	version: DbBotVersion
+	version: StoreBotVersion
 }
 
 export default class VersionTab extends React.Component<VersionTabProps> {

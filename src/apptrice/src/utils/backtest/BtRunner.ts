@@ -1,16 +1,17 @@
 import { BacktestConfig } from "../../common/btSettings/BotTools";
 import {v4 as uuid} from 'uuid';
-import { DBBotDeployment, DbBotVersion, DbExchangeAccount } from "../../../../lambdas/model.types";
+import { DBBotDeployment, DbExchangeAccount } from "../../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
 import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIteration";
 import quickStore from "../../state/quickStore";
 import { BtUpdater } from "./BtUpdater";
 import { BtDeployment, BtExchange } from "./Bt.types";
 import store from "../../state/store";
+import { StoreBotVersion } from "../../state/dataManager";
 
 let runner: BtBotRunner;
 const BtRunner = {
-	start( version: DbBotVersion, options: BacktestConfig ): string {
+	start( version: StoreBotVersion, options: BacktestConfig ): string {
 		const btid = createRun( version.botId );
 
 		prepareAndRun( version, options );
@@ -32,7 +33,7 @@ const BtRunner = {
 export default BtRunner;
 
 
-async function prepareAndRun(version: DbBotVersion, options: BacktestConfig){
+async function prepareAndRun(version: StoreBotVersion, options: BacktestConfig){
 	runner = new BtBotRunner({
 		accountId: version.accountId,
 		botId: version.botId,
@@ -81,7 +82,7 @@ function createRun( botId: any ): string{
 	return btid;
 }
 
-async function runIterations( version: DbBotVersion, runner: BtBotRunner ) {
+async function runIterations( version: StoreBotVersion, runner: BtBotRunner ) {
 	const { accountId, botId } = version;
 
 	while( runner.hasIterationsLeft() ){

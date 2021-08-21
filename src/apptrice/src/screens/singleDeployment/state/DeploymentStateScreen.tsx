@@ -1,15 +1,12 @@
 import * as React from 'react'
-import { Orders } from '../../../../../lambdas/lambda.types';
-import { DBBotDeployment } from '../../../../../lambdas/model.types';
+import { DBBotDeploymentState } from '../../../../../lambdas/model.types';
 import { Card, ScreenWrapper } from '../../../components';
-import { ScreenProps } from '../../../types';
-import deploymentLoader from '../deployment.loader';
+import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
 import styles from './_DeploymentStateScreen.module.css';
 
-export default class DeploymentStateScreen extends React.Component<ScreenProps> {
+export default class DeploymentStateScreen extends React.Component<SingleDeploymentScreenProps> {
 	render() {
-		let { data: deployment } = deploymentLoader.getData(this.getDeploymentId())
-		let state = this.getState(deployment);
+		const {state} = this.props.deployment;
 		return (
 			<ScreenWrapper title="state data">
 				{ this.renderState(state)}
@@ -17,26 +14,11 @@ export default class DeploymentStateScreen extends React.Component<ScreenProps> 
 		)
 	}
 
-	renderState(state?: any) {
-		if (!state) {
-			return <Card>Loading...</Card>
-		}
-
+	renderState(state: DBBotDeploymentState) {
 		return (
 			<Card>
 				<pre>{JSON.stringify(state, null, 2)}</pre>
 			</Card>
 		);
-	}
-
-	getDeploymentId() {
-		return this.props.router.location.params.id;
-	}
-
-	getState(deployment?: DBBotDeployment): Orders | undefined {
-		if (!deployment) return;
-		const state = deployment.state;
-		// @ts-ignore
-		return state.flatten ? state.flatten() : state;
 	}
 }
