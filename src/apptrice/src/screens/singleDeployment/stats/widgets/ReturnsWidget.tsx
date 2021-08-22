@@ -7,9 +7,9 @@ import 'chartjs-adapter-date-fns';
 import { Card } from '../../../../components';
 import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
 import memoizeOne from 'memoize-one';
-import priceRangeLoader from '../../../../state/loaders/priceRange.loader';
-import historicalPriceLoader from '../../../../state/loaders/historicalPrice.loader';
-import historicalValueLoader from '../../../../state/loaders/historicalValue.loader';
+import priceRangeLoader from '../../../../state/loadersOld/priceRange.loader';
+import historicalPriceLoader from '../../../../state/loadersOld/historicalPrice.loader';
+import historicalValueLoader from '../../../../state/loadersOld/historicalValue.loader';
 import trim from '../../../../utils/trim';
 
 interface ReturnsWidgetProps {

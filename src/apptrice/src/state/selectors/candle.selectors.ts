@@ -1,7 +1,6 @@
-import { ArrayCandle } from '../../../../../lambdas/lambda.types';
-import lorese, { Store } from '../../dataManager';
-import { CandlesDescriptor, getCandlesKey } from '../../storeKeys';
-const {selector} = lorese;
+import { ArrayCandle } from '../../../../lambdas/lambda.types';
+import { selector, Store } from '../dataManager';
+import { CandlesDescriptor, getCandlesKey } from '../storeKeys';
 
 export function candlesSelector( store: Store, descriptor: CandlesDescriptor) {
 	return store.transientData.candles[ getCandlesKey(descriptor) ];

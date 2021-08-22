@@ -22,7 +22,7 @@ type LoaderFunction<ARG,RET> = (input: ARG) => LoaderOutput<ARG,RET>;
 
 export interface Lorese<ST> {
 	addChangeListener( clbk: () => any): void
-	removeEventListener( clbk: () => any): void
+	removeChangeListener( clbk: () => any): void
 	loader<INP,RET>( config: LoaderInput<ST,INP> ): LoaderFunction<INP,RET>
 	reducer<ARG>( clbk: ReducerInput<ST,ARG> ): ReducerOutput<ARG>
 	selector<ARG,RET>( clbk: SelectorInput<ST,ARG,RET> ): SelectorOutput<ARG,RET>
@@ -46,7 +46,7 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 		addChangeListener( clbk: () => any ){
 			listeners.push( clbk );
 		},
-		removeEventListener( clbk: () => any ){
+		removeChangeListener( clbk: () => any ){
 			let i = listeners.length;
 			while( i-- > 0 ){
 				if( clbk === listeners[i] ){

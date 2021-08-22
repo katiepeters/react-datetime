@@ -1,8 +1,7 @@
-import lorese from '../../dataManager';
-import apiCacher from '../../apiCacherLorese';
+import {loader} from '../dataManager';
+import apiCacher from '../apiCacher';
 import { getExchangesSelector } from '../selectors/exchange.selectors';
-import { DbExchangeAccount } from '../../../../../lambdas/model.types';
-const {loader} = lorese;
+import { DbExchangeAccount } from '../../../../lambdas/model.types';
 
 export const exchangeListLoader = loader<string,DbExchangeAccount[]>({
 	selector: getExchangesSelector,

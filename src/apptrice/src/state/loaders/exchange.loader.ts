@@ -1,8 +1,7 @@
-import lorese from '../../dataManager';
-import apiCacher from '../../apiCacherLorese';
-import { DbExchangeAccount } from '../../../../../lambdas/model.types';
+import {loader} from '../dataManager';
+import apiCacher from '../apiCacher';
 import { exchangeSelector } from '../selectors/exchange.selectors';
-const {loader} = lorese;
+import { DbExchangeAccount } from '../../../../lambdas/model.types';
 
 interface ExchangeLoadInput {
 	accountId: string

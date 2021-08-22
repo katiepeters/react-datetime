@@ -1,8 +1,7 @@
-import { DBBotDeploymentWithHistory } from '../../../../../lambdas/model.types';
-import apiCacher from '../../apiCacherLorese';
-import lorese from '../../dataManager';
+import { DBBotDeploymentWithHistory } from '../../../../lambdas/model.types';
+import apiCacher from '../apiCacher';
+import {loader} from '../dataManager';
 import { getDeploymentSelector } from '../selectors/deployment.selectors';
-const {loader} = lorese;
 
 interface deploymentLoadInput {
 	accountId: string,

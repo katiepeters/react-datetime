@@ -1,7 +1,7 @@
 import * as React from 'react'
 import symbols from '../../../../../lambdas/_common/utils/symbols';
 import { Card, ScreenWrapper } from '../../../components';
-import { exchangeLoader } from '../../../state/lorese/loaders/exchange.loader';
+import { exchangeLoader } from '../../../state/loaders/exchange.loader';
 import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
 import PortfolioHistoryWidget from './widgets/PortfolioHistoryWidget';
 import PortfolioWidget from './widgets/PortfolioWidget';

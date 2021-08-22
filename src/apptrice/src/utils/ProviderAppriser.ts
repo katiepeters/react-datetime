@@ -1,7 +1,7 @@
 
 // An appraiser is a person who calculate the value of things (tasador)
-import historicalPriceLoader from "../state/loaders/historicalPrice.loader";
-import priceRangeLoader from "../state/loaders/priceRange.loader";
+import historicalPriceLoader from "../state/loadersOld/historicalPrice.loader";
+import priceRangeLoader from "../state/loadersOld/priceRange.loader";
 import { Appraiser } from "./Appraiser";
 
 const DAY = 24 * 60 * 60 * 1000;

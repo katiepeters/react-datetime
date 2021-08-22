@@ -1,5 +1,4 @@
-import lorese, { StoreAccount } from '../../dataManager';
-const {selector} = lorese;
+import { selector, StoreAccount } from '../dataManager';
 
 export const getAuthenticatedId = selector<void,string>( (store) => {
 	return store.authenticatedId;

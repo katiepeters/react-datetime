@@ -3,8 +3,8 @@ import { ScreenProps } from '../../types'
 import BotDetailsScreen from './botDetails/BotDetailsScreen'
 import {SidebarLayout} from '../../components';
 import AppMenu from '../../AppMenu';
-import { botLoader } from '../../state/lorese/loaders/bot.loader';
-import { getAuthenticatedId } from '../../state/lorese/selectors/account.selectors';
+import { botLoader } from '../../state/loaders/bot.loader';
+import { getAuthenticatedId } from '../../state/selectors/account.selectors';
 
 export default class BotScreen extends React.Component<ScreenProps> {
 	render() {

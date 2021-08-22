@@ -1,6 +1,5 @@
-import lorese, { Store, StoreBotVersion } from '../../dataManager';
-import { BotVersionDescriptor, getVersionKey } from '../../storeKeys';
-const {selector} = lorese;
+import { selector, Store, StoreBotVersion } from '../dataManager';
+import { BotVersionDescriptor, getVersionKey } from '../storeKeys';
 
 export function botVersionSelector(store: Store, descriptor: BotVersionDescriptor ): StoreBotVersion | void {
 	return store.botVersions[ getVersionKey(descriptor) ];

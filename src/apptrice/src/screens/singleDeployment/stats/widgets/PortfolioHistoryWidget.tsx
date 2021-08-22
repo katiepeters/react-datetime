@@ -8,8 +8,8 @@ import 'chartjs-adapter-date-fns';
 import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
 import memoizeOne from 'memoize-one';
 import trim from '../../../../utils/trim';
-import priceRangeLoader from '../../../../state/loaders/priceRange.loader';
-import historicalValueLoader from '../../../../state/loaders/historicalValue.loader';
+import priceRangeLoader from '../../../../state/loadersOld/priceRange.loader';
+import historicalValueLoader from '../../../../state/loadersOld/historicalValue.loader';
 
 interface PortfolioHistoryWidgetProps {
 	exchangeAccount: DbExchangeAccount

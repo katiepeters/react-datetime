@@ -1,9 +1,7 @@
 import memoizeOne from 'memoize-one';
-import { DbExchangeAccount } from '../../../../../lambdas/model.types';
-import lorese, { Store } from '../../dataManager';
+import { DbExchangeAccount } from '../../../../lambdas/model.types';
+import { selector, Store } from '../dataManager';
 import { getAccount, getAuthenticatedId } from './account.selectors';
-
-const {selector} = lorese;
 
 export function getExchangesSelector(store: Store, accountId: string): DbExchangeAccount[] | void{
 	const account = getAccount(accountId);

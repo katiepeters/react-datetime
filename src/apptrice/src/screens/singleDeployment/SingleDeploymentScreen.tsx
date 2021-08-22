@@ -2,8 +2,8 @@ import * as React from 'react'
 import AppMenu from '../../AppMenu';
 import { SidebarLayout } from '../../components';
 import { ScreenProps } from '../../types'
-import {deploymentLoader} from '../../state/lorese/loaders/deployment.loader';
-import { getAuthenticatedId } from '../../state/lorese/selectors/account.selectors';
+import {deploymentLoader} from '../../state/loaders/deployment.loader';
+import { getAuthenticatedId } from '../../state/selectors/account.selectors';
 
 
 export default class SingleDeploymentScreen extends React.Component<ScreenProps> {

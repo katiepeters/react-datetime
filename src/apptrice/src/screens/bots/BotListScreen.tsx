@@ -5,8 +5,8 @@ import { DbBot } from '../../../../lambdas/model.types';
 import { Button, ButtonList, DropDownButton, Modal, ModalBox, ScreenWrapper, Spinner, Table } from '../../components';
 import { TableColumn } from '../../components/table/Table';
 import Toaster from '../../components/toaster/Toaster';
-import apiCacher from '../../state/apiCacherLorese';
-import { botListLoader } from '../../state/lorese/loaders/botListLoader';
+import apiCacher from '../../state/apiCacher';
+import { botListLoader } from '../../state/loaders/botListLoader';
 import { ScreenProps } from '../../types'
 import BotEditForm, {BotEditPayload} from './BotEditForm';
 import styles from './_BotListScreen.module.css';

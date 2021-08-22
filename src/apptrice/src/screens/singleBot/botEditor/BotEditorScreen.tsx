@@ -2,14 +2,14 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import { ScreenProps } from '../../../types';
 import BotSaver from '../BotSaver';
-import apiCacher from '../../../state/apiCacherLorese';
+import apiCacher from '../../../state/apiCacher';
 import styles from './_BotEditorScreen.module.css';
 import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../../common/btSettings/BotTools';
 import BtRunner from '../../../utils/backtest/BtRunner';
 import BotEditorLayout from './BotEditorLayout';
 import { BotScreenProps } from '../BotScreenProps';
-import { botVersionLoader } from '../../../state/lorese/loaders/botVersion.loader';
+import { botVersionLoader } from '../../../state/loaders/botVersion.loader';
 import { StoreBotVersion } from '../../../state/dataManager';
 
 class BotEditorScreen extends React.Component<BotScreenProps> {

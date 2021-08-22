@@ -1,6 +1,5 @@
 import memoizeOne from 'memoize-one'
-import lorese, { Store, StoreBotDeployment } from '../../dataManager';
-const {selector} = lorese;
+import { selector, Store, StoreBotDeployment } from '../dataManager';
 
 export const getDeploymentListSelector = (store: Store, accountId: string): StoreBotDeployment[] | void => {
 	const account = store.accounts[accountId];

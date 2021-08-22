@@ -3,15 +3,15 @@ import styles from './_DeploymentsScreen.module.css';
 import { ScreenProps } from '../../types';
 import { Button, ButtonList, DropDownButton, ScreenWrapper, Spinner, Table, Card, Modal, ModalBox } from '../../components';
 import { TableColumn } from '../../components/table/Table';
-import apiCacher from '../../state/apiCacherLorese';
+import apiCacher from '../../state/apiCacher';
 import Toaster from '../../components/toaster/Toaster';
 import CreateDeploymentForm, { CreateDeploymentPayload } from './CreateDeploymentForm';
 import { CreateExchangeAccountInput } from '../../state/apiClient';
 import arrayize from '../../../../lambdas/_common/utils/arrayize';
 import { Portfolio } from '../../../../lambdas/lambda.types';
 import { isActiveDeployment } from '../../../../lambdas/_common/utils/deploymentUtils';
-import { deploymentListLoader } from '../../state/lorese/loaders/deploymentList.loader';
-import { getAuthenticatedId } from '../../state/lorese/selectors/account.selectors';
+import { deploymentListLoader } from '../../state/loaders/deploymentList.loader';
+import { getAuthenticatedId } from '../../state/selectors/account.selectors';
 import { SimpleBotDeployment } from '../../../../lambdas/model.types';
 
 

@@ -4,10 +4,10 @@ import InitialBalances, {Balances} from '../../common/btSettings/InitialBalances
 import { Button, Controls, InputGroup } from '../../components';
 import Toaster from '../../components/toaster/Toaster';
 import { FormErrors } from '../../types';
-import {botListLoader} from '../../state/lorese/loaders/botListLoader';
-import {exchangeListLoader} from '../../state/lorese/loaders/exchangeListLoader';
+import {botListLoader} from '../../state/loaders/botListLoader';
+import {exchangeListLoader} from '../../state/loaders/exchangeListLoader';
 import styles from './_CreateDeploymentForm.module.css';
-import { getBot } from '../../state/lorese/selectors/bot.selectors';
+import { getBot } from '../../state/selectors/bot.selectors';
 
 export interface CreateDeploymentPayload {
 	accountId: string

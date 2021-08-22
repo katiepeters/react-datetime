@@ -11,7 +11,7 @@ export function LoreseConnector ( Comp: any, lorese: Lorese<any> ) {
 			lorese.addChangeListener( this._refresh );
 		}
 		componentWillUnmount(){
-			lorese.removeEventListener( this._refresh );
+			lorese.removeChangeListener( this._refresh );
 		}
 
 		_refresh = () => {

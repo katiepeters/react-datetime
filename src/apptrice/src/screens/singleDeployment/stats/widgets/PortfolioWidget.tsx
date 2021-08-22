@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Balance } from '../../../../../../lambdas/lambda.types';
 import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
 import { Card, Table } from '../../../../components';
-import priceLoader from '../../../../state/loaders/price.loader';
+import priceLoader from '../../../../state/loadersOld/price.loader';
 import trim from '../../../../utils/trim';
 import styles from './_PortfolioWidget.module.css';
 

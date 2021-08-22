@@ -1,7 +1,6 @@
-import apiCacher from '../../apiCacherLorese';
-import lorese, { StoreBotVersion } from '../../dataManager';
+import apiCacher from '../apiCacher';
+import { loader, StoreBotVersion } from '../dataManager';
 import { botVersionSelector } from '../selectors/botVersion.selectors';
-const {loader} = lorese;
 
 interface BotVersionLoadInput {
 	accountId: string,

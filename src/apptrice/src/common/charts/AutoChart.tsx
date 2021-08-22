@@ -3,7 +3,7 @@ import { ArrayCandle } from '../../../../lambdas/lambda.types';
 import { Order } from '../../../../lambdas/model.types';
 import TradingChart, {ChartCandle} from './TradingChart';
 import memoizeOne from 'memoize-one';
-import { candleLoader } from '../../state/lorese/loaders/candle.loader';
+import { candleLoader } from '../../state/loaders/candle.loader';
 
 interface AutoChartProps {
 	symbol: string,

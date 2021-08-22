@@ -1,7 +1,6 @@
-import lorese, { StoreBotDeployment } from '../../dataManager';
+import { loader, StoreBotDeployment } from '../dataManager';
 import {getDeploymentListSelector} from '../selectors/deployment.selectors';
-import apiCacher from '../../apiCacherLorese';
-const {loader} = lorese;
+import apiCacher from '../apiCacher';
 
 export const deploymentListLoader = loader<string,StoreBotDeployment[]>({
 	selector: getDeploymentListSelector,

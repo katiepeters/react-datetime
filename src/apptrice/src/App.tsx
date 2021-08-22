@@ -7,9 +7,9 @@ import router from './state/router';
 import localStore from './state/localStore';
 import apiClient from './state/apiClient';
 import DataLoader from './utils/DataLoader';
-import lorese from './state/dataManager';
+import * as lorese from './state/dataManager';
 import { LoreseConnector } from './state/ReactLorese';
-import { getAuthenticatedId } from './state/lorese/selectors/account.selectors';
+import { getAuthenticatedId } from './state/selectors/account.selectors';
 
 class App extends React.Component {
   constructor(props: any) {

@@ -5,8 +5,8 @@ import VirtualAdapter from "../../../../lambdas/_common/exchanges/adapters/Virtu
 import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
 import candles from "../../../../lambdas/_common/utils/candles";
 import { Balances } from "../../common/btSettings/InitialBalances";
-import apiCacher from "../../state/apiCacherLorese";
-import { botVersionLoader } from "../../state/lorese/loaders/botVersion.loader";
+import apiCacher from "../../state/apiCacher";
+import { botVersionLoader } from "../../state/loaders/botVersion.loader";
 import { BtRunnableBot, IBtRunnableBot } from "./BtRunnableBot";
 
 export interface BtBotRunnerConfig {

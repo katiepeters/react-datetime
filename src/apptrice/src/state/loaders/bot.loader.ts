@@ -1,8 +1,7 @@
-import lorese from '../../dataManager';
-import apiCacher from '../../apiCacherLorese';
-import { DbBot } from '../../../../../lambdas/model.types';
+import {loader} from '../dataManager';
+import apiCacher from '../apiCacher';
 import { getBotSelector } from '../selectors/bot.selectors';
-const {loader} = lorese;
+import { DbBot } from '../../../../lambdas/model.types';
 
 export interface BotLoadInput {
 	accountId: string
