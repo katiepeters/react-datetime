@@ -36,9 +36,7 @@ export default class DeploymentStatsScreen extends React.Component<SingleDeploym
 					quotedAsset={quotedAsset}
 					exchangeAccount={ exchange } />
 				<ReturnsWidget
-					baseAssets={baseAssets}
-					quotedAsset={quotedAsset}
-					exchangeAccount={ exchange } />
+					deployment={ this.props.deployment } />
 			</div>
 		);
 	}

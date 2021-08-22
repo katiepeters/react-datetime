@@ -1,9 +1,12 @@
 import memoizeOne from 'memoize-one';
 import * as React from 'react'
+import { getDeploymentAssets } from '../../../../../../lambdas/_common/utils/deploymentUtils';
 import { getStats } from '../../../../common/deplotymentStats/statsCalculator';
 import StatTable from '../../../../common/deplotymentStats/StatTable';
 import { Card } from '../../../../components';
 import { BtActive } from '../../../../utils/backtest/Bt.types'
+import ReturnsWidget from '../../../singleDeployment/stats/widgets/ReturnsWidget';
+import styles from './_BtStats.module.css';
 
 interface BtStatsProps {
 	bt: BtActive
@@ -11,14 +14,20 @@ interface BtStatsProps {
 
 export default class BtStats extends React.Component<BtStatsProps> {
 	render() {
-		console.log( this.props.bt );
+		const {exchange, deployment} = this.props.bt.data;
 		return (
-			<div>
-				<Card>
-					 <StatTable
-					 	columns={ this.getTableColumns() }
-						currency={ this.getCurrency() } />
-				</Card>
+			<div className={styles.container}>
+				<div className={styles.left}>
+					<Card>
+						<StatTable
+							columns={ this.getTableColumns() }
+							currency={ this.getCurrency() } />
+					</Card>
+				</div>
+				<div className={styles.right}>
+					<ReturnsWidget
+						deployment={ deployment } />
+				</div>
 			</div>
 		);
 	}

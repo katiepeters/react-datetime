@@ -1,21 +1,16 @@
 import * as React from 'react'
 import styles from './_ReturnsWidget.module.css';
-
-
 import {Line} from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { Card } from '../../../../components';
-import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
+import { PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
 import memoizeOne from 'memoize-one';
-import priceRangeLoader from '../../../../state/loadersOld/priceRange.loader';
-import historicalPriceLoader from '../../../../state/loadersOld/historicalPrice.loader';
-import historicalValueLoader from '../../../../state/loadersOld/historicalValue.loader';
 import trim from '../../../../utils/trim';
+import { BtDeployment } from '../../../../utils/backtest/Bt.types';
+import { getDeploymentAssets, getPortfolioValue } from '../../../../../../lambdas/_common/utils/deploymentUtils';
 
 interface ReturnsWidgetProps {
-	exchangeAccount: DbExchangeAccount
-	baseAssets: string[]
-	quotedAsset: string
+	deployment?: BtDeployment
 }
 
 export default class ReturnsWidget extends React.Component<ReturnsWidgetProps> {
@@ -38,10 +33,6 @@ export default class ReturnsWidget extends React.Component<ReturnsWidgetProps> {
 			return 'This bot has not been run yet.';
 		}
 
-		if( this.isLoadingPrices() ){
-			return 'Loading...';
-		}
-
 		const data = this.getData();
 		const options = this.getOptions();
 		return (
@@ -52,27 +43,11 @@ export default class ReturnsWidget extends React.Component<ReturnsWidgetProps> {
 		);
 	}
 
-	isLoadingPrices() {
-		const {baseAssets, quotedAsset, exchangeAccount} = this.props;
-		const {provider, portfolioHistory} = exchangeAccount;
-		if( !portfolioHistory || !this.hasHistory() ) return true;
-
-		const symbols = baseAssets.map( (asset: string) => `${asset}/${quotedAsset}`);
-		const startDate = portfolioHistory[0].date;
-		const endDate = portfolioHistory[portfolioHistory.length - 1].date;
-
-		let loading = false;
-		symbols.forEach( (symbol:string) => {
-			const {isLoading} = priceRangeLoader.getData(provider, symbol, startDate, endDate);
-			loading = loading || isLoading;
-		});
-
-		return loading;
-	}
-
 	hasHistory(){
-		const {portfolioHistory} = this.props.exchangeAccount;
-		
+		const {deployment} = this.props;
+		if( !deployment || !deployment.portfolioHistory ) return false;
+
+		const {portfolioHistory} = deployment;
 		return portfolioHistory && Object.keys(portfolioHistory).length > 0;
 	}
 
@@ -118,46 +93,41 @@ export default class ReturnsWidget extends React.Component<ReturnsWidgetProps> {
 
 
 	getData() {
-		const {exchangeAccount, baseAssets, quotedAsset} = this.props;
-		return memoGetData( exchangeAccount.portfolioHistory || [], quotedAsset, baseAssets, exchangeAccount.provider );
+		const {deployment} = this.props;
+		if( !deployment ) return;
+
+		const {baseAssets} = getDeploymentAssets(deployment.symbols);
+		return memoGetData( deployment.portfolioHistory, baseAssets );
 	}
 }
 
 
-const memoGetData = memoizeOne( (portfolioHistory: PortfolioHistoryItem[], quoted: string, base: string[], provider: string ) => {
+const memoGetData = memoizeOne( (portfolioHistory: PortfolioHistoryItem[], base: string[] ) => {
 	let labels: number[] = [];
 	let sets: {[asset:string]: number[]} = {
 		bot: []
 	};
+	
 	let initialPrices: {[asset:string]: number} = {
-		bot: portfolioHistory[0].balances[quoted].total
+		bot: getPortfolioValue(portfolioHistory[0].balances)
 	};
 
 	base.forEach( (asset:string) => {
 		sets[asset] = [];
 		const balance = portfolioHistory[0].balances[asset];
-		const initialAmount = balance?.total || 0;
-		const {data: price} = historicalPriceLoader.getData( provider, `${asset}/${quoted}`, portfolioHistory[0].date );
-		const {data: value} = historicalValueLoader.getData( provider, `${asset}/${quoted}`, initialAmount, portfolioHistory[0].date );
-		initialPrices[asset] = price;
-		initialPrices.bot += value;
+		initialPrices[asset] = balance.price;
 	});
 
 	portfolioHistory.forEach( (item: PortfolioHistoryItem) => {
 		// @ts-ignore
 		labels.push( parseInt(item.date, 10) );
-
-		let total = item.balances[quoted].total;
-		base.forEach( asset => {
-			const balance = item.balances[asset];
-			const amount = balance?.total || 0;
-			const {data: price} = historicalPriceLoader.getData( provider, `${asset}/${quoted}`, item.date );
-			const {data: value} = historicalValueLoader.getData( provider, `${asset}/${quoted}`, amount, item.date );
-			sets[asset].push( (price / initialPrices[asset] * 100) - 100 );
-			total += value;
-		});
-
+		let total = getPortfolioValue( item.balances );
 		sets.bot.push( (total / initialPrices.bot * 100) - 100);
+
+		base.forEach( (asset:string) => {
+			const balance = item.balances[asset];
+			sets[asset].push( (balance.price / initialPrices[asset] * 100) - 100 );
+		});
 	});
 
 	return {

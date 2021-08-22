@@ -1,5 +1,4 @@
 .table {
-	width: 100%;
 	font-size: 14px;
 }
 
@@ -19,7 +18,7 @@
 
 .table td {
 	border-bottom: 1px solid rgba(225,235,255,.1);
-	padding: 4px;
+	padding: 4px 10px;
 }
 .valueCell {
 	text-align: right;

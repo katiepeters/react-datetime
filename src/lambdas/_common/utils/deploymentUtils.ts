@@ -1,4 +1,4 @@
-import { DBBotDeployment, SimpleBotDeployment } from "../../model.types";
+import { DBBotDeployment, DeploymentOrders, PortfolioWithPrices, SimpleBotDeployment } from "../../model.types";
 
 export function isNewDeployment( deployment: DBBotDeployment ){
 	return deployment.state?.newState === 'stateNew';
@@ -27,7 +27,6 @@ export function getDeactivatedDeployment<T extends DBBotDeployment | SimpleBotDe
 	let [lastActiveInterval] = activeIntervals.slice(-1);
 	if( lastActiveInterval && lastActiveInterval.length === 1 ){
 		lastActiveInterval.push(Date.now());
-		console.log('DEPLOYMEN', currentDeployment);
 		return {
 			...currentDeployment,
 			active: false,
@@ -35,4 +34,20 @@ export function getDeactivatedDeployment<T extends DBBotDeployment | SimpleBotDe
 		};
 	}
 	return currentDeployment;
+}
+
+export function getDeploymentAssets( symbols: string[] ){
+	return {
+		quotedAsset: symbols[0].split('/')[1],
+		baseAssets: symbols.map( (s: string) => s.split('/')[0] )
+	};
+}
+
+export function getPortfolioValue( portfolio: PortfolioWithPrices ){
+	let total = 0;
+	Object.keys( portfolio ).forEach( asset => {
+		const balance = portfolio[asset];
+		total += balance.total * balance.price;
+	});
+	return total;
 }
