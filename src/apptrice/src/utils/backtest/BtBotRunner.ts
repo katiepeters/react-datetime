@@ -5,7 +5,7 @@ import VirtualAdapter from "../../../../lambdas/_common/exchanges/adapters/Virtu
 import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
 import candles from "../../../../lambdas/_common/utils/candles";
 import { Balances } from "../../common/btSettings/InitialBalances";
-import apiCacher from "../../state/apiCacher";
+import apiCacher from "../../state/apiCacherLorese";
 import { botVersionLoader } from "../../state/lorese/loaders/botVersion.loader";
 import { BtRunnableBot, IBtRunnableBot } from "./BtRunnableBot";
 
@@ -24,10 +24,15 @@ export interface BtBotRunnerConfig {
 	exchange: 'bitfinex'
 }
 
+export interface BtVirtualExchangeAccount extends DbExchangeAccount {
+	fees: number,
+	slippage: number
+}
+
 
 export default class BtBotRunner implements BotRunner {
 	deployment: DBBotDeploymentWithHistory
-	exchange: DbExchangeAccount
+	exchange: BtVirtualExchangeAccount
 	adapter: VirtualAdapter
 	startDate: number
 	endDate: number
@@ -69,7 +74,9 @@ export default class BtBotRunner implements BotRunner {
 			resourceId: '',
 			name: 'BT Exchange',
 			provider: config.exchange,
-			type: 'virtual'
+			type: 'virtual',
+			fees: config.fees,
+			slippage: config.slippage
 		}
 
 		this.adapter = new VirtualAdapter(this.exchange);
@@ -250,7 +257,7 @@ export default class BtBotRunner implements BotRunner {
 async function getAllCandles(symbols: string[], runInterval: string, startDate: number, endDate: number) {
 	let start = add200Candles(startDate, runInterval);
 
-	let promises = symbols.map(symbol => apiCacher.getCandles({
+	let promises = symbols.map(symbol => apiCacher.loadCandles({
 		symbol,
 		runInterval,
 		startDate: start,

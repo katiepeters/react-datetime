@@ -11,8 +11,8 @@ export interface CandlesDescriptor {
 	exchange: string,
 	symbol: string,
 	runInterval: string,
-	startDate: string,
-	endDate: string
+	startDate: number,
+	endDate: number
 }
 export function getCandlesKey( {exchange, symbol, runInterval, startDate, endDate}: CandlesDescriptor ){
 	return `${exchange}:${symbol}:${runInterval}:${startDate}:${endDate}`;

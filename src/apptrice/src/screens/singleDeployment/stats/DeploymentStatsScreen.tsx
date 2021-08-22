@@ -1,7 +1,7 @@
 import * as React from 'react'
 import symbols from '../../../../../lambdas/_common/utils/symbols';
 import { Card, ScreenWrapper } from '../../../components';
-import exchangeLoader from '../../../state/loaders/exchange.loader';
+import { exchangeLoader } from '../../../state/lorese/loaders/exchange.loader';
 import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
 import PortfolioHistoryWidget from './widgets/PortfolioHistoryWidget';
 import PortfolioWidget from './widgets/PortfolioWidget';
@@ -18,13 +18,13 @@ export default class DeploymentStatsScreen extends React.Component<SingleDeploym
 	}
 
 	renderContent() {
-		const {deployment} = this.props;
-		let { data: exchange } = exchangeLoader.getData(deployment.exchangeAccountId);
+		const {accountId, exchangeAccountId, symbols} = this.props.deployment;
+		let { data: exchange } = exchangeLoader({accountId, exchangeId: exchangeAccountId});
 		if (!exchange) {
 			return <Card>Loading...</Card>;
 		}
 
-		const {baseAssets, quotedAsset} = this.getAssets( deployment.symbols );
+		const {baseAssets, quotedAsset} = this.getAssets( symbols );
 		return (
 			<div>
 				<PortfolioWidget

@@ -3,6 +3,7 @@ import { getActivatedDeployment, getDeactivatedDeployment } from '../../../lambd
 import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput, CreateBotInput, CreateBotVersionInput, UpdateBotVersionInput } from './apiClient';
 import manager from '../state/dataManager';
 import { DbBot, VersionHistory } from '../../../lambdas/model.types';
+import { getCandlesKey, getVersionKey } from './storeKeys';
 
 const {reducer} = manager;
 
@@ -98,7 +99,7 @@ const apiCacher = {
 							},
 							botVersions: {
 								...store.botVersions,
-								[`${bot.id}:0.0`]: {
+								[getVersionKey({botId: bot.id, versionNumber: '0.0'})]: {
 									accountId: bot.accountId,
 									botId: bot.id,
 									number: '0.0',
@@ -171,15 +172,15 @@ const apiCacher = {
 	// BOT VERSIONS
 	///////////////
 
-	loadSingleBotVersion(accountId: string, botId: string, number: string) {
-		return apiClient.loadSingleBotVersion(accountId, botId, number)
+	loadSingleBotVersion(accountId: string, botId: string, versionNumber: string) {
+		return apiClient.loadSingleBotVersion(accountId, botId, versionNumber)
 			.then( res => {
 				reducer<any>( (store, res) => {
 					return {
 						...store,
 						botVersions: {
 							...store.botVersions,
-							[`${botId}:${number}`]: {...res.data}
+							[getVersionKey({botId, versionNumber})]: {...res.data}
 						}
 					}
 				})(res);
@@ -219,7 +220,7 @@ const apiCacher = {
 						},
 						botVersions: {
 							...store.botVersions,
-							[`${input.botId}:${number}`]: {
+							[getVersionKey({botId: input.botId, versionNumber: number})]: {
 								accountId: input.accountId,
 								botId: input.botId,
 								number,
@@ -397,11 +398,11 @@ const apiCacher = {
 	////////////
 	// CANDLES
 	////////////
-	getCandles( options: CandleOptions ) {
+	loadCandles( options: CandleOptions ) {
 		return apiClient.loadCandles(options).then( res => {
 			reducer<any>( (store, res) => {
 				let {symbol, runInterval, startDate, endDate} = options;
-				let key = `${symbol}:${runInterval}:${startDate}:${endDate}`;
+				let key = getCandlesKey({exchange: 'bitfinex',symbol,runInterval,startDate,endDate});
 				return {
 					...store,
 					transientData: {

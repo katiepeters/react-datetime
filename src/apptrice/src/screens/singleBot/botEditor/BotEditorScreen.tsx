@@ -2,7 +2,7 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import { ScreenProps } from '../../../types';
 import BotSaver from '../BotSaver';
-import apiCacher from '../../../state/apiCacher.old';
+import apiCacher from '../../../state/apiCacherLorese';
 import styles from './_BotEditorScreen.module.css';
 import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../../common/btSettings/BotTools';
@@ -188,7 +188,7 @@ class BotEditorScreen extends React.Component<BotScreenProps> {
 	}
 
 	_onRunBt = (config: BacktestConfig) => {
-		const {bot: botId, accountId} = this.props.bot;
+		const {id: botId, accountId} = this.props.bot;
 		const version = this.getEditingVersion();
 		if( version ){
 			BtRunner.start(version, config);

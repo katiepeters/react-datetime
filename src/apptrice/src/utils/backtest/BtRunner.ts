@@ -6,16 +6,13 @@ import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIte
 import quickStore from "../../state/quickStore";
 import { BtUpdater } from "./BtUpdater";
 import { BtDeployment, BtExchange } from "./Bt.types";
-import store from "../../state/store";
 import { StoreBotVersion } from "../../state/dataManager";
 
 let runner: BtBotRunner;
 const BtRunner = {
 	start( version: StoreBotVersion, options: BacktestConfig ): string {
-		const btid = createRun( version.botId );
-
-		prepareAndRun( version, options );
-
+		const btid = uuid();
+		prepareAndRun( btid, version, options );
 		return btid;
 	},
 
@@ -33,7 +30,7 @@ const BtRunner = {
 export default BtRunner;
 
 
-async function prepareAndRun(version: StoreBotVersion, options: BacktestConfig){
+async function prepareAndRun(btid: string, version: StoreBotVersion, options: BacktestConfig){
 	runner = new BtBotRunner({
 		accountId: version.accountId,
 		botId: version.botId,
@@ -48,6 +45,8 @@ async function prepareAndRun(version: StoreBotVersion, options: BacktestConfig){
 		slippage: options.slippage,
 		exchange: 'bitfinex'
 	});
+
+	setInitialBt(btid, version, runner);
 
 	BtUpdater.update({
 		status: 'candles'
@@ -68,18 +67,25 @@ async function prepareAndRun(version: StoreBotVersion, options: BacktestConfig){
 	runner.bot?.terminate();
 }
 
-function createRun( botId: any ): string{
-	let btid = uuid();
-	store.currentBackTesting = {
-		id: btid,
-		botId: botId,
-		status: 'init',
-		iteration: 0,
+function setInitialBt(btid: string, version: StoreBotVersion, runner: BtBotRunner) {
+	BtUpdater.setBt({
 		totalIterations: 0,
-		orders: {},
-		balances: []
-	};
-	return btid;
+		currentIteration: 0,
+		candles: {},
+		status: 'candles',
+		data: {
+			id: btid,
+			accountId: version.accountId,
+			botId: version.botId,
+			versionNumber: version.number,
+			deployment: runner.deployment,
+			exchange: {
+				provider: runner.exchange.provider,
+				fees: runner.exchange.fees,
+				slippage: runner.exchange.slippage
+			}
+		}
+	});
 }
 
 async function runIterations( version: StoreBotVersion, runner: BtBotRunner ) {

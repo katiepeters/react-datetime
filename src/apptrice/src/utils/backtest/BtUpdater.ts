@@ -24,7 +24,7 @@ export const BtUpdater = {
 			activeBt.status = data.status;
 		}
 
-		if( data.accountId || data.botId || data.provider || data.startDate || data.endDate || data.deployment ){
+		if( data.accountId || data.botId || data.provider || data.deployment ){
 			let dataUpdate: BtStored = { ...activeBt.data };
 
 			if (data.accountId) {
@@ -32,12 +32,6 @@ export const BtUpdater = {
 			}
 			if (data.botId) {
 				dataUpdate.botId = data.botId;
-			}
-			if (data.startDate) {
-				dataUpdate.startDate = data.startDate;
-			}
-			if (data.endDate) {
-				dataUpdate.endDate = data.endDate;
 			}
 			if (data.deployment) {
 				dataUpdate.deployment = data.deployment;
@@ -125,10 +119,10 @@ const defaultActiveBt: BtActive = {
 	candles: {},
 	status: 'init',
 	data: {
+		id: 'none',
 		accountId: 'init',
 		botId: 'init',
-		startDate: 0,
-		endDate: 0,
+		versionNumber: '0.0',
 		deployment: {
 			logs: [],
 			orders: {

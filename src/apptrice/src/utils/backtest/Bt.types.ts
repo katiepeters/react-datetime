@@ -19,10 +19,10 @@ export interface BtExchange {
 }
 
 export interface BtStored {
+	id: string
 	accountId: string
 	botId: string
-	startDate: number
-	endDate: number
+	versionNumber: string
 	deployment: BtDeployment
 	exchange: BtExchange
 }

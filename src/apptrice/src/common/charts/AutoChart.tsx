@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { ArrayCandle } from '../../../../lambdas/lambda.types';
-import candleLoader from '../../screens/singleDeployment/charts/candle.loader';
 import { Order } from '../../../../lambdas/model.types';
 import TradingChart, {ChartCandle} from './TradingChart';
 import memoizeOne from 'memoize-one';
+import { candleLoader } from '../../state/lorese/loaders/candle.loader';
 
 interface AutoChartProps {
 	symbol: string,
@@ -17,13 +17,13 @@ interface AutoChartProps {
 export default class AutoChart extends React.Component<AutoChartProps> {
 	render() {
 		let {symbol, exchange, interval, orders, startDate, endDate} = this.props;
-		if (!startDate) {
+		if (!startDate || !endDate) {
 			let orderDates = this.getOrderDates(orders, interval);
 			startDate = orderDates.startDate;
 			endDate = orderDates.endDate;
 		}
 
-		let {data: candles} = candleLoader.getData(exchange, symbol, interval, String(startDate), String(endDate));
+		let {data: candles} = candleLoader({exchange, symbol, runInterval: interval, startDate, endDate});
 
 		return (
 			<div>
@@ -54,7 +54,7 @@ export default class AutoChart extends React.Component<AutoChartProps> {
 				endDate: Math.min(this.now, (lastOrder.closedAt || lastOrder.createdAt) + halfInterval)
 			}
 		}
-		return {startOrder, lastOrder};
+		return {startDate, endDate};
 	}
 
 	getDefaultIntervalDates( interval: string ){

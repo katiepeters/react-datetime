@@ -20,3 +20,8 @@ export const getExchangeList = selector<string,DbExchangeAccount[]|void>( (store
 const getExchangesMemo = memoizeOne( (ids, exchanges) => {
 	return ids.map( (id:string) => exchanges[id]);
 })
+
+export function exchangeSelector(store: Store, exchangeId: string) {
+	return store.exchangeAccounts[exchangeId];
+}
+export const getExchange = selector<string, DbExchangeAccount | void>( exchangeSelector );
