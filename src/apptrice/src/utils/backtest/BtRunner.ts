@@ -3,10 +3,10 @@ import {v4 as uuid} from 'uuid';
 import { DBBotDeployment, DbExchangeAccount } from "../../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
 import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIteration";
-import { BtUpdater } from "./BtUpdater";
 import { BtDeployment, BtExchange } from "./Bt.types";
 import { StoreBotVersion } from "../../state/stateManager";
 import { getActiveBt } from "../../state/selectors/bt.selectors";
+import { BtUpdater } from "../../state/updaters/bt.updater";
 
 let runner: BtBotRunner;
 const BtRunner = {

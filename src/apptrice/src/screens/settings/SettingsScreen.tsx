@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { InputGroup, ScreenWrapper } from '../../components';
 import apiClient from '../../state/apiClient';
-import localStore from '../../state/localStore';
+import { getEnvironment } from '../../state/selectors/environment.selectors';
+import { setEnvironment } from '../../state/updaters/environment.updater';
 import { ScreenProps } from '../../types';
 
 export default class SettingsScreen extends React.Component<ScreenProps> {
@@ -16,7 +17,7 @@ export default class SettingsScreen extends React.Component<ScreenProps> {
 					name="api"
 					label="API URL">
 					<select
-						value={ this.props.localStore.getEnvironment() }
+						value={ getEnvironment() }
 						onChange={ this._onChange }>
 						<option value="local">
 							Local
@@ -31,7 +32,7 @@ export default class SettingsScreen extends React.Component<ScreenProps> {
 	}
 
 	_onChange = (e: any) => {
-		localStore.setEnvironment( e.target.value );
+		setEnvironment( e.target.value );
 		apiClient.initialize(e.target.value);
 		window.location.reload();
 	}

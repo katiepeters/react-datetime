@@ -23,6 +23,7 @@ type LoaderFunction<ARG,RET> = (input: ARG) => LoaderOutput<ARG,RET>;
 export interface Lorese<ST> {
 	addChangeListener( clbk: () => any): void
 	removeChangeListener( clbk: () => any): void
+	emitStateChange(): void
 	loader<INP,RET>( config: LoaderInput<ST,INP> ): LoaderFunction<INP,RET>
 	reducer<ARG>( clbk: ReducerInput<ST,ARG> ): ReducerOutput<ARG>
 	selector<ARG,RET>( clbk: SelectorInput<ST,ARG,RET> ): SelectorOutput<ARG,RET>
@@ -50,11 +51,11 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 			let i = listeners.length;
 			while( i-- > 0 ){
 				if( clbk === listeners[i] ){
-
+					listeners.splice(i,1);
 				}
-				listeners.splice(i,1);
 			}
 		},
+		emitStateChange: emitChange,
 		loader: function<INP,RET>( config: LoaderInput<ST,INP> ): LoaderFunction<INP,RET> {
 			const isValid = config.isValid || (() => true);
 			const loadCache = new Map<string,LoaderOutput<INP,RET>>();
@@ -139,10 +140,8 @@ export default function lorese<ST>( store: ST ): Lorese<ST>{
 		reducer: function<ARG>( clbk: ReducerInput<ST,ARG> ): ReducerOutput<ARG> {
 			return function(arg: ARG) {
 			let updated = clbk( store, arg );
-				if( updated !== store ){
-					store = updated;
-					emitChange();
-				}
+				store = updated;
+				emitChange();
 			}
 		},
 		selector: function<ARG,RET>( clbk: SelectorInput<ST,ARG,RET> ): SelectorOutput<ARG,RET> {

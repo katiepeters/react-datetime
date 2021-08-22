@@ -3,17 +3,17 @@ import AppMenu from './AppMenu';
 import { SidebarLayout } from './components';
 import Toaster from './components/toaster/Toaster';
 import router from './state/router';
-import localStore from './state/localStore';
 import apiClient from './state/apiClient';
 import DataLoader from './utils/DataLoader';
 import * as lorese from './state/stateManager';
 import { LoreseConnector } from './state/ReactLorese';
 import { getAuthenticatedId } from './state/selectors/account.selectors';
+import { getApiUrl } from './state/selectors/environment.selectors';
 
 class App extends React.Component {
   constructor(props: any) {
     super(props);
-    apiClient.initialize(localStore.getApiUrl());
+    apiClient.initialize(getApiUrl());
   }
 
   render() {
@@ -26,8 +26,7 @@ class App extends React.Component {
           bgColor="#082238">
           <CurrentScreen
             authenticatedId={getAuthenticatedId()}
-            router={router}
-            localStore={localStore} />
+            router={router} />
         </SidebarLayout>
         <Toaster />
       </div>
@@ -47,7 +46,6 @@ class App extends React.Component {
   componentDidMount() {
     const refresh = () => this.forceUpdate();
     router.onChange( refresh );
-    localStore.addChangeListener( refresh );
     DataLoader.onChange = refresh;
   }
 }

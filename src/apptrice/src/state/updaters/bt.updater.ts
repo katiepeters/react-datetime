@@ -1,5 +1,5 @@
 import { reducer } from "../../state/stateManager";
-import { ActiveBtUpdate, BtActive, BtDeployment, BtExchange, BtStored } from "./Bt.types"
+import { ActiveBtUpdate, BtActive, BtDeployment, BtExchange, BtStored } from "../../utils/backtest/Bt.types";
 
 export const BtUpdater = {
 	setBt: reducer<BtActive>( (store, activeBt) => {

@@ -1,9 +1,6 @@
-import localStore from "./state/localStore";
-
 export interface ScreenProps {
 	authenticatedId: string,
-	router: any,
-	localStore: typeof localStore
+	router: any
 }
 
 export interface FormCaption {

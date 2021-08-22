@@ -58,5 +58,5 @@ const manager = lorese<Store>({
 	}
 })
 
-const { addChangeListener, removeChangeListener, loader, reducer, selector} = manager;
-export { addChangeListener, removeChangeListener, loader, reducer, selector};
+const { addChangeListener, removeChangeListener, emitStateChange, loader, reducer, selector} = manager;
+export { addChangeListener, removeChangeListener, emitStateChange, loader, reducer, selector};
