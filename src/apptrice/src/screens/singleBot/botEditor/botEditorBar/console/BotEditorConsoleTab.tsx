@@ -1,5 +1,5 @@
 import * as React from 'react';
-import quickStore from '../../../../../state/quickStore';
+import { getActiveBt } from '../../../../../state/selectors/bt.selectors';
 import EditorTab from '../../components/EditorTab';
 import styles from './_BotEditorConsoleTab.module.css';
 
@@ -7,7 +7,6 @@ interface BotEditorConsoleTabProps {
 	id: string
 	active: boolean,
 	onClick: (id:string) => void
-	quickStore: typeof quickStore
 }
 
 export default class BotEditorConsoleTab extends React.Component<BotEditorConsoleTabProps> {
@@ -31,8 +30,8 @@ export default class BotEditorConsoleTab extends React.Component<BotEditorConsol
 
 	lastLogsCount: number = 0;
 	componentDidUpdate(prevProps: BotEditorConsoleTabProps) {
-		const bt = this.props.quickStore.getActiveBt();
-		const logs = bt?.data.deployment.logs || [];
+		const bt = getActiveBt();
+		const logs = bt ? bt.data.deployment.logs : [];
 
 		const count = logs.length;
 		if ( count !== this.lastLogsCount && !this.props.active  ){

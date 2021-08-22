@@ -1,14 +1,20 @@
-import quickStore from "../../state/quickStore";
+import { reducer } from "../../state/stateManager";
 import { ActiveBtUpdate, BtActive, BtDeployment, BtExchange, BtStored } from "./Bt.types"
 
 export const BtUpdater = {
-	setBt( bt: BtActive ){
-		quickStore.setActiveBt(bt);
-	},
+	setBt: reducer<BtActive>( (store, activeBt) => {
+		return {
+			...store,
+			transientData: {
+				...store.transientData,
+				activeBt
+			}
+		}
+	}),
 
-	update( data: ActiveBtUpdate ){
+	update: reducer<ActiveBtUpdate>( (store, data) => {
 		let activeBt = {
-			...( quickStore.getActiveBt() || defaultActiveBt )
+			...( store.transientData.activeBt || defaultActiveBt )
 		};
 
 		if( data.totalIterations ){
@@ -104,12 +110,23 @@ export const BtUpdater = {
 			activeBt.data.exchange = exchangeUpdate;
 		}
 
-		quickStore.setActiveBt(activeBt);
-	},
+		return {
+			...store,
+			transientData: {
+				...store.transientData,
+				activeBt
+			}
+		}
+	}),
 
-	clear(){
-		quickStore.setActiveBt(undefined);
-	}
+	clear: reducer<void>( (store) => {
+		let transientData = {...store.transientData};
+		delete transientData.activeBt;
+		return {
+			...store,
+			transientData
+		}
+	})
 }
 
 

@@ -60,7 +60,6 @@ class BotEditorScreen extends React.Component<BotScreenProps> {
 			<BotEditorBar
 				version={ version }
 				codeProblems={this.state.codeProblems}
-				quickStore={this.props.quickStore}
 				onRun={ this._onRunBt }
 				onAbort={this._onAbortBt}
 				onHighlightLine={ this._highlightLine }/>

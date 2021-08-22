@@ -6,7 +6,6 @@ import BotEditorConsolePanel from './console/BotEditorConsolePanel';
 import BotEditorConsoleTab from './console/BotEditorConsoleTab';
 import ProblemsPanel from './problems/ProblemsPanel';
 import ProblemsTab, { CodeProblem } from './problems/ProblemsTab';
-import quickStore from '../../../../state/quickStore';
 import { Modal, ModalBox } from '../../../../components';
 import BtSettings from '../../../../common/btSettings/BtSettings';
 import ProgressBar from '../../../../common/btSettings/ProgressBar';
@@ -15,11 +14,11 @@ import VersionTab from './version/VersionTab';
 import VersionPanel from './version/VersionPanel';
 import ConsolePanel from '../../../../common/consolePanel/ConsolePanel';
 import { StoreBotVersion } from '../../../../state/stateManager';
+import { getActiveBt } from '../../../../state/selectors/bt.selectors';
 
 interface BotEditorBarProps {
 	version: StoreBotVersion,
 	codeProblems: CodeProblem[],
-	quickStore: typeof quickStore,
 	onRun: (config: BacktestConfig) => void,
 	onAbort: () => void
 	onHighlightLine: (line:number) => void
@@ -59,7 +58,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 	}
 
 	renderTabs(){
-		const {version, codeProblems, quickStore} = this.props;
+		const {version, codeProblems} = this.props;
 		
 		return (
 			<div className={styles.tabs}>
@@ -76,8 +75,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 				<BotEditorConsoleTab
 					id="console"
 					active={ 'console' === this.state.currentTab }
-					onClick={ this._onTabPress }
-					quickStore={ this.props.quickStore } />
+					onClick={ this._onTabPress } />
 			</div>
 		)
 	}
@@ -90,9 +88,13 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 		else if( currentTab === 'problems' ){
 			return <ProblemsPanel problems={ this.props.codeProblems} />
 		}
-		const activeBt = this.props.quickStore.getActiveBt();
+		const activeBt = getActiveBt();
+		const logs = activeBt ?
+			activeBt.data.deployment.logs : 
+			[]
+		;
 
-		return <ConsolePanel logs={activeBt?.data.deployment.logs || []} />;
+		return <ConsolePanel logs={logs} />;
 	}
 
 	renderBt() {
@@ -125,7 +127,7 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 
 	renderProgress() {
 		if (!this.isBtRunning()) return;
-		const activeBt = this.props.quickStore.getActiveBt();
+		const activeBt = getActiveBt()
 		const progress = activeBt ?
 			activeBt.currentIteration / activeBt.totalIterations * 100 : 
 			0
@@ -164,7 +166,9 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 
 
 	isBtRunning(): boolean {
-		return this.props.quickStore.getActiveBt()?.status === 'running' || false;
+		const bt = getActiveBt();
+		const status = bt ? bt.status : 'init';
+		return status === 'running' || status === 'candles';
 	}
 
 	_showBtModal = () => {

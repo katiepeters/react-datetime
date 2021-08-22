@@ -1,10 +1,8 @@
 import localStore from "./state/localStore";
-import quickStore from "./state/quickStore";
 
 export interface ScreenProps {
 	authenticatedId: string,
 	router: any,
-	quickStore: typeof quickStore,
 	localStore: typeof localStore
 }
 

@@ -3,10 +3,10 @@ import {v4 as uuid} from 'uuid';
 import { DBBotDeployment, DbExchangeAccount } from "../../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
 import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIteration";
-import quickStore from "../../state/quickStore";
 import { BtUpdater } from "./BtUpdater";
 import { BtDeployment, BtExchange } from "./Bt.types";
 import { StoreBotVersion } from "../../state/stateManager";
+import { getActiveBt } from "../../state/selectors/bt.selectors";
 
 let runner: BtBotRunner;
 const BtRunner = {
@@ -17,7 +17,7 @@ const BtRunner = {
 	},
 
 	abort(){
-		const activeBt = quickStore.getActiveBt();
+		const activeBt = getActiveBt();
 		if ( activeBt && activeBt.status === 'running') {
 			BtUpdater.update({status: 'aborted'});
 			if( runner ){

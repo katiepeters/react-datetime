@@ -2,7 +2,6 @@ import * as React from 'react';
 import AppMenu from './AppMenu';
 import { SidebarLayout } from './components';
 import Toaster from './components/toaster/Toaster';
-import quickStore from './state/quickStore';
 import router from './state/router';
 import localStore from './state/localStore';
 import apiClient from './state/apiClient';
@@ -27,7 +26,6 @@ class App extends React.Component {
           bgColor="#082238">
           <CurrentScreen
             authenticatedId={getAuthenticatedId()}
-            quickStore={quickStore}
             router={router}
             localStore={localStore} />
         </SidebarLayout>
@@ -48,7 +46,6 @@ class App extends React.Component {
 
   componentDidMount() {
     const refresh = () => this.forceUpdate();
-    quickStore.addChangeListener( refresh );
     router.onChange( refresh );
     localStore.addChangeListener( refresh );
     DataLoader.onChange = refresh;

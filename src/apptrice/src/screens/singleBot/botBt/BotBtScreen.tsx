@@ -4,6 +4,7 @@ import styles from './_BotBtScreen.module.css';
 import { ScreenWrapper, Tabs, Tab } from '../../../components';
 import BtStats from './sections/BtStats';
 import { BtActive } from '../../../utils/backtest/Bt.types';
+import { getActiveBt } from '../../../state/selectors/bt.selectors';
 
 export default class BotBtScreen extends React.Component<ScreenProps> {
 	render() {
@@ -15,7 +16,7 @@ export default class BotBtScreen extends React.Component<ScreenProps> {
 	}
 
 	renderContent() {
-		const activeBt = this.props.quickStore.getActiveBt();
+		const activeBt = getActiveBt();
 		if( !activeBt ) return this.renderNoBt();
 
 		return (

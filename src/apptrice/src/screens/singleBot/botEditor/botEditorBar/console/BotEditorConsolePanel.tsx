@@ -1,16 +1,13 @@
 import * as React from 'react'
 import mergeStyles from '../../../../../utils/mergeStyles';
 import styles from './_BotEditorConsolePanel.module.css';
-import quickStore from '../../../../../state/quickStore';
 import ConsolePanel from '../../../../../common/consolePanel/ConsolePanel';
+import { getActiveBt } from '../../../../../state/selectors/bt.selectors';
 
-interface BotEditorConsolePanelProps {
-	quickStore: typeof quickStore
-}
 
-export default class BotEditorConsolePanel extends React.Component<BotEditorConsolePanelProps> {
+export default class BotEditorConsolePanel extends React.Component {
 	render() {
-		const activeBt = this.props.quickStore.getActiveBt();
+		const activeBt = getActiveBt();
 		const logs = activeBt ? activeBt.data.deployment.logs : [];
 		return (
 			<ConsolePanel

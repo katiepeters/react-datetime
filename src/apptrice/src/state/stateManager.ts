@@ -1,4 +1,5 @@
 import { DbBot, DBBotDeploymentWithHistory, DbBotVersion, DbExchangeAccount, SimpleBotDeployment } from '../../../lambdas/model.types';
+import { BtActive } from '../utils/backtest/Bt.types';
 import lorese from './Lorese';
 
 export interface StoreAccount {
@@ -38,7 +39,7 @@ export interface Store {
 		[id:string]: StoreBotVersion
 	},
 	transientData: {
-		currentBt: any,
+		activeBt?: BtActive,
 		candles: any
 	}
 }
@@ -53,8 +54,7 @@ const manager = lorese<Store>({
 	exchangeAccounts: {},
 	botVersions: {},
 	transientData: {
-		candles: {},
-		currentBt: null
+		candles: {}
 	}
 })
 
