@@ -10,7 +10,7 @@ import BtRunner from '../../../utils/backtest/BtRunner';
 import BotEditorLayout from './BotEditorLayout';
 import { BotScreenProps } from '../BotScreenProps';
 import { botVersionLoader } from '../../../state/loaders/botVersion.loader';
-import { StoreBotVersion } from '../../../state/dataManager';
+import { StoreBotVersion } from '../../../state/stateManager';
 
 class BotEditorScreen extends React.Component<BotScreenProps> {
 	state = {

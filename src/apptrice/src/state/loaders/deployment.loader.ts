@@ -1,6 +1,6 @@
 import { DBBotDeploymentWithHistory } from '../../../../lambdas/model.types';
 import apiCacher from '../apiCacher';
-import {loader} from '../dataManager';
+import {loader} from '../stateManager';
 import { getDeploymentSelector } from '../selectors/deployment.selectors';
 
 interface deploymentLoadInput {

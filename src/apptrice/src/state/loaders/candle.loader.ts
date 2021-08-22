@@ -1,5 +1,5 @@
 import apiCacher from '../apiCacher';
-import {loader}  from '../dataManager';
+import {loader}  from '../stateManager';
 import { CandlesDescriptor } from '../storeKeys';
 import { candlesSelector } from '../selectors/candle.selectors';
 import { ArrayCandle } from '../../../../lambdas/lambda.types';

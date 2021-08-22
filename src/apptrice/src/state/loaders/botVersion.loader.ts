@@ -1,5 +1,5 @@
 import apiCacher from '../apiCacher';
-import { loader, StoreBotVersion } from '../dataManager';
+import { loader, StoreBotVersion } from '../stateManager';
 import { botVersionSelector } from '../selectors/botVersion.selectors';
 
 interface BotVersionLoadInput {

@@ -1,4 +1,4 @@
-import {loader} from '../dataManager';
+import {loader} from '../stateManager';
 import apiCacher from '../apiCacher';
 import { exchangeSelector } from '../selectors/exchange.selectors';
 import { DbExchangeAccount } from '../../../../lambdas/model.types';

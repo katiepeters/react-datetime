@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StoreBotVersion } from '../../../../../state/dataManager';
+import { StoreBotVersion } from '../../../../../state/stateManager';
 
 interface VersionPanelProps {
 	version: StoreBotVersion

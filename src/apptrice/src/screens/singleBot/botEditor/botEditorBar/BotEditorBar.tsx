@@ -14,7 +14,7 @@ import BotEditorBarResizer from './BotEditorBarResizer';
 import VersionTab from './version/VersionTab';
 import VersionPanel from './version/VersionPanel';
 import ConsolePanel from '../../../../common/consolePanel/ConsolePanel';
-import { StoreBotVersion } from '../../../../state/dataManager';
+import { StoreBotVersion } from '../../../../state/stateManager';
 
 interface BotEditorBarProps {
 	version: StoreBotVersion,

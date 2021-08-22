@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StoreBotVersion } from '../../../../../state/dataManager';
+import { StoreBotVersion } from '../../../../../state/stateManager';
 import EditorTab from '../../components/EditorTab';
 
 interface VersionTabProps {

@@ -6,7 +6,7 @@ import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIte
 import quickStore from "../../state/quickStore";
 import { BtUpdater } from "./BtUpdater";
 import { BtDeployment, BtExchange } from "./Bt.types";
-import { StoreBotVersion } from "../../state/dataManager";
+import { StoreBotVersion } from "../../state/stateManager";
 
 let runner: BtBotRunner;
 const BtRunner = {

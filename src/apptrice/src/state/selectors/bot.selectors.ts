@@ -1,6 +1,6 @@
 import memoizeOne from 'memoize-one';
 import { DbBot } from '../../../../lambdas/model.types';
-import { selector, Store } from '../dataManager';
+import { selector, Store } from '../stateManager';
 import { getAccount, getAuthenticatedId } from './account.selectors';
 
 export function getAccountBotsSelector(store: Store, accountId: string): DbBot[]|void {

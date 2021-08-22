@@ -1,4 +1,4 @@
-import { selector, Store, StoreBotVersion } from '../dataManager';
+import { selector, Store, StoreBotVersion } from '../stateManager';
 import { BotVersionDescriptor, getVersionKey } from '../storeKeys';
 
 export function botVersionSelector(store: Store, descriptor: BotVersionDescriptor ): StoreBotVersion | void {

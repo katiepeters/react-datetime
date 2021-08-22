@@ -1,4 +1,4 @@
-import {loader} from '../dataManager';
+import {loader} from '../stateManager';
 import apiCacher from '../apiCacher';
 import { getBotSelector } from '../selectors/bot.selectors';
 import { DbBot } from '../../../../lambdas/model.types';

@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { getActivatedDeployment, getDeactivatedDeployment } from '../../../lambdas/_common/utils/deploymentUtils';
 import apiClient, { CandleOptions, CreateExchangeAccountInput, UpdateBotInput, UpdateDeploymentInput, CreateDeploymentInput, CreateBotInput, CreateBotVersionInput, UpdateBotVersionInput } from './apiClient';
-import {reducer} from './dataManager';
+import {reducer} from './stateManager';
 import { DbBot, VersionHistory } from '../../../lambdas/model.types';
 import { getCandlesKey, getVersionKey } from './storeKeys';
 

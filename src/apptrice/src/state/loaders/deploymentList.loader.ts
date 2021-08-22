@@ -1,4 +1,4 @@
-import { loader, StoreBotDeployment } from '../dataManager';
+import { loader, StoreBotDeployment } from '../stateManager';
 import {getDeploymentListSelector} from '../selectors/deployment.selectors';
 import apiCacher from '../apiCacher';
 
