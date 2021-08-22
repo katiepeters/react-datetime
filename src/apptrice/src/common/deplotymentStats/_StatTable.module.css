@@ -1,0 +1,30 @@
+.table {
+	width: 100%;
+	font-size: 14px;
+}
+
+.table th {
+	border-bottom: 1px solid rgba(225,235,255,.2);
+	padding: 4px;
+	color: #b2b1d8;
+}
+
+.statNameValue {
+	color: #b2b1d8;
+}
+
+.tbody tr:hover {
+	background-color:#082238;
+}
+
+.table td {
+	border-bottom: 1px solid rgba(225,235,255,.1);
+	padding: 4px;
+}
+.valueCell {
+	text-align: right;
+}
+
+.statNameHeader {
+	text-align: left;
+}

@@ -110,7 +110,8 @@ function toBtDeployment( deployment: DBBotDeployment ): BtDeployment {
 		runInterval: deployment.runInterval,
 		state: deployment.state,
 		symbols: deployment.symbols,
-		portfolioHistory: deployment.portfolioHistory
+		portfolioHistory: deployment.portfolioHistory,
+		activeIntervals: deployment.activeIntervals
 	};
 }
 

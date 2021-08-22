@@ -1,6 +1,6 @@
 
 import { BotCandles } from "../../../../lambdas/lambda.types";
-import { ConsoleEntry, DBBotDeploymentState, DeploymentOrders, PortfolioHistoryItem, RunInterval } from "../../../../lambdas/model.types";
+import { ActiveInterval, ConsoleEntry, DBBotDeploymentState, DeploymentOrders, PortfolioHistoryItem, RunInterval } from "../../../../lambdas/model.types";
 import { ScreenProps } from "../../types";
 
 export interface BtDeployment {
@@ -9,7 +9,8 @@ export interface BtDeployment {
 	runInterval: RunInterval
 	state: DBBotDeploymentState
 	symbols: string[]
-	portfolioHistory: PortfolioHistoryItem[]
+	portfolioHistory: PortfolioHistoryItem[],
+	activeIntervals: ActiveInterval[]
 }
 
 export interface BtExchange {

@@ -151,6 +151,7 @@ const defaultActiveBt: BtActive = {
 			state: {},
 			symbols: [],
 			portfolioHistory: [],
+			activeIntervals: []
 		},
 		exchange: {
 			provider: 'bitfinex',

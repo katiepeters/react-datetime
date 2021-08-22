@@ -83,7 +83,7 @@ export interface DBBotDeploymentState {
 
 type ActiveIntervalClosed = [number, number]
 type ActiveIntervalOpen = [number]
-type ActiveInterval = ActiveIntervalClosed | ActiveIntervalOpen
+export type ActiveInterval = ActiveIntervalClosed | ActiveIntervalOpen
 
 export interface SimpleBotDeployment {
 	id: string
