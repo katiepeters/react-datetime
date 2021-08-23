@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { Balance } from '../../../../../../lambdas/lambda.types';
 import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
+import { getDeploymentAssets } from '../../../../../../lambdas/_common/utils/deploymentUtils';
 import { Card, Table } from '../../../../components';
 import priceLoader from '../../../../state/loadersOld/price.loader';
+import { BtDeployment } from '../../../../utils/backtest/Bt.types';
 import trim from '../../../../utils/trim';
 import styles from './_PortfolioWidget.module.css';
 
 interface PortfolioWidgetProps {
-	exchangeAccount: DbExchangeAccount
-	baseAssets: string[]
-	quotedAsset: string
+	deployment?: BtDeployment
 }
 
 export default class PortfolioWidget extends React.Component<PortfolioWidgetProps> {
@@ -20,12 +20,12 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 					<div>
 						<h3>Balances</h3>
 					</div>
-					{ this.renderContent() }
+					{ /*this.renderContent()*/ }
 				</Card>
 			</div>
 		)
 	}
-
+	/*
 	renderContent() {
 		let portfolioHistory = this.getPortfolioHistory();
 		if (!portfolioHistory) return <div>Loading...</div>;
@@ -44,11 +44,14 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 	}
 
 	getPortfolioHistory() {
-		return this.props.exchangeAccount.portfolioHistory;
+		return this.props.deployment?.portfolioHistory;
 	}
 
 	getData( portfolio: PortfolioHistoryItem ) {
-		const {baseAssets, quotedAsset} = this.props;
+		const {deployment} = this.props;
+		if( !deployment ) return;
+
+		const {baseAssets, quotedAsset} = getDeploymentAssets(deployment.symbols);
 		let data = Object.values(portfolio.balances)
 			.filter( (balance: Balance) => (
 				balance.asset === quotedAsset || baseAssets.includes(balance.asset)
@@ -112,4 +115,5 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 
 		return <span>{trim(total, 7)} {this.props.quotedAsset}</span>;
 	}
+	*/
 }

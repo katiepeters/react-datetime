@@ -18,7 +18,8 @@ export default class DeploymentStatsScreen extends React.Component<SingleDeploym
 	}
 
 	renderContent() {
-		const {accountId, exchangeAccountId, symbols} = this.props.deployment;
+		const { deployment } = this.props;
+		const {accountId, exchangeAccountId, symbols} = deployment;
 		let { data: exchange } = exchangeLoader({accountId, exchangeId: exchangeAccountId});
 		if (!exchange) {
 			return <Card>Loading...</Card>;
@@ -27,16 +28,10 @@ export default class DeploymentStatsScreen extends React.Component<SingleDeploym
 		const {baseAssets, quotedAsset} = this.getAssets( symbols );
 		return (
 			<div>
-				<PortfolioWidget
-					baseAssets={baseAssets}
-					quotedAsset={quotedAsset}
-					exchangeAccount={ exchange } />
 				<PortfolioHistoryWidget
-					baseAssets={baseAssets}
-					quotedAsset={quotedAsset}
-					exchangeAccount={ exchange } />
+					deployment={ deployment } />
 				<ReturnsWidget
-					deployment={ this.props.deployment } />
+					deployment={ deployment } />
 			</div>
 		);
 	}

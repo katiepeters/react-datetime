@@ -5,16 +5,14 @@ import styles from './_PortfolioHistoryWidget.module.css';
 import {Line} from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 
-import { DbExchangeAccount, PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
+import { PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
 import memoizeOne from 'memoize-one';
 import trim from '../../../../utils/trim';
-import priceRangeLoader from '../../../../state/loadersOld/priceRange.loader';
-import historicalValueLoader from '../../../../state/loadersOld/historicalValue.loader';
+import { BtDeployment } from '../../../../utils/backtest/Bt.types';
+import { getDeploymentAssets } from '../../../../../../lambdas/_common/utils/deploymentUtils';
 
 interface PortfolioHistoryWidgetProps {
-	exchangeAccount: DbExchangeAccount
-	baseAssets: string[]
-	quotedAsset: string
+	deployment: BtDeployment
 }
 
 export default class PortfolioHistoryWidget extends React.Component<PortfolioHistoryWidgetProps> {
@@ -36,10 +34,6 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 			return 'This bot has not been run yet.';
 		}
 
-		if( this.isLoadingPrices() ){
-			return 'Loading...';
-		}
-
 		const data = this.getData();
 		const options = this.getOptions();
 		return (
@@ -51,11 +45,12 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 	}
 
 	getData() {
-		const {exchangeAccount, baseAssets, quotedAsset} = this.props;
-		return memoGetData( exchangeAccount.portfolioHistory || [], quotedAsset, baseAssets, exchangeAccount.provider );
+		const {deployment} = this.props;
+		return memoGetData( deployment.portfolioHistory || [] );
 	}
 
 	getOptions() {
+		const {quotedAsset} = getDeploymentAssets(this.props.deployment.symbols);
 		return {
 			radius: 0,
 			scales: {
@@ -64,6 +59,9 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 					ticks: {
 						source: 'labels'
 					}
+				},
+				y: {
+					min: 0
 				}
 			},
 			interaction: {
@@ -86,7 +84,7 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 						},
 						footer: (elements: any[]) => {
 							let lastElement = elements[ elements.length - 1];
-							return `Total: ${trim(lastElement.parsed.y, 5)} ${this.props.quotedAsset} (${this.getReturn(lastElement.parsed.y)}%)`;
+							return `Total: ${trim(lastElement.parsed.y, 5)} ${quotedAsset} (${this.getReturn(lastElement.parsed.y)}%)`;
 						}
 					}
 				}
@@ -106,37 +104,17 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 		;
 	}
 
-	isLoadingPrices() {
-		const {baseAssets, quotedAsset, exchangeAccount} = this.props;
-		const {provider, portfolioHistory} = exchangeAccount;
-		if( !portfolioHistory || !this.hasHistory() ) return true;
-
-		const symbols = baseAssets.map( (asset: string) => `${asset}/${quotedAsset}`);
-		const startDate = portfolioHistory[0].date;
-		const endDate = portfolioHistory[portfolioHistory.length - 1].date;
-
-		let loading = false;
-		symbols.forEach( (symbol:string) => {
-			const {isLoading} = priceRangeLoader.getData(provider, symbol, startDate, endDate);
-			loading = loading || isLoading;
-		});
-
-		return loading;
-	}
-
 	hasHistory(){
-		const {portfolioHistory} = this.props.exchangeAccount;
-		
-		return portfolioHistory && Object.keys(portfolioHistory).length > 0;
+		const {portfolioHistory} = this.props.deployment;
+		return portfolioHistory && portfolioHistory.length > 0;
 	}
 }
 
 
-const memoGetData = memoizeOne( (portfolioHistory: PortfolioHistoryItem[], quoted: string, base: string[], provider: string ) => {
-
-	let assets = [ quoted ].concat( base );
+const memoGetData = memoizeOne( (portfolioHistory: PortfolioHistoryItem[] ) => {
 	let labels: number[] = [];
 	let sets: {[asset:string]: number[]} = {};
+	const assets = Object.keys(portfolioHistory[0].balances)
 	assets.forEach( (asset:string) => {
 		sets[asset] = [];
 	});
@@ -144,12 +122,13 @@ const memoGetData = memoizeOne( (portfolioHistory: PortfolioHistoryItem[], quote
 	portfolioHistory.forEach( (item: PortfolioHistoryItem) => {
 		// @ts-ignore
 		labels.push( parseInt(item.date, 10) );
-
-		let total = 0; 
-		assets.forEach( (asset: string) => {
-			let amount = item.balances[asset] ? item.balances[asset].total : 0;
-			let { data: value } = historicalValueLoader.getData( provider, `${asset}/${quoted}`, amount, item.date );
-			total += (value || 0);
+		
+		let total = 0;
+		assets.forEach( (asset:string) => {
+			let balance = item.balances[asset];
+			if( balance ){
+				total += (balance.total * balance.price);
+			}
 			sets[asset].push( total );
 		});
 	});
