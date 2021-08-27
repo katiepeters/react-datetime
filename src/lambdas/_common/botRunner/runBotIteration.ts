@@ -1,11 +1,11 @@
-import { DBBotDeployment, DbExchangeAccount, DeploymentOrders, PortfolioWithPrices } from "../../../lambdas/model.types";
-import { ArrayCandle, BotCandles, BotExecutorResultWithDate, Order, Portfolio } from "../../lambda.types";
+import { DbExchangeAccount, DeploymentOrders, PortfolioWithPrices, RunnableDeployment } from "../../../lambdas/model.types";
+import { BotCandles, BotExecutorResultWithDate, Order, Portfolio } from "../../lambda.types";
 import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 import { BotRunner, RunnableBot } from './BotRunner';
 import candles from "../utils/candles";
 
 export async function runBotIteration( accountId: string, deploymentId: string, runner: BotRunner ){
-	let deployment: DBBotDeployment = await runner.getDeployment( accountId, deploymentId );
+	let deployment: RunnableDeployment = await runner.getDeployment( accountId, deploymentId );
 	let exchange: DbExchangeAccount = await runner.getExchangeAccount( accountId, deployment.exchangeAccountId );
 	let adapter: ExchangeAdapter = await runner.getAdapter( exchange );
 	let bot: RunnableBot = await runner.getBot( accountId, deployment.botId, deployment.version );
@@ -51,7 +51,8 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 			orders: updatedOrders,
 			state: result.state,
 			logs: [ ...deployment.logs, ...result.logs ],
-			portfolioWithPrices: getPortfolioWithPrices( portfolio, deployment, candles )
+			portfolioWithPrices: getPortfolioWithPrices( portfolio, candles ),
+			lastRunAt: Date.now()
 		}),
 		runner.updateExchange( exchange, {
 			orders: runner.getExchangeOrders( adapter ),
@@ -141,8 +142,8 @@ function mergeResultOrders( currentOrders: DeploymentOrders, result: BotExecutor
 	}
 }
 
-function getPortfolioWithPrices( portfolio: Portfolio, deployment: DBBotDeployment, allCandles: BotCandles ): PortfolioWithPrices {
-	const symbols = deployment.symbols;
+function getPortfolioWithPrices( portfolio: Portfolio, allCandles: BotCandles ): PortfolioWithPrices {
+	const symbols = Object.keys(allCandles);
 	const queryAsset = symbols[0].split('/')[1];
 	
 	let portfolioWithPrices: PortfolioWithPrices = {};

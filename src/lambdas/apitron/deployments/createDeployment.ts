@@ -1,6 +1,7 @@
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 import { v4 as uuid } from 'uuid';
+import { CreateBotDeploymentModelInput } from "../../_common/dynamo/DeploymentTypes";
 interface CreateDeploymentInput {
 	name: string
 	accountId: string
@@ -50,15 +51,18 @@ const createDeploymentHandler: MutationHandler = {
 
 	getMutations(input: MutationGetterInput): Mutation[] {
 		const id = uuid();
+
+		let deployment: CreateBotDeploymentModelInput = {
+			id,
+			...input.body,
+			state: { newState: 'stateNew' },
+			active: input.body.active === undefined ? true : input.body.active
+		};
+
 		return [{
 			model: 'deployment',
 			action: 'create',
-			data: {
-				...input.body,
-				id,
-				state: { newState: 'stateNew' },
-				active: input.body.active === undefined ? true : input.body.active
-			}
+			data: deployment
 		}];
 	},
 

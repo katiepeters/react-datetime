@@ -1,4 +1,4 @@
-import { DbBot, DBBotDeploymentWithHistory, DbBotVersion, DbExchangeAccount, SimpleBotDeployment } from '../../../lambdas/model.types';
+import { DbBot, FullBotDeployment, DbExchangeAccount, ModelBotDeployment } from '../../../lambdas/model.types';
 import { BtActive } from '../utils/backtest/Bt.types';
 import lorese from './Lorese';
 
@@ -20,7 +20,7 @@ export interface StoreBotVersion {
 	updatedAt: number
 }
 
-export type StoreBotDeployment = SimpleBotDeployment | DBBotDeploymentWithHistory;
+export type StoreBotDeployment = ModelBotDeployment | FullBotDeployment;
 export interface Store {
 	authenticatedId: string
 	accounts: {

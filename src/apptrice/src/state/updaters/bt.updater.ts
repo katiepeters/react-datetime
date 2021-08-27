@@ -1,5 +1,6 @@
+import { RunnableDeployment } from "../../../../lambdas/model.types";
 import { reducer } from "../../state/stateManager";
-import { ActiveBtUpdate, BtActive, BtDeployment, BtExchange, BtStored } from "../../utils/backtest/Bt.types";
+import { ActiveBtUpdate, BtActive, BtExchange, BtStored } from "../../utils/backtest/Bt.types";
 
 export const BtUpdater = {
 	setBt: reducer<BtActive>( (store, activeBt) => {
@@ -50,7 +51,7 @@ export const BtUpdater = {
 		}
 
 		if( data.logs || data.orders || data.runInterval || data.state || data.symbols ){
-			let deploymentUpdate: BtDeployment = { ...activeBt.data.deployment };
+			let deploymentUpdate: RunnableDeployment = { ...activeBt.data.deployment };
 			if( data.logs ){
 				deploymentUpdate.logs = data.logs;
 			}
@@ -72,7 +73,7 @@ export const BtUpdater = {
 
 
 		if (data.logs || data.orders || data.runInterval || data.state || data.symbols || data.portfolioHistory) {
-			let deploymentUpdate: BtDeployment = { ...activeBt.data.deployment };
+			let deploymentUpdate: RunnableDeployment = { ...activeBt.data.deployment };
 			if (data.logs) {
 				deploymentUpdate.logs = data.logs;
 			}
@@ -141,6 +142,11 @@ const defaultActiveBt: BtActive = {
 		botId: 'init',
 		versionNumber: '0.0',
 		deployment: {
+			id: 'bt',
+			accountId: 'bt',
+			botId: 'bt',
+			version: 'bt',
+			exchangeAccountId: 'bt',
 			logs: [],
 			orders: {
 				foreignIdIndex: {},

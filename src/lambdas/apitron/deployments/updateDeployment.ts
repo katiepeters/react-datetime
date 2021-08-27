@@ -20,7 +20,7 @@ const updateDeploymentHandler: MutationHandler = {
 			return {error: {code: 'invalid_payload', reason: 'nothing to update'}};
 		} 
 
-		const deployment = await models.deployment.getSingleSimple(body.accountId, params.deploymentId);
+		const deployment = await models.deployment.getSingleModel(body.accountId, params.deploymentId);
 		if( !deployment ){
 			return {error: {code: 'not_found', reason: 'deployment not found', status: 404}};
 		}
@@ -40,14 +40,14 @@ const updateDeploymentHandler: MutationHandler = {
 		const {active, name, version} = input.body;
 
 		let mutation;
-		if( active !== undefined && isActiveDeployment(deployment) === active ){
+		if( active !== undefined && isActiveDeployment(deployment) !== active ){
 			const updatedDeployment = active ?
 				getActivatedDeployment( deployment ) :
 				getDeactivatedDeployment( deployment )
 			;	
 			mutation = {
 				model: 'deployment',
-				action: 'create', // We completely replace the old object by the new one
+				action: 'replace', // We completely replace the old object by the new one
 				data: updatedDeployment
 			};
 		}
@@ -64,7 +64,7 @@ const updateDeploymentHandler: MutationHandler = {
 			if( name ) mutation.data.name = name.trim();
 			if( version ) mutation.data.version = version;
 		}
-
+		
 		return [mutation];
 	},
 

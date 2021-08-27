@@ -1,5 +1,5 @@
 import { BotConfigurationExtra, BotExecutorResult, BotState, Portfolio } from "../../../../lambdas/lambda.types";
-import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order } from "../../../../lambdas/model.types";
+import { ConsoleEntry, DbExchangeAccount, DeploymentOrders, Order, RunnableDeployment } from "../../../../lambdas/model.types";
 import { BotRunInput } from "../../../../lambdas/_common/botRunner/BotRunner";
 import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
 
@@ -89,11 +89,11 @@ interface BotRunnerExchangeUpdate {
 }
 
 interface BotRunner {
-	getDeployment( deploymentId: string ): Promise<DBBotDeployment>
+	getDeployment( deploymentId: string ): Promise<RunnableDeployment>
 	getExchangeAccount( exchangeAccountId: string ): Promise<DbExchangeAccount>
 	getAdapter( exchange: DbExchangeAccount ): ExchangeAdapter
 	getBot( botId: string ): Promise<RunnableBot>
-	updateDeployment( deployment: DBBotDeployment, update: BotRunnerDeploymentUpdate ): Promise<DBBotDeployment>,
+	updateDeployment( deployment: RunnableDeployment, update: BotRunnerDeploymentUpdate ): Promise<RunnableDeployment>,
 	updatePortfolio( exchange: DbExchangeAccount, update: BotRunnerExchangeUpdate): Promise<DbExchangeAccount>,
 	setRunError( error: any ): Promise<void>
 	cancelOrders( adapter: ExchangeAdapter, ordersToCancel: Order[] ): Promise<Order[]>

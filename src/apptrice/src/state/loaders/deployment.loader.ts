@@ -1,4 +1,4 @@
-import { DBBotDeploymentWithHistory } from '../../../../lambdas/model.types';
+import { FullBotDeployment } from '../../../../lambdas/model.types';
 import apiCacher from '../apiCacher';
 import {loader} from '../stateManager';
 import { getDeploymentSelector } from '../selectors/deployment.selectors';
@@ -8,7 +8,7 @@ interface deploymentLoadInput {
 	deploymentId: string
 }
 
-export const deploymentLoader = loader<deploymentLoadInput, DBBotDeploymentWithHistory>({
+export const deploymentLoader = loader<deploymentLoadInput, FullBotDeployment>({
 	selector: (store, {deploymentId}) => {
 		let deployment = getDeploymentSelector(store, deploymentId);
 		if( deployment && ('portfolioHistory' in deployment) ){

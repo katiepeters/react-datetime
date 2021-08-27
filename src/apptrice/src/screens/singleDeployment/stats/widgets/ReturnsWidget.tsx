@@ -3,14 +3,13 @@ import styles from './_ReturnsWidget.module.css';
 import {Line} from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { Card } from '../../../../components';
-import { PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
+import { PortfolioHistoryItem, RunnableDeployment } from '../../../../../../lambdas/model.types';
 import memoizeOne from 'memoize-one';
 import trim from '../../../../utils/trim';
-import { BtDeployment } from '../../../../utils/backtest/Bt.types';
 import { getDeploymentAssets, getPortfolioValue } from '../../../../../../lambdas/_common/utils/deploymentUtils';
 
 interface ReturnsWidgetProps {
-	deployment?: BtDeployment
+	deployment?: RunnableDeployment
 }
 
 export default class ReturnsWidget extends React.Component<ReturnsWidgetProps> {

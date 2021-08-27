@@ -14,7 +14,7 @@ const deleteDeploymentHandler: MutationHandler = {
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const deployment = await models.deployment.getSingle(accountId, deploymentId);
+		const deployment = await models.deployment.getSingleModel(accountId, deploymentId);
 		if (!deployment) {
 			return { error: { code: 'not_found', reason: 'deployment not found', status: 404 } };
 		}

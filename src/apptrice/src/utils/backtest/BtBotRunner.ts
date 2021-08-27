@@ -1,5 +1,5 @@
 import { BotCandles, Portfolio } from "../../../../lambdas/lambda.types";
-import { DBBotDeployment, DBBotDeploymentWithHistory, DbExchangeAccount, DeploymentOrders, Order, PortfolioWithPrices, RunInterval } from "../../../../lambdas/model.types";
+import { RunnableDeployment, DbExchangeAccount, DeploymentOrders, Order, PortfolioWithPrices, RunInterval } from "../../../../lambdas/model.types";
 import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate } from "../../../../lambdas/_common/botRunner/BotRunner";
 import VirtualAdapter from "../../../../lambdas/_common/exchanges/adapters/VirtualAdapter";
 import { ExchangeAdapter, ExchangeOrder } from "../../../../lambdas/_common/exchanges/ExchangeAdapter";
@@ -31,7 +31,7 @@ export interface BtVirtualExchangeAccount extends DbExchangeAccount {
 
 
 export default class BtBotRunner implements BotRunner {
-	deployment: DBBotDeploymentWithHistory
+	deployment: RunnableDeployment
 	exchange: BtVirtualExchangeAccount
 	adapter: VirtualAdapter
 	startDate: number
@@ -47,9 +47,8 @@ export default class BtBotRunner implements BotRunner {
 
 		this.deployment = {
 			id: 'btDeployment',
-			name: 'BT Deployment',
 			accountId: config.accountId,
-			resourceId: '',
+			exchangeAccountId: 'bt',
 			botId: config.botId,
 			version: config.versionNumber,
 			orders: {
@@ -57,13 +56,10 @@ export default class BtBotRunner implements BotRunner {
 				items: {},
 				openOrderIds: []
 			},
-			exchangeAccountId: 'btDeployment',
 			symbols: config.baseAssets.map( (base: string) => `${base}/${config.quotedAsset}` ),
 			runInterval: config.runInterval,
 			state: {newState: 'stateNew'},
 			logs: [],
-			createdAt: Date.now(),
-			active: true,
 			activeIntervals: [[config.startDate]],
 			portfolioHistory: [] // Fist item will be loaded when we get the candles
 		};
@@ -106,7 +102,7 @@ export default class BtBotRunner implements BotRunner {
 		return Promise.resolve(this.adapter);
 	}
 
-	getCandles( adapter: ExchangeAdapter, deployment: DBBotDeployment ){
+	getCandles( adapter: ExchangeAdapter, deployment: RunnableDeployment ){
 		if( !Object.keys(this.candles).length ){
 			throw new Error('candles_not_initialized');
 		}
@@ -150,7 +146,7 @@ export default class BtBotRunner implements BotRunner {
 		;
 	}
 
-	updateDeployment( deployment: DBBotDeployment, {portfolioWithPrices, ...update}: BotRunnerDeploymentUpdate ) {
+	updateDeployment( deployment: RunnableDeployment, {portfolioWithPrices, ...update}: BotRunnerDeploymentUpdate ) {
 		this.deployment = {
 			...this.deployment,
 			...update
@@ -185,7 +181,7 @@ export default class BtBotRunner implements BotRunner {
 		return Promise.resolve(this.exchange);
 	}
 
-	setRunError( deployment: DBBotDeployment, error: any ){
+	setRunError( deployment: RunnableDeployment, error: any ){
 		/*
 		quickStore.appendLogs([{
 			id: -1,

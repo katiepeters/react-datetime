@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Orders } from '../../../../../lambdas/lambda.types';
-import { DBBotDeployment, DBBotDeploymentWithHistory } from '../../../../../lambdas/model.types';
+import { FullBotDeployment, ModelBotDeployment } from '../../../../../lambdas/model.types';
 import DeploymentCharts from '../../../common/charts/DeploymentCharts';
 import { Card, ScreenWrapper } from '../../../components';
 import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
@@ -22,7 +22,7 @@ export default class DeploymentChartsScreen extends React.Component<SingleDeploy
 		)
 	}
 
-	renderContent(deployment: DBBotDeploymentWithHistory) {
+	renderContent(deployment: FullBotDeployment) {
 		return (
 			<DeploymentCharts
 				exchangeProvider="bitfinex"
@@ -34,7 +34,7 @@ export default class DeploymentChartsScreen extends React.Component<SingleDeploy
 		return this.props.router.location.params.id;
 	}
 
-	getSymbols(deployment: DBBotDeployment): Orders | undefined {
+	getSymbols(deployment: ModelBotDeployment): Orders | undefined {
 		// @ts-ignore
 		return deployment.symbols.flatten ?
 		// @ts-ignore

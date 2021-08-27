@@ -1,7 +1,6 @@
 import memoizeOne from "memoize-one";
-import {DeploymentOrders, PortfolioHistoryItem } from "../../../../lambdas/model.types";
+import {DeploymentOrders, PortfolioHistoryItem, RunnableDeployment } from "../../../../lambdas/model.types";
 import BtOrders from "../../screens/singleBot/botBt/sections/BtOrders";
-import { BtDeployment } from "../../utils/backtest/Bt.types";
 
 export interface DeploymentStats {
 	initialValue: number,
@@ -9,11 +8,11 @@ export interface DeploymentStats {
 	netProfitPercent: number
 }
 
-export function getStats( deployment: BtDeployment ){
+export function getStats( deployment: RunnableDeployment ){
 	return calculateStatsMemo(deployment);
 }
 
-const calculateStatsMemo = memoizeOne( (deployment: BtDeployment) => {
+const calculateStatsMemo = memoizeOne( (deployment: RunnableDeployment) => {
 	const runningInterval = getRunningInterval( deployment );
 	const queryAsset = deployment.symbols[0].split('/')[1];
 
@@ -102,7 +101,7 @@ function getPortfolioValue( {balances}: PortfolioHistoryItem ){
 	return value;
 }
 
-function getRunningInterval( {activeIntervals, portfolioHistory}: BtDeployment ): [number, number] {
+function getRunningInterval( {activeIntervals, portfolioHistory}: RunnableDeployment ): [number, number] {
 	return [
 		activeIntervals[0][0],
 		portfolioHistory[portfolioHistory.length - 1].date

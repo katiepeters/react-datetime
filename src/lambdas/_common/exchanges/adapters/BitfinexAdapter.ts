@@ -148,7 +148,10 @@ function getKey(options: CandleQuery): string {
 }
 
 function toExchangeSymbol(market) {
-	return `t${market.replace('/', '')}`;
+	let assets = market.split('/');
+	let separator = market.length !== 7 ? '%3A' : '';
+	console.log( market, market.length, separator);
+	return `t${assets[0]}${separator}${assets[1]}`;
 }
 
 function toLocalSymbol( exchangeSymbol ){

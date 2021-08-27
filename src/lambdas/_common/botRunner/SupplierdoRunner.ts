@@ -1,17 +1,18 @@
-import { ConsoleEntry, DBBotDeployment, DbExchangeAccount, DeploymentOrders, Order } from "../../model.types";
+import { ConsoleEntry, DbExchangeAccount, DeploymentOrders, Order, RunnableDeployment, FullBotDeployment, PortfolioHistoryItem, PortfolioWithPrices } from "../../model.types";
 import BotDeploymentModel from "../dynamo/BotDeploymentModel"
-import BotModel from "../dynamo/BotModel";
+import BotVersionModel from "../dynamo/BotVersionModel";
 import ExchangeAccountModel from "../dynamo/ExchangeAccountModel";
 import VirtualAdapter from "../exchanges/adapters/VirtualAdapter";
 import { ExchangeAdapter, ExchangeOrder } from "../exchanges/ExchangeAdapter";
 import exchanger from "../exchanges/exchanger";
 import exchangeUtils from "../exchanges/exchangeUtils";
+import { getDeactivatedDeployment, getUpdatedDeploymentStats } from "../utils/deploymentUtils";
 import { BotRunner, BotRunnerDeploymentUpdate, BotRunnerExchangeUpdate, CodeError, RunnableBot } from "./BotRunner";
 import { SupplierdoRunnableBot } from "./SupplierdoRunnableBot";
 
 const SupplierdoRunner: BotRunner = {
 	async getDeployment( accountId: string, deploymentId: string ){
-		const deployment = await BotDeploymentModel.getSingle( accountId, deploymentId );
+		const deployment = await BotDeploymentModel.getSingleFull( accountId, deploymentId );
 		if( !deployment ){
 			throw new Error('unknown_deployment');
 		}
@@ -48,7 +49,7 @@ const SupplierdoRunner: BotRunner = {
 		return exchangeAdapter;
 	},
 
-	getCandles( adapter: ExchangeAdapter, deployment: DBBotDeployment ){
+	getCandles( adapter: ExchangeAdapter, deployment: RunnableDeployment ){
 		let promises = deployment.symbols.map( (symbol:string) => adapter.getCandles({
 			market: symbol,
 			runInterval: deployment.runInterval,
@@ -65,10 +66,10 @@ const SupplierdoRunner: BotRunner = {
 		});
 	},
 
-	async getBot( accountId: string, botId: string ): Promise<RunnableBot>{
-		let dbBot = await BotModel.getSingle( accountId, botId );
+	async getBot( accountId: string, botId: string, versionNumber: string ): Promise<RunnableBot>{
+		let botVersion = await BotVersionModel.getSingle(accountId, botId, versionNumber);
 
-		if( !dbBot ){
+		if( !botVersion ){
 			throw new CodeError({
 				code: 'unknown_bot',
 				extra:{accountId, botId}
@@ -76,15 +77,27 @@ const SupplierdoRunner: BotRunner = {
 		}
 
 		let bot = new SupplierdoRunnableBot();
-		bot.prepare( dbBot.code );
+		bot.prepare( botVersion.code );
 		return bot;
 	},
 
-	async updateDeployment( deployment: DBBotDeployment, update: BotRunnerDeploymentUpdate ) {
+	async updateDeployment( deployment: FullBotDeployment, update: BotRunnerDeploymentUpdate ) {
+		let {portfolioWithPrices, ...updt} = update;
+		let modelUpdate: Partial<FullBotDeployment> = updt;
+		if( portfolioWithPrices ){
+			const item: PortfolioHistoryItem = {
+				date: Date.now(),
+				balances: portfolioWithPrices
+			};
+			deployment.portfolioHistory.push(item);
+			modelUpdate.portfolioHistory = deployment.portfolioHistory;
+			modelUpdate.stats = getUpdatedDeploymentStats( item.balances, deployment.stats );
+		}
+
 		let payload = {
 			accountId: deployment.accountId,
 			deploymentId: deployment.id,
-			update
+			update: modelUpdate
 		};
 
 		console.log( 'Updating deployment' );
@@ -122,14 +135,19 @@ const SupplierdoRunner: BotRunner = {
 		});
 	},
 
-	async setRunError( deployment: DBBotDeployment, error: any ){
+	async setRunError( deployment: FullBotDeployment, error: any ){
 		// When the bot finishes in an error we probably want to log the error
 		// for the user and then deactivate the deployment
 		console.log('The execution ended in an error', error);
+		const deactivatedDeployment = getDeactivatedDeployment(deployment);
+		await BotDeploymentModel.replace(deactivatedDeployment);
+
+		/*
 		await BotDeploymentModel.deactivate({
 			accountId: deployment.accountId,
 			deploymentId: deployment.id
 		});
+		*/
 		// this is just for testing
 		// await BotDeploymentModel.activate({ accountId, deploymentId });
 		let logs: ConsoleEntry[] = [

@@ -1,8 +1,8 @@
-import { CreateBotDeploymentModelInput, DynamoBotDeployment, FullBotDeployment, ModelBotDeployment, UpdateBotDeploymentModelInput } from '../../model.types';
+import { DBBotDeploymentRaw, DBBotDeployment, DBBotDeploymentInput, DBBotDeploymentUpdate, SimpleBotDeployment, DBBotDeploymentWithHistory } from '../../model.types';
 import s3Helper from '../utils/s3';
 import { DBModel } from './db';
 
-const Db = new DBModel<DynamoBotDeployment>();
+const Db = new DBModel<DBBotDeploymentRaw>();
 
 const defaultOrders = {
 	foreignIdIndex: {},
@@ -17,24 +17,20 @@ interface DeleteDeploymentInput {
 interface UpdateDeploymentInput {
 	accountId: string
 	deploymentId: string
-	update: UpdateBotDeploymentModelInput
+	update: DBBotDeploymentUpdate
 }
 
 export default {
-	async getAccountDeployments( accountId: string ): Promise<ModelBotDeployment[]> {
-		let deployments = await Db.getMultiple(accountId, DEPLOYMENT_PREFIX);
-		return deployments.map( dynamoToModel );
+	async getAccountDeployments( accountId: string ): Promise<SimpleBotDeployment[]> {
+		let deployments = await Db.getMultiple(accountId, 'DEPLOYMENT#');
+		return deployments.map((d: any) => ({
+			...d,
+			active: d.active === 'true' ? true : false
+		}));
 	},
 
-	async getSingleModel(accountId: string, deploymentId: string): Promise<ModelBotDeployment | void > {
-		let entry = await Db.getSingle(accountId, `${DEPLOYMENT_PREFIX}${deploymentId}`);
-		if( entry ){
-			return dynamoToModel(entry)
-		}
-	},
-
-	async getSingleFull(accountId: string, deploymentId: string): Promise<FullBotDeployment | void > {
-		let entry = await Db.getSingle(accountId, `${DEPLOYMENT_PREFIX}${deploymentId}`);
+	async getSingle(accountId: string, deploymentId: string): Promise<DBBotDeployment | void> {
+		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
 		if( !entry ) return;
 
 		let [ logs, state, orders, history ] = await Promise.all([
@@ -45,24 +41,49 @@ export default {
 		]);
 
 		return {
-			...dynamoToModel(entry),
-			state: JSON.parse( state || '{}'),
+			...entry,
+			active: entry.active ? true : false,
 			orders: orders ? JSON.parse(orders) : defaultOrders,
+			state: JSON.parse(state || '{}'),
+			logs: JSON.parse(logs || '[]')
+		};
+	},
+
+	async getSingleSimple(accountId: string, deploymentId: string): Promise<SimpleBotDeployment|void> {
+		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
+
+		if (!entry) return;
+		return {
+			...entry,
+			active: entry.active ? true : false
+		};
+	},
+
+	async getSingleWithHistory(accountId: string, deploymentId: string): Promise<DBBotDeploymentWithHistory | void> {
+		let entry = await Db.getSingle(accountId, `DEPLOYMENT#${deploymentId}`);
+		if( !entry ) return;
+
+		let [ logs, state, orders, history ] = await Promise.all([
+			getLogs(accountId, deploymentId),
+			getState(accountId, deploymentId),
+			getOrders(accountId, deploymentId),
+			getPortfolioHistory(accountId, deploymentId)
+		]);
+
+		return {
+			...entry,
+			active: entry.active ? true : false,
+			orders: orders ? JSON.parse(orders) : defaultOrders,
+			state: JSON.parse(state || '{}'),
 			logs: JSON.parse(logs || '[]'),
 			portfolioHistory: JSON.parse(history || '[]')
-		}
+		};
 	},
 
-	async getActiveDeployments( runInterval: string ) {
-		return await Db.getIndex('ActiveDeployments').getMultiple({
-			pk: {name: 'runInterval', value: runInterval},
-			sk: {name: 'active', value: 'true'}
-		});
-	},
-
-	async create( input: CreateBotDeploymentModelInput ){
+	async create( input: DBBotDeploymentInput ){
 		const {id: deploymentId, accountId } = input;
-		let dbDeployment: DynamoBotDeployment = {
+		let dbDeployment: DBBotDeploymentRaw = {
+			id: deploymentId,
 			name: input.name,
 			accountId,
 			botId: input.botId,
@@ -72,8 +93,7 @@ export default {
 			runInterval: input.runInterval,
 			symbols: input.symbols,
 			createdAt: Date.now(),
-			activeIntervals: input.activeIntervals || [],
-			stats: input.stats
+			activeIntervals: input.activeIntervals || []
 		};
 
 		if( input.active ){
@@ -81,26 +101,34 @@ export default {
 			dbDeployment.activeIntervals = input.activeIntervals || [[dbDeployment.createdAt]];
 		}
 
+		const portfolioHistory = [
+			{
+				date: Date.now(),
+				balances: input.portfolioWithPrices
+			}
+		]
+
 		return await Promise.all([
 			Db.put(dbDeployment),
 			saveLogs(accountId, deploymentId, JSON.stringify(input.logs || [])),
 			saveState(accountId, deploymentId, JSON.stringify(input.state || [])),
 			saveOrders(accountId, deploymentId, JSON.stringify(input.orders || defaultOrders)),
-			savePortfolioHistory(accountId, deploymentId, JSON.stringify(input.portfolioHistory || []))
+			savePortfolioHistory(accountId, deploymentId, JSON.stringify(portfolioHistory))
 		]);
 	},
 
-	// This is useful to activate/deactivate 
-	async replace(input: ModelBotDeployment ){
-		return await Db.put(modelToDynamo(input));
+	async replace(input: DBBotDeploymentRaw ){
+		return await Db.put(input);
 	},
 
 	async update({ accountId, deploymentId, update }: UpdateDeploymentInput ){
 		let promises: any = [];
-
-		if( needsToUpdateDynamo(update) ) {
+		let {botId, runInterval, symbols} = update;
+		if( botId || runInterval || symbols ) {
 			promises.push(
-				Db.update(accountId, `${DEPLOYMENT_PREFIX}${deploymentId}`, getDynamoUpdate(update))
+				Db.update(accountId, `DEPLOYMENT#${deploymentId}`, {
+					botId, runInterval, symbols
+				})
 			);
 		}
 
@@ -113,19 +141,23 @@ export default {
 		if (update.state) {
 			promises.push( saveState(accountId, deploymentId, JSON.stringify(update.state)) );
 		}
-		if( update.portfolioHistory ){
+
+		if(update.portfolioWithPrices) {
+			const portfolioHistoryRaw = await getPortfolioHistory(accountId, deploymentId);
+			const history = [
+				...JSON.parse( portfolioHistoryRaw || '[]'),
+				{
+					date: Date.now(),
+					balances: update.portfolioWithPrices
+				}
+			];
+
 			promises.push(
-				savePortfolioHistory(accountId, deploymentId, JSON.stringify(update.portfolioHistory))
+				savePortfolioHistory(accountId, deploymentId, JSON.stringify(history))
 			);
 		}
-		let response;
-		try {
-			response = await Promise.all( promises );
-		}
-		catch (err:any) {
-			console.log('Weve catched the ERROR');
-			console.error( err );
-		}
+
+		return await Promise.all( promises );
 	},
 
 	async delete({accountId, deploymentId}: DeleteDeploymentInput) {
@@ -138,7 +170,22 @@ export default {
 		]
 		// @ts-ignore
 		return await Promise.all(promises);
-	}
+	},
+
+	async getActiveDeployments( runInterval: string ) {
+		return await Db.getIndex('ActiveDeployments').getMultiple({
+			pk: {name: 'runInterval', value: runInterval},
+			sk: {name: 'active', value: 'true'}
+		});
+	},
+
+	async deactivate({ accountId, deploymentId }: DeleteDeploymentInput ) {
+		return await Db.removeAttributes(accountId, `DEPLOYMENT#${deploymentId}`, ['active']);
+	},
+
+	async activate({ accountId, deploymentId }: DeleteDeploymentInput) {
+		return await Db.update(accountId, `DEPLOYMENT#${deploymentId}`, {active: 'true'});
+	},
 }
 
 function getLogsFileName( accountId: string, deploymentId: string ){
@@ -191,70 +238,4 @@ function delOrders(accountId: string, deploymentId: string) {
 }
 function delPortfolioHistory(accountId: string, deploymentId: string) {
 	return s3Helper.botState.delObject(getPortfolioHistoryFileName(accountId, deploymentId));
-}
-
-const DEPLOYMENT_PREFIX = 'DEPLOYMENT#';
-function dynamoToModel( dynamoDevelopment: DynamoBotDeployment ): ModelBotDeployment{
-	const {resourceId, ...attrs} = dynamoDevelopment
-	return {
-		id: resourceId.replace(DEPLOYMENT_PREFIX, ''),
-		...attrs,
-		active: attrs.active !== undefined
-	};
-}
-
-function modelToDynamo( modelDevelopment: ModelBotDeployment): DynamoBotDeployment {
-	const {
-		id,
-		accountId,
-		active,
-		botId, 
-		version, 
-		exchangeAccountId, 
-		createdAt,
-		lastRunAt,
-		name,
-		runInterval,
-		symbols,
-		activeIntervals,
-		stats
-	} = modelDevelopment;
-	
-	return {
-		accountId,
-		resourceId: `${DEPLOYMENT_PREFIX}${id}`,
-		botId, 
-		version, 
-		exchangeAccountId, 
-		createdAt,
-		lastRunAt,
-		name,
-		runInterval,
-		symbols,
-		activeIntervals,
-		stats,
-		active: active ? 'true' : undefined
-	};
-}
-
-
-
-const dynamoAttributes = ['version', 'runInterval', 'symbols', 'stats', 'lastRunAt'];
-function needsToUpdateDynamo( update: UpdateBotDeploymentModelInput ){
-	let i = dynamoAttributes.length;
-	while( i-- > 0 ){
-		if( update[dynamoAttributes[i]] ){
-			return true;
-		}
-	}
-}
-
-function getDynamoUpdate( update: UpdateBotDeploymentModelInput ){
-	let filtered = {};
-	dynamoAttributes.forEach( (attr: string) => {
-		if( update[attr] ){
-			filtered[ attr ] = update[attr];
-		}
-	});
-	return filtered;
 }

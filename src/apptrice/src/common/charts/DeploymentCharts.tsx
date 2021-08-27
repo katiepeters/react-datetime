@@ -1,13 +1,12 @@
 import memoizeOne from 'memoize-one';
 import * as React from 'react'
-import { DeploymentOrders, Order } from '../../../../lambdas/model.types';
+import { DeploymentOrders, Order, RunnableDeployment } from '../../../../lambdas/model.types';
 import { Tabs, Tab } from '../../components';
-import { BtDeployment } from '../../utils/backtest/Bt.types';
 import AutoChart from './AutoChart';
 import styles from './_DeploymentCharts.module.css';
 
 interface DeploymentChartsProps {
-	deployment: BtDeployment,
+	deployment: RunnableDeployment,
 	exchangeProvider: 'bitfinex',
 	selector?: 'tabs' | 'dropdown',
 	activeSymbol?: string,

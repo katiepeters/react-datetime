@@ -13,7 +13,7 @@ const getSingleDeploymentHandler: QueryHandler = {
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const deployment = await models.deployment.getSingleWithHistory(accountId, deploymentId);
+		const deployment = await models.deployment.getSingleFull(accountId, deploymentId);
 		if (!deployment) {
 			return { error: { code: 'not_found', reason: 'deployment not found', status: 404 } };
 		}

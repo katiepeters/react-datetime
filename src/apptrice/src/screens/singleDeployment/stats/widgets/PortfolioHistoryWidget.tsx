@@ -5,14 +5,13 @@ import styles from './_PortfolioHistoryWidget.module.css';
 import {Line} from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 
-import { PortfolioHistoryItem } from '../../../../../../lambdas/model.types';
+import { PortfolioHistoryItem, RunnableDeployment } from '../../../../../../lambdas/model.types';
 import memoizeOne from 'memoize-one';
 import trim from '../../../../utils/trim';
-import { BtDeployment } from '../../../../utils/backtest/Bt.types';
 import { getDeploymentAssets } from '../../../../../../lambdas/_common/utils/deploymentUtils';
 
 interface PortfolioHistoryWidgetProps {
-	deployment: BtDeployment
+	deployment: RunnableDeployment
 }
 
 export default class PortfolioHistoryWidget extends React.Component<PortfolioHistoryWidgetProps> {

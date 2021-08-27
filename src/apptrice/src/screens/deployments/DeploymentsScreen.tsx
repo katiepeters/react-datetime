@@ -12,7 +12,7 @@ import { Portfolio } from '../../../../lambdas/lambda.types';
 import { isActiveDeployment } from '../../../../lambdas/_common/utils/deploymentUtils';
 import { deploymentListLoader } from '../../state/loaders/deploymentList.loader';
 import { getAuthenticatedId } from '../../state/selectors/account.selectors';
-import { SimpleBotDeployment } from '../../../../lambdas/model.types';
+import { ModelBotDeployment } from '../../../../lambdas/model.types';
 
 
 export default class DeploymentsScreen extends React.Component<ScreenProps> {
@@ -57,7 +57,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 				columns={ this.getColumns() }
 				disabledItems={ this.state.loadingItems }
 				noElementsMessage={ this.renderNoElements() }
-				onRowClick={ (item: SimpleBotDeployment) => this.props.router.push(`/deployments/${item.id}`)}
+				onRowClick={ (item: ModelBotDeployment) => this.props.router.push(`/deployments/${item.id}`)}
 			/>
 		);
 	}
@@ -86,7 +86,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		)
 	}
 
-	getColumns(): TableColumn<SimpleBotDeployment>[] {
+	getColumns(): TableColumn<ModelBotDeployment>[] {
 		return [
 			{ field: 'id' },
 			{ field: 'name' },
@@ -96,11 +96,11 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		];
 	}
 
-	_renderActive = (item: SimpleBotDeployment) => {
+	_renderActive = (item: ModelBotDeployment) => {
 		return <span>{isActiveDeployment(item) ? 'Active' : 'Inactive'}</span>;
 	}
 
-	_renderControls = (item: SimpleBotDeployment) => {
+	_renderControls = (item: ModelBotDeployment) => {
 		// @ts-ignore
 		if (this.state.loadingItems[item.id]) {
 			return <Spinner color="#fff" />;
@@ -126,7 +126,7 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 		);
 	}
 
-	_onExchangeAction = (item: SimpleBotDeployment, action: string) => {
+	_onExchangeAction = (item: ModelBotDeployment, action: string) => {
 		const {authenticatedId} = this.props;
 		if( action === 'activate' ){
 			this.setState({loadingItems: {[item.id]: true}});

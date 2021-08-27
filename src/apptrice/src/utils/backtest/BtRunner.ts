@@ -1,9 +1,9 @@
 import { BacktestConfig } from "../../common/btSettings/BotTools";
 import {v4 as uuid} from 'uuid';
-import { DBBotDeployment, DbExchangeAccount } from "../../../../lambdas/model.types";
+import { DbExchangeAccount } from "../../../../lambdas/model.types";
 import BtBotRunner from "./BtBotRunner";
 import { runBotIteration } from "../../../../lambdas/_common/botRunner/runBotIteration";
-import { BtDeployment, BtExchange } from "./Bt.types";
+import { BtExchange } from "./Bt.types";
 import { StoreBotVersion } from "../../state/stateManager";
 import { getActiveBt } from "../../state/selectors/bt.selectors";
 import { BtUpdater } from "../../state/updaters/bt.updater";
@@ -58,7 +58,7 @@ async function prepareAndRun(btid: string, version: StoreBotVersion, options: Ba
 		currentIteration: 0,
 		candles: runner.candles,
 		totalIterations: runner.totalIterations,
-		deployment: toBtDeployment( runner.deployment ),
+		deployment: runner.deployment,
 		exchange: toBtExchange( runner.exchange )
 	});
 	await runIterations( version, runner );
@@ -96,23 +96,11 @@ async function runIterations( version: StoreBotVersion, runner: BtBotRunner ) {
 		await runBotIteration( accountId, botId, runner );
 		BtUpdater.update({
 			currentIteration: 0,
-			deployment: toBtDeployment(runner.deployment),
+			deployment: runner.deployment,
 			exchange: toBtExchange(runner.exchange)
 		});
 		runner.iteration++;
 	}
-}
-
-function toBtDeployment( deployment: DBBotDeployment ): BtDeployment {
-	return {
-		logs: deployment.logs,
-		orders: deployment.orders,
-		runInterval: deployment.runInterval,
-		state: deployment.state,
-		symbols: deployment.symbols,
-		portfolioHistory: deployment.portfolioHistory,
-		activeIntervals: deployment.activeIntervals
-	};
 }
 
 function toBtExchange( exchange: DbExchangeAccount ): BtExchange{

@@ -84,54 +84,45 @@ export interface DBBotDeploymentState {
 type ActiveIntervalClosed = [number, number]
 type ActiveIntervalOpen = [number]
 export type ActiveInterval = ActiveIntervalClosed | ActiveIntervalOpen
-
-export interface SimpleBotDeployment {
-	id: string
-	name: string
-	accountId: string
-	botId: string
-	exchangeAccountId: string
-	runInterval: RunInterval
-	symbols: string[]
-	createdAt: number
-	activeIntervals: ActiveInterval[]
-	active: boolean
+export interface BasicBotDeploymentStats {
+	startingBalances: PortfolioWithPrices,
+	lastWeekPortfolio: PortfolioHistoryItem[]
 }
 
-export interface DBBotDeployment extends TableItem {
-	id: string
-	name: string
-	botId: string
-	version: string
-	orders: DeploymentOrders
-	exchangeAccountId: string
-	runInterval: RunInterval
-	symbols: string[]
-	state: DBBotDeploymentState
-	logs: ConsoleEntry[]
-	createdAt: number
-	activeIntervals: ActiveInterval[]
-	active: boolean
-}
-
-export interface DBBotDeploymentWithHistory extends DBBotDeployment {
-	portfolioHistory: PortfolioHistoryItem[]
-}
-
-export interface DBBotDeploymentRaw extends TableItem {
-	id: string
-	name: string
+export interface BaseBotDeployment {
 	botId: string
 	version: string
 	exchangeAccountId: string
-	runInterval: RunInterval
-	symbols: string[]
+
 	createdAt: number
+	lastRunAt?: number
+	name: string
+
+	runInterval: string
+	symbols: string[]
+
 	activeIntervals: ActiveInterval[]
+	stats?: BasicBotDeploymentStats
+}
+
+export interface DynamoBotDeployment extends TableItem, BaseBotDeployment {
 	active?: string
 }
 
-export interface DBBotDeploymentInput {
+export interface ModelBotDeployment extends BaseBotDeployment {
+	id: string
+	accountId: string
+	active: boolean
+}
+
+export interface FullBotDeployment extends ModelBotDeployment {
+	orders: DeploymentOrders
+	state: DBBotDeploymentState
+	logs: ConsoleEntry[]
+	portfolioHistory: PortfolioHistoryItem[]
+}
+
+export interface CreateBotDeploymentModelInput {
 	accountId: string
 	id: string
 	name: string
@@ -141,24 +132,44 @@ export interface DBBotDeploymentInput {
 	runInterval: RunInterval
 	symbols: string[]
 	orders: DeploymentOrders
-	portfolioWithPrices: PortfolioWithPrices
+	portfolioHistory?: PortfolioHistoryItem[]
 	state?: DBBotDeploymentState
 	logs?: ConsoleEntry[]
 	active: boolean
 	createdAt?: number
 	activeIntervals?: ActiveInterval[]
+	stats?: BasicBotDeploymentStats
 }
 
-export interface DBBotDeploymentUpdate {
-	name?: string
-	botId?: string
+export interface UpdateBotDeploymentModelInput {
+	stats?: BasicBotDeploymentStats
 	version?: string
 	runInterval?: RunInterval
 	symbols?: string[]
 	orders?: DeploymentOrders
 	state?: DBBotDeploymentState
 	logs?: ConsoleEntry[]
-	portfolioWithPrices?: PortfolioWithPrices
+	portfolioHistory?: PortfolioWithPrices
+}
+
+export interface ActivityDeployment {
+	active: boolean,
+	activeIntervals?: ActiveInterval[]
+}
+
+export interface RunnableDeployment {
+	id: string
+	accountId: string
+	exchangeAccountId: string
+	botId: string
+	version: string
+	runInterval: string
+	symbols: string[]
+	orders: DeploymentOrders
+	state: DBBotDeploymentState
+	logs: ConsoleEntry[]
+	portfolioHistory: PortfolioHistoryItem[]
+	activeIntervals: ActiveInterval[]
 }
 
 export interface OrderInput {
