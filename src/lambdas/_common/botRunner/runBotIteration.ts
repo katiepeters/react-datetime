@@ -1,5 +1,5 @@
 import { DbExchangeAccount, DeploymentOrders, PortfolioWithPrices, RunnableDeployment } from "../../../lambdas/model.types";
-import { BotCandles, BotExecutorResultWithDate, Order, Portfolio } from "../../lambda.types";
+import { Balance, BotCandles, BotExecutorResultWithDate, Order, Portfolio } from "../../lambda.types";
 import { ExchangeAdapter, ExchangeOrder } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
 import { BotRunner, RunnableBot } from './BotRunner';
 import candles from "../utils/candles";
@@ -20,6 +20,7 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 	let orders = await getUpdatedOrdersFromExchange( adapter, deployment.orders );
 	deployment = await runner.updateDeployment( deployment, {orders} );
 	
+
 	const result = await bot.run({
 		candles,
 		config: {
@@ -51,7 +52,7 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 			orders: updatedOrders,
 			state: result.state,
 			logs: [ ...deployment.logs, ...result.logs ],
-			portfolioWithPrices: getPortfolioWithPrices( portfolio, candles ),
+			portfolioWithPrices: getPortfolioWithPrices( portfolio, deployment.symbols, candles ),
 			lastRunAt: Date.now()
 		}),
 		runner.updateExchange( exchange, {
@@ -142,26 +143,45 @@ function mergeResultOrders( currentOrders: DeploymentOrders, result: BotExecutor
 	}
 }
 
-function getPortfolioWithPrices( portfolio: Portfolio, allCandles: BotCandles ): PortfolioWithPrices {
-	const symbols = Object.keys(allCandles);
-	const queryAsset = symbols[0].split('/')[1];
+
+function getEmptyBalance( asset: string ): Balance {
+	return {
+		asset,
+		free: 0,
+		total: 0
+	}
+}
+
+// Portfolio can come from the exchange directly, already having assets
+// that are not related to this bot, so we need to use the development symbols
+function getPortfolioWithPrices( portfolio: Portfolio, symbols: string[], allCandles: BotCandles ): PortfolioWithPrices {
+	const quotedAsset = symbols[0].split('/')[1];
+	const baseAssets = symbols.map( (s:string) => s.split('/')[0]);
+
+	logCandles( allCandles );
 	
-	let portfolioWithPrices: PortfolioWithPrices = {};
-	for( let asset in portfolio ){
-		
-		if( asset === queryAsset ){
-			portfolioWithPrices[asset] = {
-				...portfolio[asset],
-				price: 1
-			}
-		}
-		else {
-			portfolioWithPrices[asset] = {
-				...portfolio[asset],
-				price: candles.getClose(candles.getLast(allCandles[`${asset}/${queryAsset}`]))
-			}
+	let portfolioWithPrices: PortfolioWithPrices = {
+		[quotedAsset]: {
+			...(portfolio[quotedAsset] || getEmptyBalance(quotedAsset)),
+			price: 1
 		}
 	}
 
+	baseAssets.forEach( (asset: string) => {
+		portfolioWithPrices[asset] = {
+			...portfolio[asset],
+			price: candles.getClose(candles.getLast(allCandles[`${asset}/${quotedAsset}`]))
+		}
+	});
+
 	return portfolioWithPrices;
+}
+
+
+function logCandles( allCandles: BotCandles ){
+	let lengths = {};
+	for( let pair in allCandles ){
+		lengths[pair] = allCandles[pair].length
+	}
+	console.log('Candles retrieved', lengths);
 }

@@ -52,7 +52,7 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 						label="Base assets">
 						<input name="baseAssets"
 							value={this.state.baseAssets}
-							onChange={e => this.setState({ baseAssets: e.target.value.toUpperCase() })} />
+							onChange={ this._updateBaseAssets } />
 					</InputGroup>
 				</div>
 				<div className={styles.field}>
@@ -209,6 +209,10 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 		this.props.onAbort();
 	}
 
+	_updateBaseAssets = (e:React.ChangeEvent<HTMLInputElement>) => {
+		this.setState({baseAssets: e.target.value.toUpperCase()});
+	}
+
 	getValidationErrors() {
 		return {};
 	}
@@ -219,15 +223,19 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 			startDate, endDate, fees, slippage
 		} = this.state;
 
-		let start = new Date(startDate + 'T00:00:00.000Z');
-		let end = new Date(endDate + 'T23:59:59.999Z');
-		let balances:{[asset:string]: number} = {};
-		for( let asset in initialBalances ){
-			balances[asset] = initialBalances[asset];
-		}
+		const start = new Date(startDate + 'T00:00:00.000Z');
+		const end = new Date(endDate + 'T23:59:59.999Z');
+		const baseAssets = this.getSymbols().slice(1);
+
+		let balances:{[asset:string]: number} = {
+			[quotedAsset]: initialBalances[quotedAsset] || 0
+		};
+		baseAssets.forEach( asset => {
+			balances[asset] = initialBalances[asset] || 0
+		});
 
 		return {
-			baseAssets: this.getSymbols().slice(1),
+			baseAssets,
 			quotedAsset,
 			runInterval,
 			initialBalances: balances,
