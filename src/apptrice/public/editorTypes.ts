@@ -73,6 +73,18 @@ interface BotInput {
 	utils: BotUtils
 }
 
+interface BotInputNew {
+	candleData: BotCandles,
+	config: BotConfiguration
+	state: BotState
+	trader: Trader
+	utils: BotRunUtils
+	indicators: Indicators
+	candlestickPatters: BotRunPatterns
+	plotter: BotRunPlotter
+}
+
+
 interface Balance {
 	free: number,
 	locked: number

@@ -102,6 +102,7 @@ export interface BaseBotDeployment {
 	symbols: string[]
 
 	activeIntervals: ActiveInterval[]
+	indicatorsUsed: string[]
 	stats?: BasicBotDeploymentStats
 }
 

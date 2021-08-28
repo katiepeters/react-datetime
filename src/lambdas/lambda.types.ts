@@ -1,4 +1,8 @@
 import { ConsoleEntry, DeploymentOrders } from "./model.types"
+import { Indicators } from "./_common/botRunner/botRunIndicators"
+import { Patterns } from "./_common/botRunner/botRunPatterns"
+import { Plotter } from "./_common/botRunner/botRunPlotter"
+import { BotRunUtils } from "./_common/botRunner/botRunUtils"
 
 export interface BotConfigurationExtra{
 	[key: string]: any
@@ -60,6 +64,17 @@ export interface BotInput {
 	trader: Trader
 	state: BotState,
 	utils: BotUtils
+}
+
+export interface BotInputNew {
+	candleData: BotCandles,
+	config: BotConfiguration
+	state: BotState
+	trader: Trader
+	utils: BotRunUtils
+	indicators: Indicators
+	candlestickPatters: Patterns
+	plotter: Plotter
 }
 
 export interface Balance {
