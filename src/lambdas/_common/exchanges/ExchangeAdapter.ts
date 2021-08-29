@@ -10,7 +10,7 @@ export interface CandleQuery {
 
 export interface ExchangeOrder {
 	id: string
-	symbol: string
+	pair: string
 	type: 'limit' | 'market'
 	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
 	errorReason: string | null
@@ -37,22 +37,22 @@ export interface ExchangeVirtualData {
 }
 
 export interface Ticker {
-	[symbol: string]: SymbolTicker
+	[pair: string]: PairTicker
 }
 
-export interface SymbolTicker {
+export interface PairTicker {
 	date: number,
 	price: number,
 	volume: number,
 	change: number
 }
 
-export interface ExchangeSymbols {
-	[symbol:string]: ExchangeSymbol
+export interface ExchangePairs {
+	[pair:string]: ExchangePair
 }
 
-export interface ExchangeSymbol {
-	symbolKey: string
+export interface ExchangePair {
+	pairKey: string
 	minOrder: number
 	maxOrder: number
 }
@@ -67,5 +67,5 @@ export interface ExchangeAdapter {
 	getOrderHistory(): Promise<ExchangeOrder[]>
 	hydrate?: () => Promise<void>
 	getTicker: () => Promise<Ticker>
-	getSymbols: () => Promise<ExchangeSymbols>
+	getPairs: () => Promise<ExchangePairs>
 }

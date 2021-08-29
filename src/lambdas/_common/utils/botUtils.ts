@@ -1,4 +1,4 @@
 import candles from './candles';
-import symbols from './symbols';
+import pairs from './pairs';
 
-export default {candles, symbols};
+export default {candles, pairs};

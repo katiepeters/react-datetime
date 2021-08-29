@@ -1,6 +1,6 @@
 import { OrderInput, Order, Orders, Portfolio, BotCandles, Balance } from '../lambda.types';
 import candles from '../_common/utils/candles';
-import symbols from '../_common/utils/symbols';
+import pairs from '../_common/utils/pairs';
 import { v4 as uuid } from 'uuid';
 import { DeploymentOrders } from '../model.types';
 export default class Trader {
@@ -55,7 +55,7 @@ export default class Trader {
 			createdAt: Date.now(),
 			placedAt: null,
 			closedAt: null,
-			marketPrice: this.prices[ orderInput.symbol ]
+			marketPrice: this.prices[ orderInput.pair ]
 		};
 
 		this.ordersToPlace.push( order )
@@ -71,32 +71,32 @@ export default class Trader {
 	}
 
 	getPortfolioValue(){
-		let quotedAsset = symbols.getQuoted(Object.keys(this.prices)[0]);
+		let quotedAsset = pairs.getQuoted(Object.keys(this.prices)[0]);
 		let quotedBalance = this.getBalance(quotedAsset);
 
 		let total = quotedBalance.total;
-		Object.keys( this.prices ).forEach( symbol => {
-			let asset = symbols.getBase( symbol );
+		Object.keys( this.prices ).forEach( pair => {
+			let asset = pairs.getBase( pair );
 			let balance = this.getBalance(asset);
 			if( asset === quotedAsset ){
 				total += balance.total;
 			}
 			else {
-				total += balance.total * this.prices[symbol];
+				total += balance.total * this.prices[pair];
 			}
 		})
 		return total;
 	}
 
-	getPrice(symbol: string): number {
-		return this.prices[symbol];
+	getPrice(pair: string): number {
+		return this.prices[pair];
 	}
 }
 
-function getPrices( symbolCandles: BotCandles ){
+function getPrices( pairCandles: BotCandles ){
 	let prices: { [asset: string]: number } = {};
-	Object.keys( symbolCandles ).forEach( (symbol:string) => {
-		prices[symbol] = candles.getClose( candles.getLast(symbolCandles[symbol]) )
+	Object.keys( pairCandles ).forEach( (pair:string) => {
+		prices[pair] = candles.getClose( candles.getLast(pairCandles[pair]) )
 	});
 	return prices;
 }

@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { Portfolio } from '../../../lambdas/lambda.types';
 
 export interface CandleOptions {
-	symbol: string
+	pair: string
 	runInterval: string
 	startDate: number
 	endDate: number
@@ -13,7 +13,7 @@ export interface CreateDeploymentInput {
 	botId: string
 	exchangeAccountId: string
 	runInterval: string
-	symbols: string[]
+	pairs: string[]
 	active?: boolean
 }
 
@@ -205,8 +205,8 @@ const apiClient = {
 	////////////
 	// CANDLES
 	////////////
-	loadCandles( {symbol, runInterval, startDate, endDate}: CandleOptions): Promise<AxiosResponse>{
-		let query = `symbol=${symbol}&runInterval=${runInterval}&startDate=${startDate}&endDate=${endDate}`;
+	loadCandles( {pair, runInterval, startDate, endDate}: CandleOptions): Promise<AxiosResponse>{
+		let query = `pair=${pair}&runInterval=${runInterval}&startDate=${startDate}&endDate=${endDate}`;
 		return axios.get(`${API_URL}/candles?${query}`)
 			.then(res => {
 				console.log(res);
@@ -254,8 +254,8 @@ const apiClient = {
 		;
 	},
 
-	loadPrices( exchange:string, symbol:string, type: string ){
-		return axios.get(`${API_URL}/prices?exchange=${exchange}&symbol=${symbol}&type=${type}`)
+	loadPrices( exchange:string, pair:string, type: string ){
+		return axios.get(`${API_URL}/prices?exchange=${exchange}&pair=${pair}&type=${type}`)
 			.then( res => {
 				console.log( res );
 				return res;

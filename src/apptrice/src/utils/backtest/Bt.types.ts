@@ -8,7 +8,7 @@ export interface BtDeployment {
 	orders: DeploymentOrders
 	runInterval: RunInterval
 	state: DBBotDeploymentState
-	symbols: string[]
+	pairs: string[]
 	portfolioHistory: PortfolioHistoryItem[],
 	activeIntervals: ActiveInterval[]
 }
@@ -50,7 +50,7 @@ export interface ActiveBtUpdate {
 	orders?: DeploymentOrders
 	runInterval?: RunInterval
 	state?: DBBotDeploymentState
-	symbols?: string[]
+	pairs?: string[]
 	portfolioHistory?: PortfolioHistoryItem[],
 	fees?: number
 	slippage?: number

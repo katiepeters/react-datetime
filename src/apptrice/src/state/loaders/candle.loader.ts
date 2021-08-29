@@ -6,8 +6,8 @@ import { ArrayCandle } from '../../../../lambdas/lambda.types';
 
 export const candleLoader = loader<CandlesDescriptor, ArrayCandle[]>({
 	selector: candlesSelector,
-	load: ({symbol, runInterval, startDate, endDate}) => apiCacher.loadCandles({
-		symbol, runInterval, startDate, endDate
+	load: ({pair, runInterval, startDate, endDate}) => apiCacher.loadCandles({
+		pair, runInterval, startDate, endDate
 	})
 });
 

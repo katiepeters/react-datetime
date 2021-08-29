@@ -3,19 +3,19 @@ import DataLoader, { DataLoaderConfig } from "../../utils/DataLoader";
 import priceSeriesLoader, {PriceTypeHistory} from "./priceSeries.loader";
 
 const config: DataLoaderConfig<number> = {
-	getFromCache(exchange: string, symbol: string, timestamp: number ): number | undefined {
+	getFromCache(exchange: string, pair: string, timestamp: number ): number | undefined {
 		let type = tickerTimer.getTypeFromTimestamp( timestamp );
 		let prices = priceSeriesLoader.getFromCache(
-			exchange, symbol, type
+			exchange, pair, type
 		);
 
 		if( prices ){
 			return getTypePrice( type, prices, timestamp );
 		}
 	},
-	loadData( exchange: string, symbol: string, timestamp: number ) {
+	loadData( exchange: string, pair: string, timestamp: number ) {
 		let type = tickerTimer.getTypeFromTimestamp( timestamp );
-		return priceSeriesLoader.loadData( exchange, symbol, type );
+		return priceSeriesLoader.loadData( exchange, pair, type );
 	}
 }
 

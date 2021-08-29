@@ -9,13 +9,13 @@ interface DeploymentChartsProps {
 	deployment: RunnableDeployment,
 	exchangeProvider: 'bitfinex',
 	selector?: 'tabs' | 'dropdown',
-	activeSymbol?: string,
-	onChange?: (activeSymbol: string) => any
+	activePair?: string,
+	onChange?: (activePair: string) => any
 }
 
 export default class DeploymentCharts extends React.Component<DeploymentChartsProps> {
 	state = {
-		activeSymbol: this.props.deployment.symbols[0]
+		activePair: this.props.deployment.pairs[0]
 	}
 
 	render() {
@@ -29,10 +29,10 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 				</div>
 				<div className={styles.chart}>
 					<AutoChart
-						symbol={this.state.activeSymbol}
+						pair={this.state.activePair}
 						exchange={exchange}
 						interval={runInterval}
-						orders={this.getActiveSymbolOrders(orders)}
+						orders={this.getActivePairOrders(orders)}
 					/>
 				</div>
 			</div>
@@ -44,47 +44,47 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 		
 		if( selector === 'dropdown' ){
 			return (
-				<select value={this.state.activeSymbol}
+				<select value={this.state.activePair}
 					onChange={ (e:React.ChangeEvent<HTMLSelectElement>) => this._onChange(e.target.value)}>
-					{deployment.symbols.map((symbol: string) => (
-						<option key={symbol} value={symbol}>{symbol}</option>
+					{deployment.pairs.map((pair: string) => (
+						<option key={pair} value={pair}>{pair}</option>
 					))}
 					</select>
 			)
 		}
 		else {
 			return (
-				<Tabs active={this.state.activeSymbol}
+				<Tabs active={this.state.activePair}
 					onChange={ this._onChange }>
-					{deployment.symbols.map((symbol: string) => (
-						<Tab key={symbol} id={symbol}>{symbol}</Tab>
+					{deployment.pairs.map((pair: string) => (
+						<Tab key={pair} id={pair}>{pair}</Tab>
 					))}
 				</Tabs>
 			);
 		}
 	}
 
-	getActiveSymbolOrders(orders: DeploymentOrders ): Order[] {
-		return getSymbolOrders( orders, this.state.activeSymbol );
+	getActivePairOrders(orders: DeploymentOrders ): Order[] {
+		return getPairOrders( orders, this.state.activePair );
 	}
 
-	getActiveSymbol(){
-		return this.props.activeSymbol || this.state.activeSymbol;
+	getActivePair(){
+		return this.props.activePair || this.state.activePair;
 	}
 
-	_onChange = (activeSymbol: string) => {
+	_onChange = (activePair: string) => {
 		if( this.props.onChange ){
-			this.props.onChange(activeSymbol);
+			this.props.onChange(activePair);
 		}
 		else {
-			this.setState({ activeSymbol });
+			this.setState({ activePair });
 		}
 	}
 
 }
 
-const getSymbolOrders = memoizeOne( (orders: DeploymentOrders, symbol: string ) => {
+const getPairOrders = memoizeOne( (orders: DeploymentOrders, pair: string ) => {
 	return Object.values(orders.items).filter((order: Order) => (
-		order.symbol === symbol
+		order.pair === pair
 	));
 });

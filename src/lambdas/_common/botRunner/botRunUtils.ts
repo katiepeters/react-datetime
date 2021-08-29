@@ -31,6 +31,10 @@ export interface BotRunUtils {
 	getQuotedAsset( pair: string ): string
 	/** Get the base asset from a market pair */
 	getBaseAsset( pair: string): string
+	/** Returns true when the target series cross over the base series. */
+	isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]
+	/** Returns true when the target series cross under the base series. */
+	isCrossUnder( targetSeries: number[], baseSeries: number[] ): boolean[]
 }
 
 export const botRunUtils: BotRunUtils = {
@@ -54,5 +58,33 @@ export const botRunUtils: BotRunUtils = {
 
 	getBaseAsset( pair: string ) {
 		return pair.split('/')[0];
+	},
+
+	isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[] {
+		return isCrossOver(targetSeries, baseSeries );
+	},
+	
+	isCrossUnder( targetSeries: number[], baseSeries: number[]): boolean[] {
+		return isCrossOver(baseSeries, targetSeries);
 	}
+}
+
+function isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]{
+	let maxLength = Math.max( targetSeries.length, baseSeries.length );
+	let minLength = Math.min( targetSeries.length, baseSeries.length );
+	let diff = maxLength - minLength;
+	let results = new Array<boolean>(maxLength);
+
+	let target = targetSeries.slice(-minLength);
+	let base = baseSeries.slice(-minLength);
+
+	for(let i = 0; i<diff+1; i++ ){
+		results[i] = false;
+	}
+
+	for(let i = 1; i< target.length; i++ ){
+		results[diff+i] = target[i-1] < base[i-1] && target[i] > base[i];
+	}
+
+	return results;
 }

@@ -49,7 +49,7 @@ export default class PortfolioHistoryWidget extends React.Component<PortfolioHis
 	}
 
 	getOptions() {
-		const {quotedAsset} = getDeploymentAssets(this.props.deployment.symbols);
+		const {quotedAsset} = getDeploymentAssets(this.props.deployment.pairs);
 		return {
 			radius: 0,
 			scales: {

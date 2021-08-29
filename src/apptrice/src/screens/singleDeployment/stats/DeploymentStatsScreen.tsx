@@ -1,5 +1,5 @@
 import * as React from 'react'
-import symbols from '../../../../../lambdas/_common/utils/symbols';
+import pairs from '../../../../../lambdas/_common/utils/pairs';
 import { Card, ScreenWrapper } from '../../../components';
 import { exchangeLoader } from '../../../state/loaders/exchange.loader';
 import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
@@ -19,13 +19,13 @@ export default class DeploymentStatsScreen extends React.Component<SingleDeploym
 
 	renderContent() {
 		const { deployment } = this.props;
-		const {accountId, exchangeAccountId, symbols} = deployment;
+		const {accountId, exchangeAccountId, pairs} = deployment;
 		let { data: exchange } = exchangeLoader({accountId, exchangeId: exchangeAccountId});
 		if (!exchange) {
 			return <Card>Loading...</Card>;
 		}
 
-		const {baseAssets, quotedAsset} = this.getAssets( symbols );
+		const {baseAssets, quotedAsset} = this.getAssets( pairs );
 		return (
 			<div>
 				<PortfolioHistoryWidget
@@ -40,14 +40,14 @@ export default class DeploymentStatsScreen extends React.Component<SingleDeploym
 		return this.props.router.location.params.id;
 	}
 
-	getAssets(deploySymbols: string[]){
+	getAssets(deployPairs: string[]){
 		let quotedAsset: string = '';
 		let baseAssets: string[] = [];
-		deploySymbols.forEach( (symbol: string) => {
+		deployPairs.forEach( (pair: string) => {
 			if( !quotedAsset ){
-				quotedAsset = symbols.getQuoted(symbol);
+				quotedAsset = pairs.getQuoted(pair);
 			}
-			baseAssets.push(symbols.getBase(symbol));
+			baseAssets.push(pairs.getBase(pair));
 		});
 		return {quotedAsset, baseAssets}
 	}

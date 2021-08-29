@@ -2,8 +2,8 @@ import { Portfolio, ArrayCandle, Order, OrderInput, Balance, BotCandles } from "
 import { DbExchangeAccount } from "../../../model.types";
 import ExchangeAccountModel from "../../dynamo/ExchangeAccountModel";
 import candles from "../../utils/candles";
-import symbols from "../../utils/symbols";
-import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeOrders, ExchangeSymbols, ExchangeVirtualData, Ticker } from "../ExchangeAdapter";
+import pairs from "../../utils/pairs";
+import { CandleQuery, ExchangeAdapter, ExchangeOrder, ExchangeOrders, ExchangePairs, ExchangeVirtualData, Ticker } from "../ExchangeAdapter";
 import BitfinexAdapter from "./BitfinexAdapter";
 import { v4 as uuid } from 'uuid';
 
@@ -19,7 +19,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	openOrders: string[]
 	lastDate: number
 	closeDate: number
-	lastCandles: {[symbol: string]: ArrayCandle}
+	lastCandles: {[pair: string]: ArrayCandle}
 
 	constructor(exchangeAccount: DbExchangeAccount) {
 		this.exchangeAccount = exchangeAccount;
@@ -64,8 +64,8 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		return data;
 	}
 
-	updateCandlesData( symbol: string, symbolCandles: ArrayCandle[] ){
-		const lastCandles = symbolCandles.slice(-2);
+	updateCandlesData( pair: string, pairCandles: ArrayCandle[] ){
+		const lastCandles = pairCandles.slice(-2);
 		const lastDate = candles.getTime(lastCandles[1]);
 		const prevDate = candles.getTime(lastCandles[0]);
 
@@ -74,7 +74,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 			this.closeDate = (lastDate + prevDate) / 2;
 		}
 
-		this.lastCandles[symbol] = lastCandles[1];
+		this.lastCandles[pair] = lastCandles[1];
 		this.updateOpenOrders();
 	}
 
@@ -89,7 +89,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		if( !this.hasEnoughFunds(order) ){
 			let errorOrder: ExchangeOrder = {
 				id: uuid(), // Simulate exchange orders having a different id
-				symbol: order.symbol,
+				pair: order.pair,
 				type: order.type,
 				status: 'error',
 				errorReason: 'not_enough_funds',
@@ -106,7 +106,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		}
 		let exchangeOrder: ExchangeOrder = {
 			id: uuid(), // Simulate exchange orders having a different id
-			symbol: order.symbol,
+			pair: order.pair,
 			type: order.type,
 			status: 'placed',
 			errorReason: null,
@@ -129,7 +129,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		const amount = order.amount;
 		let price = order.price || 1;
 		if( order.type === 'market' ){
-			price = this.getLastPrice(order.symbol);
+			price = this.getLastPrice(order.pair);
 		}
 		else if( order.status === 'completed' && order.executedPrice ){
 			price = order.executedPrice;
@@ -164,17 +164,17 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		}
 
 		// Update balances
-		this.portfolio[symbols.getBase(order.symbol)] = baseBalance;
-		this.portfolio[symbols.getQuoted(order.symbol)] = quotedBalance;
+		this.portfolio[pairs.getBase(order.pair)] = baseBalance;
+		this.portfolio[pairs.getQuoted(order.pair)] = quotedBalance;
 	}
 
-	getLastPrice( symbol:string ): number {
-		return candles.getClose( this.lastCandles[symbol] );
+	getLastPrice( pair:string ): number {
+		return candles.getClose( this.lastCandles[pair] );
 	}
 
 	getOrderBalances( order ){
-		const baseAsset = symbols.getBase(order.symbol);
-		const quotedAsset = symbols.getQuoted(order.symbol);
+		const baseAsset = pairs.getBase(order.pair);
+		const quotedAsset = pairs.getQuoted(order.pair);
 
 		return {
 			baseBalance: this.getBalance( baseAsset ),
@@ -255,11 +255,11 @@ export default class VirtualAdapter implements ExchangeAdapter {
 
 	hasEnoughFunds( order: OrderInput ){
 		if (order.direction === 'buy') {
-			let coin = symbols.getQuoted(order.symbol);
+			let coin = pairs.getQuoted(order.pair);
 			let balance = this.getBalance(coin).free;
 			
 			if (order.type === 'market') {
-				return balance >= order.amount * this.getCurrentPrice(order.symbol);
+				return balance >= order.amount * this.getCurrentPrice(order.pair);
 			}
 			else {
 				// @ts-ignore
@@ -267,7 +267,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 			}
 		}
 		else {
-			let coin = symbols.getBase(order.symbol);
+			let coin = pairs.getBase(order.pair);
 			let balance = this.portfolio[coin]?.free;
 			if (!balance) return false;
 
@@ -281,8 +281,8 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		}
 	}
 
-	getCurrentPrice( symbol: string ): number{
-		return candles.getClose( this.lastCandles[symbol] );
+	getCurrentPrice( pair: string ): number{
+		return candles.getClose( this.lastCandles[pair] );
 	}
 
 	updateOpenOrders() {
@@ -296,7 +296,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	checkOrderCompleted( order: ExchangeOrder ): boolean {
-		let lastCandle = this.lastCandles[order.symbol];
+		let lastCandle = this.lastCandles[order.pair];
 		if( !lastCandle ) return false;
 
 		let updatedOrder: ExchangeOrder | undefined;
@@ -357,8 +357,8 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		return Promise.resolve({});
 	}
 
-	async getSymbols(): Promise<ExchangeSymbols> {
-		// we don't transalte symbols from virtual exchange
+	async getPairs(): Promise<ExchangePairs> {
+		// we don't transalte pairs from virtual exchange
 		return Promise.resolve({});
 	}
 }

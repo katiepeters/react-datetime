@@ -91,7 +91,7 @@ export default {
 			resourceId: `DEPLOYMENT#${input.id}`,
 			exchangeAccountId: input.exchangeAccountId,
 			runInterval: input.runInterval,
-			symbols: input.symbols,
+			pairs: input.pairs,
 			createdAt: Date.now(),
 			activeIntervals: input.activeIntervals || []
 		};
@@ -123,11 +123,11 @@ export default {
 
 	async update({ accountId, deploymentId, update }: UpdateDeploymentInput ){
 		let promises: any = [];
-		let {botId, runInterval, symbols} = update;
-		if( botId || runInterval || symbols ) {
+		let {botId, runInterval, pairs} = update;
+		if( botId || runInterval || pairs ) {
 			promises.push(
 				Db.update(accountId, `DEPLOYMENT#${deploymentId}`, {
-					botId, runInterval, symbols
+					botId, runInterval, pairs
 				})
 			);
 		}

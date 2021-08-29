@@ -97,7 +97,7 @@ async function setTestData( event ) {
       orders: {},
       config: {
         exchangeAccountId: 'EXCHANGE#testExchange',
-        symbols: ['BTC/USD']
+        pairs: ['BTC/USD']
       },
       state: {}
     });

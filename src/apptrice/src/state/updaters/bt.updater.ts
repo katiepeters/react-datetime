@@ -50,7 +50,7 @@ export const BtUpdater = {
 			activeBt.data = dataUpdate;
 		}
 
-		if( data.logs || data.orders || data.runInterval || data.state || data.symbols ){
+		if( data.logs || data.orders || data.runInterval || data.state || data.pairs ){
 			let deploymentUpdate: RunnableDeployment = { ...activeBt.data.deployment };
 			if( data.logs ){
 				deploymentUpdate.logs = data.logs;
@@ -64,15 +64,15 @@ export const BtUpdater = {
 			if (data.state) {
 				deploymentUpdate.state = data.state;
 			}
-			if (data.symbols) {
-				deploymentUpdate.symbols = data.symbols;
+			if (data.pairs) {
+				deploymentUpdate.pairs = data.pairs;
 			}
 
 			activeBt.data.deployment = deploymentUpdate;
 		}
 
 
-		if (data.logs || data.orders || data.runInterval || data.state || data.symbols || data.portfolioHistory) {
+		if (data.logs || data.orders || data.runInterval || data.state || data.pairs || data.portfolioHistory) {
 			let deploymentUpdate: RunnableDeployment = { ...activeBt.data.deployment };
 			if (data.logs) {
 				deploymentUpdate.logs = data.logs;
@@ -86,8 +86,8 @@ export const BtUpdater = {
 			if (data.state) {
 				deploymentUpdate.state = data.state;
 			}
-			if (data.symbols) {
-				deploymentUpdate.symbols = data.symbols;
+			if (data.pairs) {
+				deploymentUpdate.pairs = data.pairs;
 			}
 			if( data.portfolioHistory ){
 				deploymentUpdate.portfolioHistory = data.portfolioHistory;
@@ -130,7 +130,6 @@ export const BtUpdater = {
 	})
 }
 
-
 const defaultActiveBt: BtActive = {
 	totalIterations: 0,
 	currentIteration: 0,
@@ -155,9 +154,15 @@ const defaultActiveBt: BtActive = {
 			},
 			runInterval: '1h',
 			state: {},
-			symbols: [],
+			pairs: [],
 			portfolioHistory: [],
-			activeIntervals: []
+			activeIntervals: [],
+			plotterData: {
+				indicators: [],
+				candlestickPatterns: [],
+				series: {},
+				points: {}
+			}
 		},
 		exchange: {
 			provider: 'bitfinex',

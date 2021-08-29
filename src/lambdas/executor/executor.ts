@@ -1,8 +1,11 @@
-import { BotCandles, BotConfiguration, TradeBot, BotExecutorPayload, BotExecutorResult } from "../lambda.types";
+import { TradeBot, BotExecutorPayload } from "../lambda.types";
 import * as ts from "typescript";
 import Trader from "./Trader";
-import botUtils from '../_common/utils/botUtils';
 import cons from './Consoler';
+import { botRunUtils } from "../_common/botRunner/botRunUtils";
+import { BotRunIndicators } from "../_common/botRunner/botRunIndicators";
+import { BotRunPatterns } from "../_common/botRunner/botRunPatterns";
+import { BotRunPlotter, Plotter } from "../_common/botRunner/botRunPlotter";
 
 export async function executor(event: BotExecutorPayload) {
 	// Tweak consoles
@@ -25,15 +28,34 @@ export async function executor(event: BotExecutorPayload) {
 	const trader = new Trader(
 		event.portfolio, event.orders, event.candles
 	);
+
+	const {points, series, indicators: ind, candlestickPatterns: patt} = event.plotterData;
+	const indicators = new BotRunIndicators( ind );
+	const candlestickPatterns = new BotRunPatterns( patt );
+	const plotterInstance = new BotRunPlotter({
+		points, series, timestamp: Date.now()
+	});
+
+	const plotter: Plotter = {
+		plotPoint(name, value, pair, chart){
+			return plotterInstance.plotPoint(name, value, pair, chart);
+		},
+		plotSeries(name, value, pair, chart){
+			return plotterInstance.plotSeries(name, value, pair, chart);
+		}
+	}
 	
 	// Pass a state object that can be updated
 	try {
 		bot.onData({
-			candles: event.candles,
+			candleData: event.candles,
 			config: event.config,
 			trader,
 			state: state,
-			utils: botUtils
+			utils: botRunUtils,
+			indicators,
+			candlestickPatterns,
+			plotter
 		});
 	}
 	catch (err) {
@@ -57,7 +79,13 @@ export async function executor(event: BotExecutorPayload) {
 		ordersToCancel: trader.ordersToCancel,
 		ordersToPlace: trader.ordersToPlace,
 		state: state,
-		logs
+		logs,
+		plotterData: {
+			series: plotterInstance.series,
+			points: plotterInstance.points,
+			indicators: Object.keys(indicators.indicatorsUsed),
+			candlestickPatterns: Object.keys(candlestickPatterns.patternsUsed)
+		}
 	};
 }
 

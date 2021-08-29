@@ -1,6 +1,6 @@
 import { Balance, Portfolio } from "../../lambda.types";
 import arrayize from "../../_common/utils/arrayize";
-import symbols from "../../_common/utils/symbols";
+import pairUtils from "../../_common/utils/pairs";
 
 interface ShapeValidationError {
 	code: string
@@ -80,7 +80,7 @@ const validIntervals = {
 const validators = {
 	string: value => typeof value === 'string',
 	runInterval: value => validIntervals[value] === true,
-	symbols: validateSymbols,
+	pairs: validatePairs,
 	boolean: value => typeof value === 'boolean',
 	provider: value => value === 'bitfinex',
 	providerType: value => value === 'real' || value === 'virtual',
@@ -92,15 +92,15 @@ const validators = {
 	versionLabel: value => typeof value === 'string' && value.length <= 20
 }
 
-function validateSymbols( symb ){
-	if( !Array.isArray(symb) || !symb.length || !validateSymbol(symb[0]) ) return false;
+function validatePairs( pairs ){
+	if( !Array.isArray(pairs) || !pairs.length || !validatePair(pairs[0]) ) return false;
 
-	const quotedAsset = symbols.getQuoted( symb[0] );
+	const quotedAsset = pairUtils.getQuoted( pairs[0] );
 	if( !quotedAsset ) return false;
 	
-	for( let i in symb ){
-		const symbol = symb[i];
-		if (!validateSymbol(symbol) || symbols.getQuoted(symbol) !== quotedAsset) {
+	for( let i in pairs ){
+		const pair = pairs[i];
+		if (!validatePair(pair) || pairUtils.getQuoted(pair) !== quotedAsset) {
 			return false;
 		}
 	}
@@ -108,8 +108,8 @@ function validateSymbols( symb ){
 	return true;
 }
 
-function validateSymbol( symbol ){
-	return typeof symbol === 'string' && symbol.split('/').length === 2;
+function validatePair( pair ){
+	return typeof pair === 'string' && pair.split('/').length === 2;
 }
 
 function validatePortfolio( portfolio: Portfolio ){

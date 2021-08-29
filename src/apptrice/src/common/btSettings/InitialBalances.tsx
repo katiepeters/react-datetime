@@ -2,10 +2,10 @@ import * as React from 'react'
 import { Card, InputGroup } from '../../components';
 import styles from './_BtSettings.module.css';
 
-export interface Balances { [symbol: string]: number };
+export interface Balances { [pair: string]: number };
 
 interface InitialBalancesProps {
-	symbols: string[]
+	pairs: string[]
 	balances: Balances
 	onChange: (balances: Balances) => any
 	innerPadding?: boolean
@@ -24,46 +24,46 @@ export default class InitialBalances extends React.Component<InitialBalancesProp
 				<div className={styles.groupHeader}>
 					Initial balances
 				</div>
-				{ this.renderSymbols() }
+				{ this.renderPairs() }
 			</div>
 		);
 	}
 
-	renderSymbols(){
-		const {symbols} = this.props;
-		if( !symbols.length ){
+	renderPairs(){
+		const {pairs} = this.props;
+		if( !pairs.length ){
 			return <Card>Select assets first.</Card>
 		}
-		return this.props.symbols.map(this._renderBalanceInput);
+		return this.props.pairs.map(this._renderBalanceInput);
 	}
 
-	_renderBalanceInput = (symbol: string) => {
+	_renderBalanceInput = (pair: string) => {
 
 		return (
 			<div className={styles.field}>
 				<InputGroup
-					name={`${symbol}_balance`}
-					label={symbol}>
-					<input name={`${symbol}_balance`}
+					name={`${pair}_balance`}
+					label={pair}>
+					<input name={`${pair}_balance`}
 						// @ts-ignore
-						value={this.props.balances[symbol] || '0'}
-						onChange={e => this.updateBalances(symbol, e.target.value)} />
+						value={this.props.balances[pair] || '0'}
+						onChange={e => this.updateBalances(pair, e.target.value)} />
 				</InputGroup>
 			</div>
 		);
 	}
 
-	updateBalances(symbol: string, value: string) {
+	updateBalances(pair: string, value: string) {
 		this.props.onChange({
 			...this.props.balances,
-			[symbol]: parseFloat(value)
+			[pair]: parseFloat(value)
 		});
 	}
 
 	componentDidMount() {
 		let balances: Balances = {};
-		this.props.symbols.forEach( symbol => {
-			balances[symbol] = this.props.balances[symbol] || 0
+		this.props.pairs.forEach( pair => {
+			balances[pair] = this.props.balances[pair] || 0
 		});
 		this.props.onChange(balances);
 	}

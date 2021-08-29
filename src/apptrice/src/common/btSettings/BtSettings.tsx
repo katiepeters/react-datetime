@@ -186,7 +186,7 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 	renderInitialBalances() {
 		return (
 			<InitialBalances
-				symbols={ this.getSymbols() }
+				pairs={ this.getPairs() }
 				balances={ this.state.initialBalances }
 				onChange={initialBalances => this.setState({initialBalances})}
 				innerPadding />
@@ -225,7 +225,7 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 
 		const start = new Date(startDate + 'T00:00:00.000Z');
 		const end = new Date(endDate + 'T23:59:59.999Z');
-		const baseAssets = this.getSymbols().slice(1);
+		const baseAssets = this.getPairs().slice(1);
 
 		let balances:{[asset:string]: number} = {
 			[quotedAsset]: initialBalances[quotedAsset] || 0
@@ -246,18 +246,18 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 		};
 	}
 
-	getQuotedSymbol() {
+	getQuotedPair() {
 		return this.state.quotedAsset;
 	}
 
-	getSymbols() {
-		let symbols = [this.state.quotedAsset];
-		this.state.baseAssets.split(/\s*,\s*/).forEach(symbol => {
-			if (symbol.trim()) {
-				symbols.push(symbol.trim());
+	getPairs() {
+		let pairs = [this.state.quotedAsset];
+		this.state.baseAssets.split(/\s*,\s*/).forEach(pair => {
+			if (pair.trim()) {
+				pairs.push(pair.trim());
 			}
 		});
-		return symbols;
+		return pairs;
 	}
 
 	getInputDate(time: number) {

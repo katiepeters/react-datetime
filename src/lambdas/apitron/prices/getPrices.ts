@@ -15,8 +15,8 @@ const getPrices: QueryHandler = {
 			type: 'pricesType'
 		});
 
-		const {exchange, type, symbol} = query;
-		let pair = symbol.replace('_', '/');
+		const {exchange, type, pair} = query;
+		let pair = pair.replace('_', '/');
 
 		console.log(error);
 		if (error) return { error: { ...error, code: 'invalid_request' } };
@@ -51,12 +51,12 @@ function getAdapter( exchange: string ): ExchangeAdapter | undefined {
 	}
 }
 
-function getCachePath( exchange: string, symbol: string, type: PriceType ){
-	return `${exchange}/p/${symbol.replace('/', '_')}-${type[0]}}`;
+function getCachePath( exchange: string, pair: string, type: PriceType ){
+	return `${exchange}/p/${pair.replace('/', '_')}-${type[0]}}`;
 }
 
-async function getCached( exchange: string, symbol: string, type: PriceType ){
-	let path = getCachePath( exchange, symbol, type );
+async function getCached( exchange: string, pair: string, type: PriceType ){
+	let path = getCachePath( exchange, pair, type );
 	let cached = await s3Helper.exchanges.getContent( path );
 	console.log('Cached', cached);
 	if( cached ){
@@ -96,9 +96,9 @@ const typeIntervals: {[type:string]: CandleInterval} = {
 	'monthly': '1mo',
 };
 
-async function getExchangePrices( adapter: ExchangeAdapter, symbol: string, type: PriceType ): Promise<ExchangePriceCache> {
+async function getExchangePrices( adapter: ExchangeAdapter, pair: string, type: PriceType ): Promise<ExchangePriceCache> {
 	const options = {
-		market: symbol,
+		market: pair,
 		runInterval: typeIntervals[type],
 		lastCandleAt: Date.now(),
 		candleCount: type === 'monthly' ? 1000 : 100
@@ -131,8 +131,8 @@ function getTypeTimestamp( original: number, type: PriceType ){
 }
 
 
-async function updateCache(exchange: string, symbol: string, type: PriceType, data: ExchangePriceCache, cached: ExchangePriceCache | undefined ): Promise<ExchangePriceCache> {
-	const path = getCachePath( exchange, symbol, type);
+async function updateCache(exchange: string, pair: string, type: PriceType, data: ExchangePriceCache, cached: ExchangePriceCache | undefined ): Promise<ExchangePriceCache> {
+	const path = getCachePath( exchange, pair, type);
 	const content: ExchangePriceCache = {
 		lastUpdatedAt: data.lastUpdatedAt,
 		prices: cached && type === 'monthly' ?

@@ -14,7 +14,7 @@ export function getStats( deployment: RunnableDeployment ){
 
 const calculateStatsMemo = memoizeOne( (deployment: RunnableDeployment) => {
 	const runningInterval = getRunningInterval( deployment );
-	const queryAsset = deployment.symbols[0].split('/')[1];
+	const queryAsset = deployment.pairs[0].split('/')[1];
 
 	return {
 		...calculatePortfolioMetrics( queryAsset, deployment.portfolioHistory ),

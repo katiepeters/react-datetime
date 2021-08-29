@@ -13,7 +13,9 @@ export interface Patterns {
 
 export class BotRunPatterns {
 	patternsUsed: {[pattern: string]: boolean}
-	constructor( used: {[pattern:string]: boolean} = {} ) {
+	constructor( patterns: string[] = [] ) {
+		let used = {};
+		patterns.forEach( (pattern: string) => used[pattern] = true );
 		this.patternsUsed = used;
 	}
 

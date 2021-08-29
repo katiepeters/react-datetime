@@ -9,11 +9,11 @@ export function getVersionKey( descriptor: BotVersionDescriptor ){
 
 export interface CandlesDescriptor {
 	exchange: string,
-	symbol: string,
+	pair: string,
 	runInterval: string,
 	startDate: number,
 	endDate: number
 }
-export function getCandlesKey( {exchange, symbol, runInterval, startDate, endDate}: CandlesDescriptor ){
-	return `${exchange}:${symbol}:${runInterval}:${startDate}:${endDate}`;
+export function getCandlesKey( {exchange, pair, runInterval, startDate, endDate}: CandlesDescriptor ){
+	return `${exchange}:${pair}:${runInterval}:${startDate}:${endDate}`;
 }

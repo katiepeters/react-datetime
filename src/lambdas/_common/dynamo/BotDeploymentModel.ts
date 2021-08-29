@@ -4,11 +4,17 @@ import { DBModel } from './db';
 
 const Db = new DBModel<DynamoBotDeployment>();
 
-const defaultOrders = {
+const emptyOrders = {
 	foreignIdIndex: {},
 	items: {},
 	openOrderIds: []
 };
+const emptyPlotterData = {
+	indicators: [],
+	candlestickPatters: [],
+	series: {},
+	points: {}
+}
 interface DeleteDeploymentInput {
 	accountId: string
 	deploymentId: string
@@ -37,19 +43,21 @@ export default {
 		let entry = await Db.getSingle(accountId, `${DEPLOYMENT_PREFIX}${deploymentId}`);
 		if( !entry ) return;
 
-		let [ logs, state, orders, history ] = await Promise.all([
+		let [ logs, state, orders, history, plotterData ] = await Promise.all([
 			getLogs(accountId, deploymentId),
 			getState(accountId, deploymentId),
 			getOrders(accountId, deploymentId),
-			getPortfolioHistory(accountId, deploymentId)
+			getPortfolioHistory(accountId, deploymentId),
+			getPlotterData(accountId, deploymentId)
 		]);
 
 		return {
 			...dynamoToModel(entry),
 			state: JSON.parse( state || '{}'),
-			orders: orders ? JSON.parse(orders) : defaultOrders,
+			orders: orders ? JSON.parse(orders) : emptyOrders,
 			logs: JSON.parse(logs || '[]'),
-			portfolioHistory: JSON.parse(history || '[]')
+			portfolioHistory: JSON.parse(history || '[]'),
+			plotterData: plotterData ? JSON.parse(plotterData) : emptyPlotterData
 		}
 	},
 
@@ -70,7 +78,7 @@ export default {
 			resourceId: `DEPLOYMENT#${input.id}`,
 			exchangeAccountId: input.exchangeAccountId,
 			runInterval: input.runInterval,
-			symbols: input.symbols,
+			pairs: input.pairs,
 			createdAt: Date.now(),
 			activeIntervals: input.activeIntervals || [],
 			stats: input.stats
@@ -85,8 +93,9 @@ export default {
 			Db.put(dbDeployment),
 			saveLogs(accountId, deploymentId, JSON.stringify(input.logs || [])),
 			saveState(accountId, deploymentId, JSON.stringify(input.state || [])),
-			saveOrders(accountId, deploymentId, JSON.stringify(input.orders || defaultOrders)),
-			savePortfolioHistory(accountId, deploymentId, JSON.stringify(input.portfolioHistory || []))
+			saveOrders(accountId, deploymentId, JSON.stringify(input.orders || emptyOrders)),
+			savePortfolioHistory(accountId, deploymentId, JSON.stringify(input.portfolioHistory || [])),
+			savePlotterData(accountId, deploymentId, JSON.stringify(input.plotterData || emptyPlotterData))
 		]);
 	},
 
@@ -151,7 +160,10 @@ function getOrdersFileName(accountId: string, deploymentId: string) {
 	return `${accountId}/de-${deploymentId}/orders`;
 }
 function getPortfolioHistoryFileName(accountId: string, deploymentId: string) {
-	return `${accountId}/des-${deploymentId}/portfolioHistory`;
+	return `${accountId}/de-${deploymentId}/portfolioHistory`;
+}
+function getPlotterDataFileName(accountId: string, deploymentId: string){
+	return `${accountId}/de-${deploymentId}/plotterData`;
 }
 
 function getLogs( accountId: string, deploymentId: string ){
@@ -166,6 +178,9 @@ function getOrders(accountId: string, deploymentId: string) {
 function getPortfolioHistory(accountId: string, deploymentId: string) {
 	return s3Helper.botState.getContent(getPortfolioHistoryFileName(accountId, deploymentId));
 }
+function getPlotterData(accountId: string, deploymentId: string) {
+	return s3Helper.botState.getContent(getPlotterDataFileName(accountId, deploymentId));
+}
 
 function saveLogs(accountId: string, deploymentId: string, logs: string) {
 	return s3Helper.botState.setContent(getLogsFileName(accountId, deploymentId), logs);
@@ -179,6 +194,10 @@ function saveOrders(accountId: string, deploymentId: string, orders: string) {
 function savePortfolioHistory(accountId: string, deploymentId: string, portfolioHistory: string) {
 	return s3Helper.botState.setContent(getPortfolioHistoryFileName(accountId, deploymentId), portfolioHistory);
 }
+function savePlotterData(accountId: string, deploymentId: string, portfolioHistory: string) {
+	return s3Helper.botState.setContent(getPlotterDataFileName(accountId, deploymentId), portfolioHistory);
+}
+
 
 function delLogs(accountId: string, deploymentId: string) {
 	return s3Helper.botState.delObject(getLogsFileName(accountId, deploymentId));
@@ -191,6 +210,9 @@ function delOrders(accountId: string, deploymentId: string) {
 }
 function delPortfolioHistory(accountId: string, deploymentId: string) {
 	return s3Helper.botState.delObject(getPortfolioHistoryFileName(accountId, deploymentId));
+}
+function delPlotterData(accountId: string, deploymentId: string) {
+	return s3Helper.botState.delObject(getPlotterDataFileName(accountId, deploymentId));
 }
 
 const DEPLOYMENT_PREFIX = 'DEPLOYMENT#';
@@ -215,7 +237,7 @@ function modelToDynamo( modelDevelopment: ModelBotDeployment): DynamoBotDeployme
 		lastRunAt,
 		name,
 		runInterval,
-		symbols,
+		pairs,
 		activeIntervals,
 		stats
 	} = modelDevelopment;
@@ -230,7 +252,7 @@ function modelToDynamo( modelDevelopment: ModelBotDeployment): DynamoBotDeployme
 		lastRunAt,
 		name,
 		runInterval,
-		symbols,
+		pairs,
 		activeIntervals,
 		stats,
 		active: active ? 'true' : undefined
@@ -239,7 +261,7 @@ function modelToDynamo( modelDevelopment: ModelBotDeployment): DynamoBotDeployme
 
 
 
-const dynamoAttributes = ['version', 'runInterval', 'symbols', 'stats', 'lastRunAt'];
+const dynamoAttributes = ['version', 'runInterval', 'pairs', 'stats', 'lastRunAt'];
 function needsToUpdateDynamo( update: UpdateBotDeploymentModelInput ){
 	let i = dynamoAttributes.length;
 	while( i-- > 0 ){

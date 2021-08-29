@@ -1,3 +1,7 @@
+// This file is going to be injected directly into the monaco editor
+// to define the types the programmer can use. Don't use export statements
+// because they would break the editor's autocomplete
+
 interface BotConfigurationExtra {
 	[key: string]: any
 }
@@ -7,7 +11,7 @@ type ArrayCandle = [
 ]
 
 type BotCandles = {
-	[symbol: string]: ArrayCandle[]
+	[pair: string]: ArrayCandle[]
 }
 
 type BotState = {
@@ -15,7 +19,7 @@ type BotState = {
 }
 
 interface BotConfiguration {
-	symbols: string[]
+	pairs: string[]
 	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	exchange: 'bitfinex'
 	[key: string]: any
@@ -26,22 +30,10 @@ interface Trader {
     getBalance(asset: string): Balance
 	getOrder(id: string): Order | void
     getOpenOrders(): Order[]
-	placeOrder(orderInput: OrderInput): Order
+	placeOrder(orderInput: LimitOrderInput|MarketOrderInput): Order
 	cancelOrder(orderId: string)
     getPortfolioValue(): number
-    getPrice(symbol: string): number
-}
-
-interface CandleUtils {
-	getLast(candles: ArrayCandle[]): ArrayCandle
-	getTime(candle: ArrayCandle): number
-	getOpen(candle: ArrayCandle): number
-	getClose(candle: ArrayCandle): number
-	getHigh(candle: ArrayCandle): number
-	getLow(candle: ArrayCandle): number
-	getVolume(candle: ArrayCandle): number
-	getMiddle(candle: ArrayCandle): number
-	getAmplitude(candle: ArrayCandle): number
+    getPrice(pair: string): number
 }
 
 interface Console {
@@ -55,56 +47,93 @@ interface Console {
 
 declare var console: Console;
 
-interface SymbolsUtils {
-	getBase(symbol: string): string
-	getQuoted(symbol: string): string
+
+interface Candle {
+	open: number
+	close: number
+	high: number
+	low: number
+	volume: number
+	date: number
+	getMiddle(): number
+	getAmplitude(): number
+	isBullish(): boolean
 }
 
-interface BotUtils {
-	candles: CandleUtils
-	symbols: SymbolsUtils
+interface BotRunUtils {
+	/** Converts candle data in an array into a structured object to make candle property access simpler. */
+	getCandle( candleData: ArrayCandle ): Candle
+	/** Get the quoted asset from a market pair */
+	getQuotedAsset( pair: string ): string
+	/** Get the base asset from a market pair */
+	getBaseAsset( pair: string): string
+	/** Returns `true` when the target series cross over the base series. */
+	isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]
+	/** Returns `true` when the target series cross under the base series. */
+	isCrossUnder( targetSeries: number[], baseSeries: number[] ): boolean[]
+}
+
+type CandleAttribute = 'open' | 'close' | 'high' | 'low' | 'volume';
+interface Indicators {
+	/** Calculates the Standard Moving Average from an array of candle data. By default uses the `close` attribute. */
+	sma( candleData: ArrayCandle[], period: number, attr?: CandleAttribute ): number[]
+	/** Calculates the Standard Moving Average from an array of values. */
+	smaArray( candleData: number[], period: number ): number[]
+}
+
+interface Patterns {
+	hammer(candles: ArrayCandle[], isConfirmed?: boolean): boolean[],
+	hangingMan(candles: ArrayCandle[], isConfirmed?: boolean): boolean[],
+	inverseHammer(candles: ArrayCandle[], isConfirmed?: boolean): boolean[],
+	shootingStar(candles: ArrayCandle[], isConfirmed?: boolean): boolean[],
+}
+
+interface Plotter {
+	plotPoint(collectionName: string, value: number, pair?: string, chart?: string): void
+	plotSeries(seriesName: string, value: number, pair?: string, chart?: string): void
 }
 
 interface BotInput {
-	candles: BotCandles
-	config: BotConfiguration
-	trader: Trader
-	state: BotState,
-	utils: BotUtils
-}
-
-interface BotInputNew {
 	candleData: BotCandles,
 	config: BotConfiguration
 	state: BotState
 	trader: Trader
 	utils: BotRunUtils
 	indicators: Indicators
-	candlestickPatters: BotRunPatterns
-	plotter: BotRunPlotter
+	candlestickPatters: Patterns
+	plotter: Plotter
 }
 
 
 interface Balance {
+    asset: string,
 	free: number,
-	locked: number
+	total: number
 }
 
 interface Portfolio {
 	[asset: string]: Balance
 }
 
-interface OrderInput {
-    symbol: string
-    type: 'limit' | 'market'
-    direction: 'buy' | 'sell'
+type OrderDirection = 'buy' | 'sell'
+interface MarketOrderInput {
+    pair: string,
+    type: 'market',
+    direction: OrderDirection
     amount: number
-    price: number | null
 }
 
-interface Order extends OrderInput {
+interface LimitOrderInput extends MarketOrderInput {
+    price: number
+}
+
+interface Order {
 	id: string
 	foreignId: string | null
+    pair: string,
+    type: 'market',
+    direction: OrderDirection
+    amount: number
 	status: 'pending' | 'placed' | 'completed' | 'cancelled' | 'error'
 	errorReason: string | null
 	price: number | null
@@ -200,10 +229,10 @@ declare function unescape(string: string): string;
 
 interface Symbol {
     toString(): string;
-    valueOf(): symbol;
+    valueOf(): pair;
 }
 
-declare type PropertyKey = string | number | symbol;
+declare type PropertyKey = string | number | pair;
 
 interface PropertyDescriptor {
     configurable?: boolean;
@@ -1449,9 +1478,9 @@ interface TypedPropertyDescriptor<T> {
 }
 
 declare type ClassDecorator = <TFunction extends Function>(target: TFunction) => TFunction | void;
-declare type PropertyDecorator = (target: Object, propertyKey: string | symbol) => void;
-declare type MethodDecorator = <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
-declare type ParameterDecorator = (target: Object, propertyKey: string | symbol, parameterIndex: number) => void;
+declare type PropertyDecorator = (target: Object, propertyKey: string | pair) => void;
+declare type MethodDecorator = <T>(target: Object, propertyKey: string | pair, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
+declare type ParameterDecorator = (target: Object, propertyKey: string | pair, parameterIndex: number) => void;
 
 declare type PromiseConstructorLike = new <T>(executor: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void) => PromiseLike<T>;
 

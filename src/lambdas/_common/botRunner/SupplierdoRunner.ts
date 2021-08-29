@@ -50,8 +50,8 @@ const SupplierdoRunner: BotRunner = {
 	},
 
 	getCandles( adapter: ExchangeAdapter, deployment: RunnableDeployment ){
-		let promises = deployment.symbols.map( (symbol:string) => adapter.getCandles({
-			market: symbol,
+		let promises = deployment.pairs.map( (pair:string) => adapter.getCandles({
+			market: pair,
 			runInterval: deployment.runInterval,
 			lastCandleAt: exchangeUtils.getLastCandleAt(deployment.runInterval, Date.now()),
 			candleCount: 200
@@ -59,8 +59,8 @@ const SupplierdoRunner: BotRunner = {
 
 		return Promise.all( promises ).then( results => {
 			let candles = {};
-			deployment.symbols.forEach( (symbol,i) => {
-				candles[symbol] = results[i]
+			deployment.pairs.forEach( (pair,i) => {
+				candles[pair] = results[i]
 			});
 			return candles;
 		});

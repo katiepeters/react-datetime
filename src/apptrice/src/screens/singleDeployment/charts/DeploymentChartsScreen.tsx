@@ -13,7 +13,6 @@ export default class DeploymentChartsScreen extends React.Component<SingleDeploy
 
 	render() {
 		const {deployment} = this.props;
-		let symbols = this.getSymbols( deployment );
 
 		return (
 			<ScreenWrapper title="Charts">
@@ -32,15 +31,6 @@ export default class DeploymentChartsScreen extends React.Component<SingleDeploy
 
 	getDeploymentId() {
 		return this.props.router.location.params.id;
-	}
-
-	getSymbols(deployment: ModelBotDeployment): Orders | undefined {
-		// @ts-ignore
-		return deployment.symbols.flatten ?
-		// @ts-ignore
-			deployment.symbols.flatten() :
-			deployment.symbols
-		;
 	}
 
 	componentDidMount() {

@@ -5,7 +5,7 @@ interface BotConfigurationExtra {
 }
 
 type BotCandles = {
-	[symbol: string]: ArrayCandle[]
+	[pair: string]: ArrayCandle[]
 }
 
 type BotState = {
@@ -13,7 +13,7 @@ type BotState = {
 }
 
 interface BotConfiguration {
-	symbols: string[]
+	pairs: string[]
 	runInterval: '5m' | '10m' | '30m' | '1h' | '4h' | '1d'
 	exchange: 'bitfinex'
 	[key: string]: any
@@ -38,14 +38,14 @@ interface CandleUtils {
 	getAmplitude(candle: ArrayCandle): number
 }
 
-interface SymbolsUtils {
-	getBase(symbol: string): string
-	getQuoted(symbol: string): string
+interface PairsUtils {
+	getBase(pair: string): string
+	getQuoted(pair: string): string
 }
 
 interface BotUtils {
 	candles: CandleUtils
-	symbols: SymbolsUtils
+	pairs: PairsUtils
 }
 
 interface BotInput {
@@ -68,7 +68,7 @@ interface Portfolio {
 
 interface OrderInput {
 	id: string
-	symbol: string
+	pair: string
 	type: 'limit' | 'market'
 	direction: 'buy' | 'sell'
 	amount: number

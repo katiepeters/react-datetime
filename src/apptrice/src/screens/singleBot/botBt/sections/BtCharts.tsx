@@ -15,7 +15,7 @@ interface BtChartsProps extends ScreenProps {
 
 export default class BtCharts extends React.Component<BtChartsProps> {
 	state = {
-		activeSymbol: this.props.bt.data.deployment.symbols[0]
+		activePair: this.props.bt.data.deployment.pairs[0]
 	}
 
 	render() {
@@ -26,21 +26,21 @@ export default class BtCharts extends React.Component<BtChartsProps> {
 					selector="dropdown"
 					exchangeProvider={ exchange.provider }
 					deployment={ deployment }
-					activeSymbol={ this.state.activeSymbol }
-					onChange={ (activeSymbol: string) => this.setState({activeSymbol}) } />
+					activePair={ this.state.activePair }
+					onChange={ (activePair: string) => this.setState({activePair}) } />
 				<OrderList orders={ this.getOrders() } />
 			</div>
 		)
 	}
 
 	getOrders() {
-		return memoOrders( this.props.bt.data.deployment.orders, this.state.activeSymbol );
+		return memoOrders( this.props.bt.data.deployment.orders, this.state.activePair );
 	}
 }
 
 
-const memoOrders = memoizeOne( (allOrders: DeploymentOrders, activeSymbol: string ): Orders => {
+const memoOrders = memoizeOne( (allOrders: DeploymentOrders, activePair: string ): Orders => {
 	return arrayize<Order>( allOrders.items ).filter( (it: Order) => (
-		it.symbol === activeSymbol
+		it.pair === activePair
 	));
 });

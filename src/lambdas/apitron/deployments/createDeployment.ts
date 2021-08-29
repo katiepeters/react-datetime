@@ -9,7 +9,7 @@ interface CreateDeploymentInput {
 	botId: string
 	exchangeAccountId: string
 	runInterval: string
-	symbols: string[]
+	pairs: string[]
 	active?: boolean
 }
 
@@ -25,7 +25,7 @@ const createDeploymentHandler: MutationHandler = {
 			active: 'boolean?',
 			exchangeAccountId: 'string',
 			runInterval: 'runInterval',
-			symbols: 'symbols'
+			pairs: 'pairs'
 		});
 
 		if( error ) {

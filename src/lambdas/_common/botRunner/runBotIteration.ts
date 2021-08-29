@@ -11,7 +11,7 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 	let bot: RunnableBot = await runner.getBot( accountId, deployment.botId, deployment.version );
 
 	// First get candles (virtual exchanges will refresh its data)
-	let [ portfolio, candles ] = await Promise.all([
+	let [ portfolio, candleData ] = await Promise.all([
 		adapter.getPortfolio(),
 		runner.getCandles( adapter, deployment )
 	]);
@@ -20,18 +20,18 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 	let orders = await getUpdatedOrdersFromExchange( adapter, deployment.orders );
 	deployment = await runner.updateDeployment( deployment, {orders} );
 	
-
 	const result = await bot.run({
-		candles,
+		candleData,
 		config: {
-			symbols: deployment.symbols,
+			pairs: deployment.pairs,
 			runInterval: deployment.runInterval,
 			exchange: exchange.provider,
 			exchangeType: exchange.type
 		},
 		state: deployment.state,
 		orders: orders,
-		portfolio
+		portfolio,
+		plotterData: deployment.plotterData
 	});
 
 	if( result.error ){
@@ -52,8 +52,9 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 			orders: updatedOrders,
 			state: result.state,
 			logs: [ ...deployment.logs, ...result.logs ],
-			portfolioWithPrices: getPortfolioWithPrices( portfolio, deployment.symbols, candles ),
-			lastRunAt: Date.now()
+			portfolioWithPrices: getPortfolioWithPrices( portfolio, deployment.pairs, candleData ),
+			lastRunAt: Date.now(),
+			plotterData: result.plotterData
 		}),
 		runner.updateExchange( exchange, {
 			orders: runner.getExchangeOrders( adapter ),
@@ -153,10 +154,10 @@ function getEmptyBalance( asset: string ): Balance {
 }
 
 // Portfolio can come from the exchange directly, already having assets
-// that are not related to this bot, so we need to use the development symbols
-function getPortfolioWithPrices( portfolio: Portfolio, symbols: string[], allCandles: BotCandles ): PortfolioWithPrices {
-	const quotedAsset = symbols[0].split('/')[1];
-	const baseAssets = symbols.map( (s:string) => s.split('/')[0]);
+// that are not related to this bot, so we need to use the development pairs
+function getPortfolioWithPrices( portfolio: Portfolio, pairs: string[], allCandles: BotCandles ): PortfolioWithPrices {
+	const quotedAsset = pairs[0].split('/')[1];
+	const baseAssets = pairs.map( (s:string) => s.split('/')[0]);
 
 	logCandles( allCandles );
 	

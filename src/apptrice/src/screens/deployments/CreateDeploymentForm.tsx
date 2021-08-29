@@ -15,7 +15,7 @@ export interface CreateDeploymentPayload {
 	botId: string
 	exchangeAccountId: string
 	runInterval: string
-	symbols: string[]
+	pairs: string[]
 	active: boolean
 	exchange?: string
 	initialBalances?: Balances
@@ -243,7 +243,7 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 					</InputGroup>
 				</div>
 				<InitialBalances
-					symbols={this.getAssets() }
+					pairs={this.getAssets() }
 					balances={ this.state.initialBalances }
 					onChange={ initialBalances => this.setState({initialBalances})} />
 			</div>
@@ -257,14 +257,14 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 			return Toaster.show('There are errors in the form');
 		}
 
-		const symbols = this.getSymbols();
+		const pairs = this.getPairs();
 		const {botId, botVersion, exchangeAccountId, runInterval, name} = this.state;
 		const payload = {
 			accountId: this.props.accountId,
 			name,
 			botId, exchangeAccountId, runInterval,
 			version: botVersion,
-			symbols,
+			pairs,
 			active: true,
 			exchange: this.state.exchange,
 			initialBalances: this.state.initialBalances
@@ -334,28 +334,28 @@ export default class CreateDeploymentForm extends React.Component<CreateDeployme
 		return errors;
 	}
 
-	getSymbols() {
-		let symbols: string[] = [];
-		this.state.baseAssets.split(/\s*,\s*/).forEach(symbol => {
-			if (symbol.trim()) {
-				symbols.push(symbol.trim() + '/' + this.state.quotedAsset);
+	getPairs() {
+		let pairs: string[] = [];
+		this.state.baseAssets.split(/\s*,\s*/).forEach(pair => {
+			if (pair.trim()) {
+				pairs.push(pair.trim() + '/' + this.state.quotedAsset);
 			}
 		});
-		return symbols;
+		return pairs;
 	}
 
 	getAssets() {
-		let symbols = this.state.quotedAsset ?
+		let assets = this.state.quotedAsset ?
 			[this.state.quotedAsset] :
 			[]
 		;
 
-		this.state.baseAssets.split(/\s*,\s*/).forEach(symbol => {
-			if (symbol.trim()) {
-				symbols.push(symbol.trim());
+		this.state.baseAssets.split(/\s*,\s*/).forEach(asset => {
+			if (asset.trim()) {
+				assets.push(asset.trim());
 			}
 		});
-		return symbols;
+		return assets;
 	}
 
 	mounted = true

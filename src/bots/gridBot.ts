@@ -4,20 +4,20 @@ const CONCURRENT_BUYS = 3;
 export default class GridBot extends TradeBot {
 	onData(input: BotInput) {
 		let { state, candles, utils } = input;
-		state.currentSymbols = selectSymbols( candles, state.currentSymbols, utils, Object.keys(candles) );
-		for( let symbol in candles ){
-			handleSingleSymbol(symbol, input);
+		state.currentPairs = selectPairs( candles, state.currentPairs, utils, Object.keys(candles) );
+		for( let pair in candles ){
+			handleSinglePair(pair, input);
 		}
 	}
 }
 
-function handleSingleSymbol(symbol, input) {
+function handleSinglePair(pair, input) {
 	const {state, utils, trader} = input;
-	const candles = input[symbol].candles;
+	const candles = input[pair].candles;
 	const {getClose, getLast, getAmplitude} = input.utils.candles;
 
-	const openBuyOrders = state.openBuyOrders ? (state.openBuyOrders[symbol] || []) : [];
-	if (openBuyOrders.length() === 0 && !state.currentSymbols[symbol]) {
+	const openBuyOrders = state.openBuyOrders ? (state.openBuyOrders[pair] || []) : [];
+	if (openBuyOrders.length() === 0 && !state.currentPairs[pair]) {
 		return;
 	}
 
@@ -45,42 +45,42 @@ function handleSingleSymbol(symbol, input) {
 		}
 	}
 
-	// Handle buys only if the symbol is selected
-	if (!state.currentSymbols[symbol]) return;
+	// Handle buys only if the pair is selected
+	if (!state.currentPairs[pair]) return;
 
 	buyLevels.forEach(level => {
 		let levelId = getLevelId(level[0]);
 		if (!orderLevels[levelId]) {
-			let orderId = trader.placeLimitOrder(symbol, getBuyValue(), level[0]).id;
+			let orderId = trader.placeLimitOrder(pair, getBuyValue(), level[0]).id;
 			console.log(`Created order ${orderId}`);
 			state.openBuyOrders[orderId] = {
 				levelId,
 				sellPrice: level[1],
-				symbol
+				pair
 			}
 		}
 	});
 
-	console.log(`${symbol} at ${currentPrice}: Grid ${getGridInterval(data)} - Buy at ${levelIds}`);
+	console.log(`${pair} at ${currentPrice}: Grid ${getGridInterval(data)} - Buy at ${levelIds}`);
 	console.log('---');
 }
 
-function selectSymbols(candles, currentSymbols, utils, allSymbols) {
+function selectPairs(candles, currentPairs, utils, allPairs) {
 	const volatilities = getVolatilities(candles, utils.candles);
-	let nextSymbols = getEmptyCurrentSymbols();
-	if (!currentSymbols) {
-		currentSymbols = getEmptyCurrentSymbols();
+	let nextPairs = getEmptyCurrentPairs();
+	if (!currentPairs) {
+		currentPairs = getEmptyCurrentPairs();
 	}
 
 	let current = [];
 	volatilities.forEach(pair => {
-		if (currentSymbols[pair.symbol]) {
+		if (currentPairs[pair.pair]) {
 			current.push(pair);
 		}
 		else {
 			current.push({
-				symbol: pair.symbol,
-				volatility: pair.volatility - 0.015 // penalty for new symbols to gain stability
+				pair: pair.pair,
+				volatility: pair.volatility - 0.015 // penalty for new pairs to gain stability
 			});
 		}
 	});
@@ -88,32 +88,32 @@ function selectSymbols(candles, currentSymbols, utils, allSymbols) {
 	current = current.sort(volatilitySortFn);
 	let i = 0;
 	while (i < CONCURRENT_SYMBOLS) {
-		nextSymbols[current[0].symbol] = true;
+		nextPairs[current[0].pair] = true;
 	}
 
-	return nextSymbols;
+	return nextPairs;
 }
 
-function getEmptyCurrentSymbols() {
-	let symbols = {};
-	SYMBOLS.forEach((symbol, i) => {
-		symbols[symbol] = false;
+function getEmptyCurrentPairs() {
+	let pairs = {};
+	SYMBOLS.forEach((pair, i) => {
+		pairs[pair] = false;
 	});
 
-	return symbols;
+	return pairs;
 }
 
 function getVolatilities(candles, {getAmplitude}) {
 	const runInterval = 5;
 	let volatilities = [];
 
-	for (let symbol in candles) {
-		let sum = candles[symbol].slice(-runInterval).reduce((acc, candle) => (
+	for (let pair in candles) {
+		let sum = candles[pair].slice(-runInterval).reduce((acc, candle) => (
 			acc + getAmplitude(candle)
 		), 0);
 
 		volatilities.push({
-			symbol,
+			pair,
 			volatility: sum / runInterval
 		});
 	}
@@ -252,13 +252,13 @@ function checkBuyOrder( order, orderMeta, currentPrice, levelIds ){
 	const {id, status} = order;
 
 	if( status === 'completed' ){
-		openSellOrder( trader, order.symbol, orderMeta.sellPrice, currentPrice );
+		openSellOrder( trader, order.pair, orderMeta.sellPrice, currentPrice );
 		trader.placeOrder({
 			type: 'limit',
 			direction: 'sell',
 			price: orderMeta.sellPrice,
-			symbol: order.symbol,
-			amount: getBuyAmount( symbol, price )
+			pair: order.pair,
+			amount: getBuyAmount( pair, price )
 		}
 	}
 	else if( status === 'cancelled' || status === 'error' ) {
@@ -269,7 +269,7 @@ function checkBuyOrder( order, orderMeta, currentPrice, levelIds ){
 	}
 }
 
-function openSellOrder( trader, symbol, limitPrice, currentPrice ){
+function openSellOrder( trader, pair, limitPrice, currentPrice ){
 	let sell
 }
 

@@ -4,24 +4,24 @@ import historicalPriceLoader from "./historicalPrice.loader";
 import priceSeriesLoader from "./priceSeries.loader";
 
 const config: DataLoaderConfig<[number,number]> = {
-	getFromCache(exchange: string, symbol: string, startDate: number, endDate: number ): [number, number] | undefined {
+	getFromCache(exchange: string, pair: string, startDate: number, endDate: number ): [number, number] | undefined {
 		let types = getRangeTypes( startDate, endDate );
 		let i = types.length;
 		while( i-- > 0 ){
-			const {isLoading} = priceSeriesLoader.getData(exchange, symbol, types[i]);
+			const {isLoading} = priceSeriesLoader.getData(exchange, pair, types[i]);
 			if( isLoading ) return;
 		}
 
-		let {data:startPrice} = historicalPriceLoader.getData( exchange, symbol, startDate );
-		let {data:endPrice} = historicalPriceLoader.getData( exchange, symbol, endDate );
+		let {data:startPrice} = historicalPriceLoader.getData( exchange, pair, startDate );
+		let {data:endPrice} = historicalPriceLoader.getData( exchange, pair, endDate );
 
 		return [
 			startPrice, endPrice
 		];
 	},
-	loadData( exchange: string, symbol: string, startDate: number, endDate: number ) {
+	loadData( exchange: string, pair: string, startDate: number, endDate: number ) {
 		let promises = getRangeTypes( startDate, endDate ).map( (type: string) => (
-			priceSeriesLoader.loadData( exchange, symbol, type)
+			priceSeriesLoader.loadData( exchange, pair, type)
 		));
 
 		return Promise.all( promises );

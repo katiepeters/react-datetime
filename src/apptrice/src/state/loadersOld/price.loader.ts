@@ -1,12 +1,12 @@
-import symbols from "../../../../lambdas/_common/utils/symbols";
+import pairs from "../../../../lambdas/_common/utils/pairs";
 import DataLoader, { DataLoaderConfig } from "../../utils/DataLoader";
 import tickerLoader from './ticker.loader';
 
 
 const config: DataLoaderConfig<number> = {
-	getFromCache(exchange: string, amount: string, symbol: string ): number | undefined {
-		let base = symbols.getBase(symbol);
-		let quoted = symbols.getQuoted(symbol);
+	getFromCache(exchange: string, amount: string, pair: string ): number | undefined {
+		let base = pairs.getBase(pair);
+		let quoted = pairs.getQuoted(pair);
 
 		if( base === quoted ) return parseFloat(amount);
 
@@ -15,15 +15,15 @@ const config: DataLoaderConfig<number> = {
 		if( !prices ) return;
 
 		// Direct price conversion
-		let symbolData = prices[symbol];
-		if( symbolData ){
-			return parseFloat(amount) * symbolData.price;
+		let pairData = prices[pair];
+		if( pairData ){
+			return parseFloat(amount) * pairData.price;
 		}
 
 		// Through USD
 		let baseData = prices[`${base}/USD`];
 
-		if( !symbolData ) return;
+		if( !pairData ) return;
 
 		let quotedData = prices[`${quoted}/USD`];
 
@@ -31,12 +31,12 @@ const config: DataLoaderConfig<number> = {
 
 		return parseFloat(amount) * baseData.price / quotedData.price;
 	},
-	loadData(exchange: string, amount: string, symbol: string ) {
+	loadData(exchange: string, amount: string, pair: string ) {
 		return tickerLoader.loadData( exchange )
 			.then( () => {
-				let price = this.getFromCache( exchange, amount, symbol );
+				let price = this.getFromCache( exchange, amount, pair );
 				if( price === undefined ){
-					throw new Error('unexistant_exchange_symbol');
+					throw new Error('unexistant_exchange_pair');
 				}
 			})
 		;

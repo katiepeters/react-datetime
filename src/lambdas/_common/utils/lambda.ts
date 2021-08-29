@@ -13,14 +13,6 @@ interface SupplierdoPayload {
 	deploymentId: string
 }
 
-type BotCandles = {
-	[symbol: string]: ArrayCandle[]
-}
-
-type BotState = {
-	[attribute: string]: any
-}
-
 
 let lambdaOptions: any = { region: process.env.region };
 if (process.env.IS_OFFLINE ) {

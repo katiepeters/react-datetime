@@ -39,7 +39,7 @@ export default class BtStats extends React.Component<BtStatsProps> {
 	}
 
 	getCurrency() {
-		return this.props.bt.data.deployment.symbols[0].split('/')[1];
+		return this.props.bt.data.deployment.pairs[0].split('/')[1];
 	}
 }
 

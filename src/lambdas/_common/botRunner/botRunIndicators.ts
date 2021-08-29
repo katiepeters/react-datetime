@@ -15,7 +15,9 @@ export class BotRunIndicators implements Indicators {
 	// The used indicators will be automatically plotted in the charts
 	indicatorsUsed: {[indicator:string]: boolean}
 
-	constructor( used: {[indicator:string]: boolean} = {} ) {
+	constructor( indicators: string[] = [] ) {
+		let used = {};
+		indicators.forEach( (indicator: string) => used[indicator] = true );
 		this.indicatorsUsed = used;
 	}
 

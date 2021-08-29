@@ -6,7 +6,7 @@ import memoizeOne from 'memoize-one';
 import { candleLoader } from '../../state/loaders/candle.loader';
 
 interface AutoChartProps {
-	symbol: string,
+	pair: string,
 	exchange: string,
 	interval: string,
 	orders: Order[],
@@ -16,14 +16,14 @@ interface AutoChartProps {
 
 export default class AutoChart extends React.Component<AutoChartProps> {
 	render() {
-		let {symbol, exchange, interval, orders, startDate, endDate} = this.props;
+		let {pair, exchange, interval, orders, startDate, endDate} = this.props;
 		if (!startDate || !endDate) {
 			let orderDates = this.getOrderDates(orders, interval);
 			startDate = orderDates.startDate;
 			endDate = orderDates.endDate;
 		}
 
-		let {data: candles} = candleLoader({exchange, symbol, runInterval: interval, startDate, endDate});
+		let {data: candles} = candleLoader({exchange, pair, runInterval: interval, startDate, endDate});
 
 		return (
 			<div>

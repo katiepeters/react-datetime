@@ -48,11 +48,11 @@ export class ProviderAppraiser implements Appraiser {
 		return loading;
 	}
 
-	getPrice( symbol: string, time: number ){
-		let pair = `${symbol}/${this.quoted}`;
-		if( !pair ) throw new TypeError(`Appriser doesn't support ${symbol} prices`);
+	getPrice( pair: string, time: number ){
+		let str = `${pair}/${this.quoted}`;
+		if( !str ) throw new TypeError(`Appriser doesn't support ${pair} prices`);
 		if( time < this.startDate || time > (this.endDate + DAY) ) {
-			throw new Error(`Appriser: Date ${time} out of range for ${symbol} price request`);
+			throw new Error(`Appriser: Date ${time} out of range for ${pair} price request`);
 		}
 
 		let {data: price} = historicalPriceLoader.getData(this.provider, pair, time);

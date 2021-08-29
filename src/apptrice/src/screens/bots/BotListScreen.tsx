@@ -156,8 +156,7 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 		let bot = {
 			accountId: this.props.authenticatedId,
 			name: name,
-			code: `
-`
+			code: initialBotCode
 		};
 
 		return apiCacher.createBot(bot).then((res: AxiosResponse) => {
@@ -198,3 +197,14 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 		;
 	}
 }
+
+
+const initialBotCode = `
+function initializeState(config, state ){
+
+}
+
+function onData(input: BotInput) {
+	
+}
+`

@@ -1,6 +1,7 @@
 import { BotCandles, BotConfigurationExtra, BotExecutorResult, BotState, Portfolio, OrderInput, BotExecutorResultWithDate, Orders } from "../../../lambdas/lambda.types";
-import { ConsoleEntry, RunnableDeployment, DbExchangeAccount, DeploymentOrders, Order, PortfolioWithPrices } from "../../../lambdas/model.types";
+import { ConsoleEntry, RunnableDeployment, DbExchangeAccount, DeploymentOrders, Order, PortfolioWithPrices, PlotterData } from "../../../lambdas/model.types";
 import { ExchangeAdapter, ExchangeOrder, ExchangeOrders } from "../../../lambdas/_common/exchanges/ExchangeAdapter";
+import { PairPlottingSeries } from "./botRunPlotter";
 
 export interface BotInitializeStateResponse {
 	state: BotState,
@@ -13,11 +14,17 @@ export interface RunnableBot {
 }
 
 export interface BotRunInput {
-	candles: BotCandles,
+	candleData: BotCandles,
 	config: BotConfigurationExtra,
 	state: BotState,
 	orders: DeploymentOrders,
-	portfolio: Portfolio
+	portfolio: Portfolio,
+	plotterData: {
+		indicators: string[],
+		candlestickPatterns: string[],
+		series: PairPlottingSeries
+		points: PairPlottingSeries
+	}
 }
 
 export interface BotRunnerDeploymentUpdate {
@@ -25,6 +32,7 @@ export interface BotRunnerDeploymentUpdate {
 	orders?: DeploymentOrders,
 	logs?: ConsoleEntry[],
 	portfolioWithPrices?: PortfolioWithPrices,
+	plotterData?: PlotterData
 	lastRunAt?: number
 }
 

@@ -1,5 +1,5 @@
 import BitfinexAdapter from "../_common/exchanges/adapters/BitfinexAdapter";
-import { ExchangeSymbols, Ticker } from "../_common/exchanges/ExchangeAdapter";
+import { ExchangePairs, Ticker } from "../_common/exchanges/ExchangeAdapter";
 import s3Helper from "../_common/utils/s3";
 
 
@@ -18,14 +18,14 @@ export async function tickerUpdater({exchange}: TickerUpdaterInput) {
 	let adapter = new Adapter({});
 
 	const now = Date.now();
-	const [ticker, symbols] = await Promise.all([
+	const [ticker, pairs] = await Promise.all([
 		adapter.getTicker(),
-		adapter.getSymbols()
+		adapter.getPairs()
 	]);
 	
 	let promises = [
 		updateTicker(exchange, ticker),
-		updateSymbols(exchange, symbols)
+		updatePairs(exchange, pairs)
 	];
 
 	/*
@@ -64,7 +64,7 @@ function updateTicker( exchange: string, ticker: Ticker ){
 	return s3Helper.exchanges.setContent( path, JSON.stringify(ticker), meta );
 }
 
-function updateSymbols( exchange: string, symbols: ExchangeSymbols ){
-	const path = `${EXCHANGE_PATH}/${exchange.toLowerCase()}/symbols`;
-	return s3Helper.exchanges.setContent( path, JSON.stringify(symbols), meta );
+function updatePairs( exchange: string, pairs: ExchangePairs ){
+	const path = `${EXCHANGE_PATH}/${exchange.toLowerCase()}/pairs`;
+	return s3Helper.exchanges.setContent( path, JSON.stringify(pairs), meta );
 }

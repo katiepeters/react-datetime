@@ -45,7 +45,7 @@ function placeBuy( state, trader: Trader, currentPrice: number ) {
         type: 'limit',
         direction: 'buy',
         price: buyPrice,
-        symbol: 'BTC/USD',
+        pair: 'BTC/USD',
         amount: trader.getPortfolioValue() / currentPrice
     });
 
@@ -61,7 +61,7 @@ function placeSell( state, trader: Trader, currentPrice: number ){
         type: 'limit',
         direction: 'sell',
         price: sellPrice,
-        symbol: 'BTC/USD',
+        pair: 'BTC/USD',
         amount: portfolio['BTC'].free
     });
 

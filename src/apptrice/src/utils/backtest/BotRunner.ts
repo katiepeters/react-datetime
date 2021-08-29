@@ -12,7 +12,7 @@ export async function runBotIteration( deploymentId: string, runner: BotRunner )
 
 	if( isNewDeployment( deployment ) ){
 		let {state, logs} = await bot.initializeState({
-			symbols: getDeploymentSymbols(deployment),
+			pairs: getDeploymentPairs(deployment),
 			runInterval: deployment.runInterval,
 			exchange: exchange.provider
 		});
@@ -22,7 +22,7 @@ export async function runBotIteration( deploymentId: string, runner: BotRunner )
 	// First get candles (virtual exchanges will refresh its data)
 	const [ portfolio, candles ] = await Promise.all([
 		adapter.getPortfolio(),
-		runner.getCandles( adapter, getDeploymentSymbols(deployment) )
+		runner.getCandles( adapter, getDeploymentPairs(deployment) )
 	]);
 
 	// Update the closed orders in the last iteration
@@ -32,7 +32,7 @@ export async function runBotIteration( deploymentId: string, runner: BotRunner )
 	const result = await bot.run({
 		candles,
 		config: {
-			symbols: deployment.symbols,
+			pairs: deployment.pairs,
 			runInterval: deployment.runInterval,
 			exchange: exchange.provider,
 			exchangeType: exchange.type

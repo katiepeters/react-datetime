@@ -56,12 +56,18 @@ export default class BtBotRunner implements BotRunner {
 				items: {},
 				openOrderIds: []
 			},
-			symbols: config.baseAssets.map( (base: string) => `${base}/${config.quotedAsset}` ),
+			pairs: config.baseAssets.map( (base: string) => `${base}/${config.quotedAsset}` ),
 			runInterval: config.runInterval,
 			state: {newState: 'stateNew'},
 			logs: [],
 			activeIntervals: [[config.startDate]],
-			portfolioHistory: [] // Fist item will be loaded when we get the candles
+			portfolioHistory: [], // Fist item will be loaded when we get the candles,
+			plotterData: {
+				indicators: [],
+				candlestickPatterns: [],
+				series: {},
+				points: {}
+			}
 		};
 
 		this.exchange = {
@@ -117,8 +123,8 @@ export default class BtBotRunner implements BotRunner {
 	}
 
 	getAllCandles(){
-		const { symbols, runInterval } = this.deployment;
-		return getAllCandles( symbols, runInterval, this.startDate, this.endDate )
+		const { pairs, runInterval } = this.deployment;
+		return getAllCandles( pairs, runInterval, this.startDate, this.endDate )
 			.then( (candles: BotCandles) => {
 				this.candles = candles;
 				this.totalIterations = getTotalIterations(candles);
@@ -250,11 +256,11 @@ export default class BtBotRunner implements BotRunner {
 }
 
 
-async function getAllCandles(symbols: string[], runInterval: string, startDate: number, endDate: number) {
+async function getAllCandles(pairs: string[], runInterval: string, startDate: number, endDate: number) {
 	let start = add200Candles(startDate, runInterval);
 
-	let promises = symbols.map(symbol => apiCacher.loadCandles({
-		symbol,
+	let promises = pairs.map(pair => apiCacher.loadCandles({
+		pair,
 		runInterval,
 		startDate: start,
 		endDate
@@ -262,7 +268,7 @@ async function getAllCandles(symbols: string[], runInterval: string, startDate: 
 
 	let candleArr = await Promise.all(promises);
 	let candles: BotCandles = {};
-	candleArr.forEach((res, i) => candles[symbols[i]] = res.data);
+	candleArr.forEach((res, i) => candles[pairs[i]] = res.data);
 	return candles;
 }
 
@@ -280,8 +286,8 @@ function add200Candles(start: number, runInterval: string) {
 }
 
 function getTotalIterations(candles: BotCandles) {
-	let symbol = Object.keys(candles)[0];
-	return candles[symbol].length - 200;
+	let pair = Object.keys(candles)[0];
+	return candles[pair].length - 200;
 }
 
 function createPortfolio(initialBalances: {[asset: string]: number}) {

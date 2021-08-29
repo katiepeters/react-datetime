@@ -7,58 +7,58 @@ export type PriceTypeHistory = {
 	[timestamp: number]: number
 };
 
-export type PriceSymbolHistory = {
+export type PricePairHistory = {
 	hourly?: PriceTypeHistory,
 	daily?: PriceTypeHistory,
 	weekly?: PriceTypeHistory,
 	monthly?: PriceTypeHistory,
 };
 
-export type SymbolPromises = {
+export type PairPromises = {
 	[key: string]: Promise<any>
 }
 
 const priceHistory: {
 	[exchange: string]: {
-		[symbol: string]: PriceSymbolHistory
+		[pair: string]: PricePairHistory
 	} 
 } = {};
 
-const symbolPromises: SymbolPromises = {};
+const pairPromises: PairPromises = {};
 
 const config: DataLoaderConfig<PriceTypeHistory> = {
-	getFromCache(exchange: string, symbol: string, type: PriceSeriesType ): PriceTypeHistory | undefined {
+	getFromCache(exchange: string, pair: string, type: PriceSeriesType ): PriceTypeHistory | undefined {
 		return (priceHistory[exchange] &&
-			priceHistory[exchange][symbol] &&
-			priceHistory[exchange][symbol][type]) ||
+			priceHistory[exchange][pair] &&
+			priceHistory[exchange][pair][type]) ||
 			undefined
 		;
 	},
-	loadData( exchange: string, symbol: string, type: PriceSeriesType ) {
-		let promiseKey = getKey(exchange, symbol, type );
-		let promise = symbolPromises[ promiseKey ];
+	loadData( exchange: string, pair: string, type: PriceSeriesType ) {
+		let promiseKey = getKey(exchange, pair, type );
+		let promise = pairPromises[ promiseKey ];
 		if( promise ) return promise;
 
-		symbolPromises[ promiseKey ] = apiClient.loadPrices(exchange, symbol, type)
+		pairPromises[ promiseKey ] = apiClient.loadPrices(exchange, pair, type)
 			.then( res => {
 				let history = priceHistory[exchange] || {};
 				priceHistory[exchange] = {
 					...history,
-					[symbol]: {
-						...(history[symbol] || {} ),
+					[pair]: {
+						...(history[pair] || {} ),
 						[type]: res.data
 					}
 				};
-				delete symbolPromises[ promiseKey ];
+				delete pairPromises[ promiseKey ];
 			})
 		;
 
-		return symbolPromises[ promiseKey ];
+		return pairPromises[ promiseKey ];
 	}
 }
 
-function getKey( exchange: string, symbol: string, type: string ){
-	return `${exchange}_${symbol}_${type}`;
+function getKey( exchange: string, pair: string, type: string ){
+	return `${exchange}_${pair}_${type}`;
 }
 
 

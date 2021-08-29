@@ -219,23 +219,23 @@ export default class BotTools extends React.Component<BotToolsProps> {
 	renderInitialBalances() {
 		return (
 			<InitialBalances
-				symbols={ this.getSymbols() }
+				pairs={ this.getPairs() }
 				balances={ this.state.initialBalances }
 				onChange={ InitialBalances => this.setState({InitialBalances}) }
 				innerPadding={true} />
 		);
 	}
 
-	_renderBalanceInput = (symbol:string) => {
+	_renderBalanceInput = (pair:string) => {
 		return (
 			<div style={styles.field}>
 				<InputGroup
-					name={`${symbol}_balance`}
-					label={symbol}>
-					<input name={`${symbol}_balance`}
+					name={`${pair}_balance`}
+					label={pair}>
+					<input name={`${pair}_balance`}
 						// @ts-ignore
-						value={this.state.initialBalances[symbol] || 0}
-						onChange={e => this.updateInitialBalance(symbol, e.target.value)} />
+						value={this.state.initialBalances[pair] || 0}
+						onChange={e => this.updateInitialBalance(pair, e.target.value)} />
 				</InputGroup>
 			</div>
 		);
@@ -268,7 +268,7 @@ export default class BotTools extends React.Component<BotToolsProps> {
 		let end = new Date(endDate + 'T23:59:59.999Z');
 
 		return {
-			baseAssets: this.getSymbols().slice(1),
+			baseAssets: this.getPairs().slice(1),
 			quotedAsset,
 			runInterval,
 			initialBalances,
@@ -279,27 +279,27 @@ export default class BotTools extends React.Component<BotToolsProps> {
 		};
 	}
 
-	updateInitialBalance( symbol:string, value: string ){
+	updateInitialBalance( pair:string, value: string ){
 		this.setState({
 			initialBalances: {
 				...this.state.initialBalances,
-				[symbol]: value
+				[pair]: value
 			}
 		});
 	}
 
-	getQuotedSymbol(){
+	getQuotedPair(){
 		return this.state.quotedAsset;
 	}
 
-	getSymbols() {
-		let symbols = [this.state.quotedAsset];
-		this.state.baseAssets.split(/\s*,\s*/).forEach( symbol => {
-			if( symbol.trim() ){
-				symbols.push( symbol.trim() );
+	getPairs() {
+		let pairs = [this.state.quotedAsset];
+		this.state.baseAssets.split(/\s*,\s*/).forEach( pair => {
+			if( pair.trim() ){
+				pairs.push( pair.trim() );
 			}
 		});
-		return symbols;
+		return pairs;
 	}
 
 	getInputDate( time: number ){

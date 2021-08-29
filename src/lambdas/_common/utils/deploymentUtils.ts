@@ -37,10 +37,10 @@ export function getDeactivatedDeployment<T extends ActivityDeployment>( currentD
 	return currentDeployment;
 }
 
-export function getDeploymentAssets( symbols: string[] ){
+export function getDeploymentAssets( pairs: string[] ){
 	return {
-		quotedAsset: symbols[0].split('/')[1],
-		baseAssets: symbols.map( (s: string) => s.split('/')[0] )
+		quotedAsset: pairs[0].split('/')[1],
+		baseAssets: pairs.map( (s: string) => s.split('/')[0] )
 	};
 }
 

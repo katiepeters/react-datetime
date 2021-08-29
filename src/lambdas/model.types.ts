@@ -1,4 +1,5 @@
 import { Balance, Portfolio } from "./lambda.types";
+import { PairPlottingSeries } from "./_common/botRunner/botRunPlotter";
 
 export interface TableItem {
 	accountId: string
@@ -81,6 +82,13 @@ export interface DBBotDeploymentState {
 	[attribute: string]: any
 }
 
+export interface PlotterData {
+	indicators: string[]
+	candlestickPatterns: string[]
+	series: PairPlottingSeries
+	points: PairPlottingSeries
+}
+
 type ActiveIntervalClosed = [number, number]
 type ActiveIntervalOpen = [number]
 export type ActiveInterval = ActiveIntervalClosed | ActiveIntervalOpen
@@ -99,10 +107,9 @@ export interface BaseBotDeployment {
 	name: string
 
 	runInterval: string
-	symbols: string[]
+	pairs: string[]
 
 	activeIntervals: ActiveInterval[]
-	indicatorsUsed: string[]
 	stats?: BasicBotDeploymentStats
 }
 
@@ -121,6 +128,7 @@ export interface FullBotDeployment extends ModelBotDeployment {
 	state: DBBotDeploymentState
 	logs: ConsoleEntry[]
 	portfolioHistory: PortfolioHistoryItem[]
+	plotterData: PlotterData
 }
 
 export interface CreateBotDeploymentModelInput {
@@ -131,11 +139,12 @@ export interface CreateBotDeploymentModelInput {
 	version: string
 	exchangeAccountId: string
 	runInterval: RunInterval
-	symbols: string[]
+	pairs: string[]
 	orders: DeploymentOrders
 	portfolioHistory?: PortfolioHistoryItem[]
 	state?: DBBotDeploymentState
 	logs?: ConsoleEntry[]
+	plotterData?: PlotterData
 	active: boolean
 	createdAt?: number
 	activeIntervals?: ActiveInterval[]
@@ -146,11 +155,12 @@ export interface UpdateBotDeploymentModelInput {
 	stats?: BasicBotDeploymentStats
 	version?: string
 	runInterval?: RunInterval
-	symbols?: string[]
+	pairs?: string[]
 	orders?: DeploymentOrders
 	state?: DBBotDeploymentState
 	logs?: ConsoleEntry[]
 	portfolioHistory?: PortfolioWithPrices
+	plotterData?: PlotterData
 }
 
 export interface ActivityDeployment {
@@ -165,16 +175,17 @@ export interface RunnableDeployment {
 	botId: string
 	version: string
 	runInterval: string
-	symbols: string[]
+	pairs: string[]
 	orders: DeploymentOrders
 	state: DBBotDeploymentState
 	logs: ConsoleEntry[]
 	portfolioHistory: PortfolioHistoryItem[]
 	activeIntervals: ActiveInterval[]
+	plotterData: PlotterData
 }
 
 export interface OrderInput {
-	symbol: string
+	pair: string
 	type: 'limit' | 'market'
 	direction: 'buy' | 'sell'
 	amount: number

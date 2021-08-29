@@ -4,12 +4,12 @@ export interface Plotter {
 }
 
 export interface PlotterInput {
-	series: PairSeries,
-	points: PairSeries,
+	series: PairPlottingSeries,
+	points: PairPlottingSeries,
 	timestamp: number
 }
 
-interface PairSeries {
+export interface PairPlottingSeries {
 	[pair: string]: ChartSeries
 }
 interface ChartSeries {
@@ -24,8 +24,8 @@ interface Coords {
 }
 
 export class BotRunPlotter {
-	series: PairSeries
-	points: PairSeries
+	series: PairPlottingSeries
+	points: PairPlottingSeries
 	timestamp: number
 
 	constructor({series,points,timestamp}: PlotterInput ){
@@ -51,7 +51,7 @@ export class BotRunPlotter {
 	}
 }
 
-function plot( collection: PairSeries, name: string, value: number, pair: string, chart: string) {
+function plot( collection: PairPlottingSeries, name: string, value: number, pair: string, chart: string) {
 	let pairSeries = collection[pair];
 	if( !pairSeries ){
 		pairSeries = collection[pair] = {};
@@ -70,7 +70,7 @@ function plot( collection: PairSeries, name: string, value: number, pair: string
 	points.push({x: this.timestamp, y: value});
 }
 
-function getPairPoints( collection: PairSeries, pair: string ){
+function getPairPoints( collection: PairPlottingSeries, pair: string ){
 	let allPairsPoints = collection.all || {};
 	let pairPoints = collection[pair] || {};
 

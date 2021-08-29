@@ -85,7 +85,7 @@ app.post('/runnow', function(req, res) {
 })
 
 app.get('/candles', async function(req,res) {
-	const { symbol, runInterval, startDate, endDate, exchange = 'bitfinex' } = req.query;
+	const { pair, runInterval, startDate, endDate, exchange = 'bitfinex' } = req.query;
 
 	// @ts-ignore
 	const dummyExchangeAccount: DbExchangeAccount = {key: 'candles', secret: 'candles'};
@@ -95,7 +95,7 @@ app.get('/candles', async function(req,res) {
 	const lastCandleAt = exchangeUtils.getLastCandleAt(runInterval, endDate);
 	const candleCount = getCandleCount(startDate, endDate, runInterval );
 	const options = {
-		market: symbol,
+		market: pair,
 		runInterval,
 		candleCount,
 		lastCandleAt
@@ -158,7 +158,7 @@ async function setTestData(event) {
 			},
 			exchangeAccountId: 'virtualExchange',
 			runInterval: '1h',
-			symbols: ['BTC/USD', 'ETH/USD'],
+			pairs: ['BTC/USD', 'ETH/USD'],
 			state: {newState: 'stateNew'},
 			active: true,
 			portfolioWithPrices: {USD: {asset: 'USD', free: 1000, total: 1000, price: 1}}

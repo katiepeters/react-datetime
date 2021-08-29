@@ -51,7 +51,7 @@ export default class PortfolioWidget extends React.Component<PortfolioWidgetProp
 		const {deployment} = this.props;
 		if( !deployment ) return;
 
-		const {baseAssets, quotedAsset} = getDeploymentAssets(deployment.symbols);
+		const {baseAssets, quotedAsset} = getDeploymentAssets(deployment.pairs);
 		let data = Object.values(portfolio.balances)
 			.filter( (balance: Balance) => (
 				balance.asset === quotedAsset || baseAssets.includes(balance.asset)

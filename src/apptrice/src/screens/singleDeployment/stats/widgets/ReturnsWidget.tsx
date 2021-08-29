@@ -95,7 +95,7 @@ export default class ReturnsWidget extends React.Component<ReturnsWidgetProps> {
 		const {deployment} = this.props;
 		if( !deployment ) return;
 
-		const {baseAssets} = getDeploymentAssets(deployment.symbols);
+		const {baseAssets} = getDeploymentAssets(deployment.pairs);
 		return memoGetData( deployment.portfolioHistory, baseAssets );
 	}
 }

@@ -13,8 +13,8 @@ export default class OrderItem extends React.PureComponent<OrderItemProps> {
 
 		return (
 			<div className={styles.row}>
-				{ this.renderSymbolColor(order) }
-				{ this.renderSymbolAndId(order) }
+				{ this.renderPairColor(order) }
+				{ this.renderPairAndId(order) }
 				{ this.renderDirectionAndType(order) }
 				{ this.renderPlacedAt(order) }
 				{ this.renderAmount(order) }
@@ -33,8 +33,8 @@ export default class OrderItem extends React.PureComponent<OrderItemProps> {
 						{this.formatDate(order.placedAt)}
 					</div>
 				</td>
-				<td className={`${styles.cell} ${styles.column_symbol}`}>
-					{this.renderSymbol(order.symbol)}
+				<td className={`${styles.cell} ${styles.column_pair}`}>
+					{this.renderPair(order.pair)}
 				</td>
 				<td className={`${styles.cell} ${styles.column_type}`}>
 					<div className={styles.mainInfo}>
@@ -49,20 +49,20 @@ export default class OrderItem extends React.PureComponent<OrderItemProps> {
 		);*/
 	}
 
-	renderSymbolColor(order: Order){
+	renderPairColor(order: Order){
 		return (
 			<div className={styles.colorWrapper}>
 				<div className={styles.dot}
-					style={{background: getSymbolColor(order.symbol)}} />
+					style={{background: getPairColor(order.pair)}} />
 			</div>
 		);
 	}
 
-	renderSymbolAndId( order: Order ){
+	renderPairAndId( order: Order ){
 		return (
-			<div className={`${styles.cell} ${styles.column_symbol}`}>
+			<div className={`${styles.cell} ${styles.column_pair}`}>
 				<div className={styles.mainInfo}>
-					{order.symbol}
+					{order.pair}
 				</div>
 				<div className={styles.secondaryInfo}>
 					#{order.id.slice(0, 6)}
@@ -104,7 +104,7 @@ export default class OrderItem extends React.PureComponent<OrderItemProps> {
 	renderAmount( order: Order ) {
 		const amount = order.amount;
 		const value = order.amount * (order.price || order.marketPrice);
-		const assets = order.symbol.split('/');
+		const assets = order.pair.split('/');
 
 		return (
 			<div className={`${styles.cell} ${styles.column_amount}`}>
@@ -167,13 +167,13 @@ const COLORS = [
 ];
 
 let colorIndex: number = 0;
-let symbolColors: { [symbol: string]: string } = {};
-function getSymbolColor(symbol: string) {
-	let color = symbolColors[symbol];
+let pairColors: { [pair: string]: string } = {};
+function getPairColor(pair: string) {
+	let color = pairColors[pair];
 	if (!color) {
 		color = COLORS[colorIndex];
 		colorIndex += 1;
-		symbolColors[symbol] = color;
+		pairColors[pair] = color;
 	}
 	return color;
 }
