@@ -2,13 +2,19 @@ import * as React from 'react'
 import { Orders } from '../../../../lambdas/lambda.types';
 import OrderSeries from './chartMarkers/OrderSeries';
 import OHLC from './chartMarkers/OHLC';
+import memoizeOne from 'memoize-one';
 
 const { ChartCanvas, Chart } = require('react-stockcharts');
 const { last, timeIntervalBarWidth } = require("react-stockcharts/lib/utils");
 const { XAxis, YAxis } = require('react-stockcharts/lib/axes');
-const { CandlestickSeries, BarSeries } = require('react-stockcharts/lib/series');
+const { CandlestickSeries, BarSeries, LineSeries } = require('react-stockcharts/lib/series');
 const { CrossHairCursor, EdgeIndicator, MouseCoordinateX, MouseCoordinateY } = require('react-stockcharts/lib/coordinates');
 const { fitWidth } = require('react-stockcharts/lib/helper');
+const { MovingAverageTooltip } = require('react-stockcharts/lib/tooltip');
+
+const { ema, wma, sma, tma } = require("react-stockcharts/lib/indicator");
+
+const { discontinuousTimeScaleProvider } = require("react-stockcharts/lib/scale");
 
 const { scaleTime } = require('d3-scale');
 const { utcHour } = require('d3-time');
@@ -31,6 +37,8 @@ interface TradingChartProps {
 	ratio: number,
 	data: any,
 	orders: Orders,
+	indicators?: string[],
+	patterns?: string[],
 	candles: ChartCandle[],
 	includePreviousCandles: boolean
 }
@@ -42,6 +50,26 @@ class TradingChart extends React.Component<TradingChartProps> {
 
 	render() {
 		const { width, ratio, candles, orders } = this.props;
+		
+
+		const volumeAccessor = (d: any) => {
+			return d.volume;
+		}
+
+		const indicators = this.getIndicators();
+		const calculatedData = getDataMemo( candles, indicators );
+		const xScaleProvider = discontinuousTimeScaleProvider
+			.inputDateAccessor((d: ChartCandle) => d.date)
+		;
+
+		const height = 400;
+
+		const {
+			data,
+			xScale,
+			displayXAccessor,
+		} = xScaleProvider(calculatedData);
+
 		// This is the data for the x axis
 		const xAccessor = (d: any) => d.date;
 		// These are the initial limits for the x zoom
@@ -50,23 +78,18 @@ class TradingChart extends React.Component<TradingChartProps> {
 			xAccessor(candles[0])
 		];
 
-		const volumeAccessor = (d: any) => {
-			return d.volume;
-		}
-
-		const height = 400;
-
 		return (
 			<ChartCanvas
 				width={width}
 				height={height}
 				ratio={ratio}
 				type="hybrid"
-				data={candles}
+				data={data}
 				xAccessor={xAccessor}
-				xScale={scaleTime()}
+				xScale={xScale /*scaleTime()*/}
 				xExtents={xExtents}
 				margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
+				displayXAccessor={displayXAccessor}
 				pointsPerPxThreshold={.6}>
 
 
@@ -128,6 +151,8 @@ class TradingChart extends React.Component<TradingChartProps> {
 					<OHLC
 						origin={[-30,0]}
 						textFill="#ffffff" />
+					{ this.renderIndicatorTooltips( indicators || [] )}
+					{ this.renderIndicatorLineSeries( indicators || [] ) }
 				</Chart>
 				<Chart id={2}
 					origin={(w: number, h: number) => [0, h - 100]}
@@ -149,6 +174,45 @@ class TradingChart extends React.Component<TradingChartProps> {
 			</ChartCanvas>
 		);
 	}
+
+	renderIndicatorTooltips( indicators: RunnableIndicator[] ) {
+		if( !indicators.length ) return;
+
+		let maOptions: any[] = [];
+		indicators.forEach( (indicator: RunnableIndicator) => {
+			if( indicator.tooltip === 'ma' ){
+				maOptions.push({
+					// @ts-ignore
+					yAccessor: indicator.func.accessor(),
+					type: indicator.type.toLocaleUpperCase(),
+					windowSize: parseInt(indicator.args[0]),
+					stroke: indicator.color
+				});
+			}
+		});
+
+		if( maOptions.length ){
+			return (
+				<MovingAverageTooltip
+					origin={[-48, 10]}
+					options={ maOptions } />
+			)
+		}
+	}
+
+	renderIndicatorLineSeries(indicators: RunnableIndicator[]) {
+		if( !indicators.length ) return;
+
+		return indicators.map( (indicator:any, i: number) => (
+			<LineSeries key={indicator.key}
+				yAccessor={indicator.func.accessor()}
+				stroke={indicator.color} />
+		));
+	}
+
+	getIndicators() {
+		return getIndicatorsMemo( this.props.indicators );
+	}
 }
 
 const TradingChartWidth = fitWidth(TradingChart);
@@ -165,3 +229,51 @@ const candleStyles = {
 	fill: strokeColor,
 	opacity: 1
 }
+
+interface RunnableIndicator {
+	key: string,
+	type: string,
+	args: any[],
+	tooltip: string,
+	color: string,
+	func: Function
+}
+
+const colors = ['#ff0000', '#ffff00', '#00ff0', '#00ffff', '#0000ff', '#ff00ff'];
+const indicatorFunctions: {[name:string]: Function} = { sma, ema, wma, tma };
+const getIndicatorsMemo = memoizeOne( (sources: string[] | undefined ) => {
+
+	let indicators: RunnableIndicator[] = [];
+	if( !sources ) return indicators;
+
+	let i = 0;
+
+	sources.forEach( (source:string) => {
+		let [name, ...args] = source.split('|');
+		if( ['sma', 'ema', 'wma', 'tma'].includes(name) ){
+			indicators.push({
+				key: source,
+				type: name,
+				args: args,
+				tooltip: 'ma',
+				color: colors[i++],
+				func: indicatorFunctions[name]()
+					.options({ windowSize: parseInt(args[0])})
+					.merge( (data:any, value: number) => {data[source] = value})
+					.accessor((data:any) => data[source])
+			});
+		}
+		else {
+			console.warn(`Unknown indicator ${name}`)
+		}
+	});
+
+	return indicators;
+});
+
+
+const getDataMemo = memoizeOne( ( data: ChartCandle[], indicators: RunnableIndicator[] ) => {
+	let calculated = data;
+	indicators.forEach( (i: RunnableIndicator) => calculated = i.func(calculated) );
+	return calculated;
+});

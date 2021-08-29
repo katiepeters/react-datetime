@@ -10,6 +10,8 @@ interface AutoChartProps {
 	exchange: string,
 	interval: string,
 	orders: Order[],
+	indicators?: string[],
+	patterns?: string[],
 	startDate?: number,
 	endDate?: number
 }
@@ -36,7 +38,9 @@ export default class AutoChart extends React.Component<AutoChartProps> {
 		return (
 			<TradingChart
 				orders={this.props.orders}
-				candles={ getChartCandles(candles) } />
+				candles={ getChartCandles(candles) }
+				indicators={ this.props.indicators || [] }
+				patterns={ this.props.patterns || [] } />
 		)
 	}
 

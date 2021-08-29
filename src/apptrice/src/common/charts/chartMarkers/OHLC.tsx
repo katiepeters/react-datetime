@@ -15,6 +15,7 @@ export default function OHLC(props: any) {
 		<OHLCTooltip
 			{ ...props }
 			displayTexts={ displayTexts }
+			origin={[-50,0]}
 			labelFill="#f390dd"
 			textFill="#b2b1d8">
 			{ defaultDisplay }
