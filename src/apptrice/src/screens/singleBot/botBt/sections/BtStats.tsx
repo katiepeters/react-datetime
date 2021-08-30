@@ -1,6 +1,5 @@
 import memoizeOne from 'memoize-one';
 import * as React from 'react'
-import { getDeploymentAssets } from '../../../../../../lambdas/_common/utils/deploymentUtils';
 import { getStats } from '../../../../common/deplotymentStats/statsCalculator';
 import StatTable from '../../../../common/deplotymentStats/StatTable';
 import { Card } from '../../../../components';

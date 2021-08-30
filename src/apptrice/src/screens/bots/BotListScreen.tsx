@@ -9,7 +9,7 @@ import apiCacher from '../../state/apiCacher';
 import { botListLoader } from '../../state/loaders/botListLoader';
 import { ScreenProps } from '../../types'
 import BotEditForm, {BotEditPayload} from './BotEditForm';
-import styles from './_BotListScreen.module.css';
+// import styles from './_BotListScreen.module.css';
 
 interface BotListScreenState {
 	loadingItems: {[id:string]: boolean},

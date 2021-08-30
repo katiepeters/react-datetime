@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { FormCaption, FormErrors } from '../../types';
+import * as React from 'react';
+import { FormCaption } from '../../types';
 import mergeStyles from '../../utils/mergeStyles';
 import styles from './_InputGroup.module.css';
 
@@ -9,7 +9,7 @@ interface InputGroupProps  {
 	caption?: FormCaption
 }
 
-export default class InputGroup extends Component<InputGroupProps> {
+export default class InputGroup extends React.Component<InputGroupProps> {
 	render() {
 		const { caption } = this.props;
 

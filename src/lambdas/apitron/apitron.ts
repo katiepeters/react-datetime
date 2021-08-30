@@ -64,7 +64,7 @@ app.post('/runnow', function(req, res) {
 	if (!deploymentId) return returnMissingAttr(res, 'deploymentId');
 
 	console.log('getting deployment');
-	BotDeploymentModel.getSingle(accountId, deploymentId)
+	BotDeploymentModel.getSingleModel(accountId, deploymentId)
 		.then( deployment => {
 			if (!deployment ){
 				return res.status(404)
@@ -161,7 +161,13 @@ async function setTestData(event) {
 			pairs: ['BTC/USD', 'ETH/USD'],
 			state: {newState: 'stateNew'},
 			active: true,
-			portfolioWithPrices: {USD: {asset: 'USD', free: 1000, total: 1000, price: 1}}
+			portfolioHistory: [
+				{
+					date: Date.now(),
+					balances: {USD: {asset: 'USD', free: 1000, total: 1000, price: 1}}
+				}
+			]
+				
 		});
 
 		await BotModel.create({

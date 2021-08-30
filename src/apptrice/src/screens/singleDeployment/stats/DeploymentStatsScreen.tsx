@@ -4,7 +4,6 @@ import { Card, ScreenWrapper } from '../../../components';
 import { exchangeLoader } from '../../../state/loaders/exchange.loader';
 import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
 import PortfolioHistoryWidget from './widgets/PortfolioHistoryWidget';
-import PortfolioWidget from './widgets/PortfolioWidget';
 import ReturnsWidget from './widgets/ReturnsWidget';
 
 export default class DeploymentStatsScreen extends React.Component<SingleDeploymentScreenProps> {
@@ -19,13 +18,12 @@ export default class DeploymentStatsScreen extends React.Component<SingleDeploym
 
 	renderContent() {
 		const { deployment } = this.props;
-		const {accountId, exchangeAccountId, pairs} = deployment;
+		const {accountId, exchangeAccountId} = deployment;
 		let { data: exchange } = exchangeLoader({accountId, exchangeId: exchangeAccountId});
 		if (!exchange) {
 			return <Card>Loading...</Card>;
 		}
 
-		const {baseAssets, quotedAsset} = this.getAssets( pairs );
 		return (
 			<div>
 				<PortfolioHistoryWidget

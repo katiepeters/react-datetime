@@ -2,7 +2,6 @@ import * as React from 'react'
 import Button from '../../../../components/button/Button';
 import { BacktestConfig } from '../../../../common/btSettings/BotTools';
 import styles from './_BotEditorBar.module.css';
-import BotEditorConsolePanel from './console/BotEditorConsolePanel';
 import BotEditorConsoleTab from './console/BotEditorConsoleTab';
 import ProblemsPanel from './problems/ProblemsPanel';
 import ProblemsTab, { CodeProblem } from './problems/ProblemsTab';
@@ -22,11 +21,6 @@ interface BotEditorBarProps {
 	onRun: (config: BacktestConfig) => void,
 	onAbort: () => void
 	onHighlightLine: (line:number) => void
-}
-
-const panelComponents: { [any: string]: any } = {
-	problems: ProblemsPanel,
-	console: BotEditorConsolePanel
 }
 
 export default class BotEditorBar extends React.Component<BotEditorBarProps> {
@@ -58,8 +52,6 @@ export default class BotEditorBar extends React.Component<BotEditorBarProps> {
 	}
 
 	renderTabs(){
-		const {version, codeProblems} = this.props;
-		
 		return (
 			<div className={styles.tabs}>
 				<VersionTab

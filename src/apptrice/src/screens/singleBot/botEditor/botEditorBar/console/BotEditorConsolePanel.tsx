@@ -1,6 +1,5 @@
 import * as React from 'react'
-import mergeStyles from '../../../../../utils/mergeStyles';
-import styles from './_BotEditorConsolePanel.module.css';
+// import styles from './_BotEditorConsolePanel.module.css';
 import ConsolePanel from '../../../../../common/consolePanel/ConsolePanel';
 import { getActiveBt } from '../../../../../state/selectors/bt.selectors';
 

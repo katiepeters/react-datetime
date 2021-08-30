@@ -116,14 +116,17 @@ interface Portfolio {
 }
 
 type OrderDirection = 'buy' | 'sell'
-interface MarketOrderInput {
+interface OrderInput {
     pair: string,
-    type: 'market',
     direction: OrderDirection
     amount: number
 }
+interface MarketOrderInput extends OrderInput {
+    type: 'market'
+}
 
-interface LimitOrderInput extends MarketOrderInput {
+interface LimitOrderInput extends OrderInput {
+    type: 'limit'
     price: number
 }
 

@@ -17,7 +17,7 @@ function initializeState(config, state) {
 	state.orderLevels
 }
 
-function onData({ config, state, trader, candles, utils }: BotInput) {
+function onData({ config, state, trader, candleData, utils }: BotInput) {
 	const volatilities = getVolatilities();
 	state.activePairs = selectPairs(volatilities);
 
@@ -87,9 +87,8 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 	}
 
 	function getCurrentPrice(pair) {
-		return utils.candles.getClose(
-			utils.candles.getLast(candles[pair])
-		);
+		let [candle] = candleData[pair].slice(-1);
+		return utils.getCandle(candle).close;
 	}
 
 
@@ -128,14 +127,13 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 	}
 
 	function getVolatilities() {
-		const { getAmplitude } = utils.candles;
 
 		const runInterval = 5;
 		let volatilities = [];
 
-		for (let pair in candles) {
-			let sum = candles[pair].slice(-runInterval).reduce((acc, candle) => (
-				acc + getAmplitude(candle)
+		for (let pair in candleData) {
+			let sum = candleData[pair].slice(-runInterval).reduce((acc, candle) => (
+				acc + utils.getCandle(candle).getAmplitude()
 			), 0);
 
 			volatilities.push({
@@ -165,7 +163,6 @@ function onData({ config, state, trader, candles, utils }: BotInput) {
 			trader.placeOrder({
 				type: 'market',
 				direction: 'sell',
-				price: currentPrice,
 				pair,
 				amount: getSellAmount(currentPrice)
 			});

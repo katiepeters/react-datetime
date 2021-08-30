@@ -16,7 +16,7 @@ const { ema, wma, sma, tma } = require("react-stockcharts/lib/indicator");
 
 const { discontinuousTimeScaleProvider } = require("react-stockcharts/lib/scale");
 
-const { scaleTime } = require('d3-scale');
+// const { scaleTime } = require('d3-scale');
 const { utcHour } = require('d3-time');
 const { format } = require('d3-format');
 const { timeFormat } = require('d3-time-format');
@@ -195,7 +195,9 @@ class TradingChart extends React.Component<TradingChartProps> {
 			return (
 				<MovingAverageTooltip
 					origin={[-48, 10]}
-					options={ maOptions } />
+					options={ maOptions }
+					labelFill="#f390dd"
+					textFill="#b2b1d8" />
 			)
 		}
 	}

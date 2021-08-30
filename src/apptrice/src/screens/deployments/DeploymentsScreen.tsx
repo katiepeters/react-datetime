@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styles from './_DeploymentsScreen.module.css';
+// import styles from './_DeploymentsScreen.module.css';
 import { ScreenProps } from '../../types';
 import { Button, ButtonList, DropDownButton, ScreenWrapper, Spinner, Table, Card, Modal, ModalBox } from '../../components';
 import { TableColumn } from '../../components/table/Table';

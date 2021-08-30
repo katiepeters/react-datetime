@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { Orders } from '../../../../../lambdas/lambda.types';
-import { FullBotDeployment, ModelBotDeployment } from '../../../../../lambdas/model.types';
+import { FullBotDeployment } from '../../../../../lambdas/model.types';
 import DeploymentCharts from '../../../common/charts/DeploymentCharts';
-import { Card, ScreenWrapper } from '../../../components';
+import { ScreenWrapper } from '../../../components';
 import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
-import styles from './_DeploymentChartsScreen.module.css';
+// import styles from './_DeploymentChartsScreen.module.css';
 
 export default class DeploymentChartsScreen extends React.Component<SingleDeploymentScreenProps> {
 	state = {

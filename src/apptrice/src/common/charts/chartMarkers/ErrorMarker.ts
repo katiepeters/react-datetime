@@ -35,7 +35,7 @@ ErrorMarker.drawOnCanvasWithNoStateChange = (props: any, point: any, ctx: any) =
 
 export default ErrorMarker;
 
-
+/*
 function getTrianglePoints(width: number) {
 	const innerHypotenuse = (width / 2) * (1 / Math.cos(30 * Math.PI / 180));
 	const innerOpposite = (width / 2) * (1 / Math.tan(60 * Math.PI / 180));
@@ -44,3 +44,4 @@ function getTrianglePoints(width: number) {
 		innerHypotenuse
 	};
 }
+*/

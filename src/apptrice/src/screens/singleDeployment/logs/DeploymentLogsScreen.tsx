@@ -2,7 +2,7 @@ import * as React from 'react'
 import ConsolePanel from '../../../common/consolePanel/ConsolePanel';
 import { Card, ScreenWrapper } from '../../../components';
 import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
-import styles from './_DeploymentLogsScreen.module.css';
+// import styles from './_DeploymentLogsScreen.module.css';
 
 export default class DeploymentLogsScreen extends React.Component<SingleDeploymentScreenProps> {
 	render() {

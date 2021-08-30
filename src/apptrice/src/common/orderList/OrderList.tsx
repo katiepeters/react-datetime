@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Orders } from '../../../../lambdas/lambda.types';
 import { DynamicList } from '../../components';
 import OrderItem from './OrderItem';
-import styles from './_OrderList.module.css';
+// import styles from './_OrderList.module.css';
 
 interface OrderListProps {
 	orders: Orders

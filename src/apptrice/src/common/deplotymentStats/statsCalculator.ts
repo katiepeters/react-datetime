@@ -1,6 +1,5 @@
 import memoizeOne from "memoize-one";
 import {DeploymentOrders, PortfolioHistoryItem, RunnableDeployment } from "../../../../lambdas/model.types";
-import BtOrders from "../../screens/singleBot/botBt/sections/BtOrders";
 
 export interface DeploymentStats {
 	initialValue: number,

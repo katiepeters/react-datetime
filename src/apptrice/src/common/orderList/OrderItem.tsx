@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Order } from '../../../../lambdas/model.types';
-import { ExchangeOrder } from '../../../../lambdas/_common/exchanges/ExchangeAdapter';
 import styles from './_OrderItem.module.css';
 
 interface OrderItemProps {

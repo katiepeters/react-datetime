@@ -8,7 +8,7 @@ import { CreateExchangeAccountInput } from '../../state/apiClient';
 import { exchangeListLoader } from '../../state/loaders/exchangeListLoader';
 import { ScreenProps } from '../../types';
 import CreateExchangeForm, {CreateExchangePayload} from './CreateExchangeForm';
-import styles from './_ExchangesScreen.module.css';
+// import styles from './_ExchangesScreen.module.css';
 
 interface ExchangeScreenState {
 	createModalOpen: boolean,
@@ -21,7 +21,7 @@ export default class ExchangesScreen extends React.Component<ScreenProps> {
 	}
 
 	render() {
-		let { data, isLoading, error } = exchangeListLoader(this.props.authenticatedId);
+		let { data } = exchangeListLoader(this.props.authenticatedId);
 		return (
 			<ScreenWrapper title="API accounts" titleExtra={ this.renderCreateButton() }>
 				{ data ? this.renderList(data) : 'Loading...' }

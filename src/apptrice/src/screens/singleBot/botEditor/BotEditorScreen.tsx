@@ -3,7 +3,7 @@ import Editor from '@monaco-editor/react';
 import { ScreenProps } from '../../../types';
 import BotSaver from '../BotSaver';
 import apiCacher from '../../../state/apiCacher';
-import styles from './_BotEditorScreen.module.css';
+// import styles from './_BotEditorScreen.module.css';
 import BotEditorBar from './botEditorBar/BotEditorBar';
 import { BacktestConfig } from '../../../common/btSettings/BotTools';
 import BtRunner from '../../../utils/backtest/BtRunner';

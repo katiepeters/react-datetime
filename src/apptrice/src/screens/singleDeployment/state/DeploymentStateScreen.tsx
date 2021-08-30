@@ -2,7 +2,7 @@ import * as React from 'react'
 import { DBBotDeploymentState } from '../../../../../lambdas/model.types';
 import { Card, ScreenWrapper } from '../../../components';
 import { SingleDeploymentScreenProps } from '../SingleDeploymentScreenProps';
-import styles from './_DeploymentStateScreen.module.css';
+// import styles from './_DeploymentStateScreen.module.css';
 
 export default class DeploymentStateScreen extends React.Component<SingleDeploymentScreenProps> {
 	render() {

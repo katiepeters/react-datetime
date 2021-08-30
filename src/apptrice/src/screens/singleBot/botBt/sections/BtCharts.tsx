@@ -7,7 +7,7 @@ import DeploymentCharts from '../../../../common/charts/DeploymentCharts';
 import OrderList from '../../../../common/orderList/OrderList';
 import { ScreenProps } from '../../../../types'
 import { BtActive } from '../../../../utils/backtest/Bt.types';
-import styles from './_BtCharts.module.css';
+// import styles from './_BtCharts.module.css';
 
 interface BtChartsProps extends ScreenProps {
 	bt: BtActive
