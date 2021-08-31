@@ -35,11 +35,11 @@ export class BotRunPlotter {
 	}
 
 	plotPoint(collectionName: string, value: number, pair?: string, chart?: string) {
-		return plot(this.points, collectionName, value, pair || 'all', chart || 'main');
+		return plot(this.timestamp, this.points, collectionName, value, pair || 'all', chart || 'main');
 	}
 
 	plotSeries(seriesName: string, value: number, pair?: string, chart?: string) {
-		return plot(this.series, seriesName, value, pair || 'all', chart || 'secondary');
+		return plot(this.timestamp, this.series, seriesName, value, pair || 'all', chart || 'secondary');
 	}
 
 	getChartPoints( pair: string ){
@@ -51,7 +51,7 @@ export class BotRunPlotter {
 	}
 }
 
-function plot( collection: PairPlottingSeries, name: string, value: number, pair: string, chart: string) {
+function plot( x: number, collection: PairPlottingSeries, name: string, y: number, pair: string, chart: string) {
 	let pairSeries = collection[pair];
 	if( !pairSeries ){
 		pairSeries = collection[pair] = {};
@@ -67,7 +67,7 @@ function plot( collection: PairPlottingSeries, name: string, value: number, pair
 		points = chartSeries[name] = [];
 	}
 	
-	points.push({x: this.timestamp, y: value});
+	points.push({x, y});
 }
 
 function getPairPoints( collection: PairPlottingSeries, pair: string ){

@@ -27,10 +27,10 @@ function isBullish(): boolean {
 export interface BotRunUtils {
 	/** Converts candle data in an array into a structured object to make candle property access simpler. */
 	getCandle( candleData: ArrayCandle ): Candle
-	/** Get the quoted asset from a market pair */
-	getQuotedAsset( pair: string ): string
-	/** Get the base asset from a market pair */
-	getBaseAsset( pair: string): string
+	/** Converts an array of arrayCandles into an array of structured objects to make candle property access simpler. */
+	getCandles( candleData: ArrayCandle[] ): Candle[]
+	/** Returns quoted and base assets of a pair */
+	getPairAssets( pair: string ): {quoted: string, base: string}
 	/** Returns true when the target series cross over the base series. */
 	isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]
 	/** Returns true when the target series cross under the base series. */
@@ -38,26 +38,15 @@ export interface BotRunUtils {
 }
 
 export const botRunUtils: BotRunUtils = {
-	getCandle( candleData: ArrayCandle ): Candle {
-		return {
-			date: candleData[0],
-			open: candleData[1],
-			close: candleData[2],
-			high: candleData[3],
-			low: candleData[4],
-			volume: candleData[5],
-			getMiddle,
-			getAmplitude,
-			isBullish
-		}
+	getCandle: toCandle,
+
+	getCandles( candleData ){
+		return candleData.map( toCandle )
 	},
 
-	getQuotedAsset( pair: string ) {
-		return pair.split('/')[1];
-	},
-
-	getBaseAsset( pair: string ) {
-		return pair.split('/')[0];
+	getPairAssets( pair: string ) {
+		const [base, quoted] = pair.split('/');
+		return {base, quoted};
 	},
 
 	isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[] {
@@ -87,4 +76,19 @@ function isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]{
 	}
 
 	return results;
+}
+
+
+function toCandle( candleData: ArrayCandle ): Candle {
+	return {
+		date: candleData[0],
+		open: candleData[1],
+		close: candleData[2],
+		high: candleData[3],
+		low: candleData[4],
+		volume: candleData[5],
+		getMiddle,
+		getAmplitude,
+		isBullish
+	}
 }

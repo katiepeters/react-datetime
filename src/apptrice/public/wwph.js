@@ -264,24 +264,13 @@ function isBullish() {
     return this.open < this.close;
 }
 exports.botRunUtils = {
-    getCandle: function (candleData) {
-        return {
-            date: candleData[0],
-            open: candleData[1],
-            close: candleData[2],
-            high: candleData[3],
-            low: candleData[4],
-            volume: candleData[5],
-            getMiddle: getMiddle,
-            getAmplitude: getAmplitude,
-            isBullish: isBullish
-        };
+    getCandle: toCandle,
+    getCandles: function (candleData) {
+        return candleData.map(toCandle);
     },
-    getQuotedAsset: function (pair) {
-        return pair.split('/')[1];
-    },
-    getBaseAsset: function (pair) {
-        return pair.split('/')[0];
+    getPairAssets: function (pair) {
+        var _a = pair.split('/'), base = _a[0], quoted = _a[1];
+        return { base: base, quoted: quoted };
     },
     isCrossOver: function (targetSeries, baseSeries) {
         return isCrossOver(targetSeries, baseSeries);
@@ -304,6 +293,19 @@ function isCrossOver(targetSeries, baseSeries) {
         results[diff + i] = target[i - 1] < base[i - 1] && target[i] > base[i];
     }
     return results;
+}
+function toCandle(candleData) {
+    return {
+        date: candleData[0],
+        open: candleData[1],
+        close: candleData[2],
+        high: candleData[3],
+        low: candleData[4],
+        volume: candleData[5],
+        getMiddle: getMiddle,
+        getAmplitude: getAmplitude,
+        isBullish: isBullish
+    };
 }
 
 

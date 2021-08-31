@@ -40,7 +40,9 @@ interface TradingChartProps {
 	indicators?: string[],
 	patterns?: string[],
 	candles: ChartCandle[],
-	includePreviousCandles: boolean
+	includePreviousCandles: boolean,
+	onLoadMore?: (start: number, end: number ) => void,
+	highlightedInterval?: [number, number]
 }
 
 let chartIndex = 0;
@@ -75,7 +77,7 @@ class TradingChart extends React.Component<TradingChartProps> {
 		// These are the initial limits for the x zoom
 		const xExtents = [
 			xAccessor(last(candles)),
-			xAccessor(candles[0])
+			xAccessor(candles[Math.max(0,candles.length - 150)])
 		];
 
 		return (
@@ -90,7 +92,8 @@ class TradingChart extends React.Component<TradingChartProps> {
 				xExtents={xExtents}
 				margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
 				displayXAccessor={displayXAccessor}
-				pointsPerPxThreshold={.6}>
+				pointsPerPxThreshold={.6}
+				onLoadMore={ this.props.onLoadMore }>
 
 
 				<Chart id={1} yExtents={(d: any) => [d.high, d.low]}>
@@ -120,7 +123,8 @@ class TradingChart extends React.Component<TradingChartProps> {
 						tickStrokeWidth={1} />
 					<CandlestickSeries
 						width={timeIntervalBarWidth(utcHour)}
-						{...candleStyles} />
+						yAccessor={ (d: ChartCandle) => ({ open: d.open, high: d.high, low: d.low, close: d.close, date: d.date })}
+						{...this.getCandleStyles() } />
 					<OrderSeries orders={orders} candles={candles} />
 					<EdgeIndicator
 						itemType="last"
@@ -214,6 +218,30 @@ class TradingChart extends React.Component<TradingChartProps> {
 
 	getIndicators() {
 		return getIndicatorsMemo( this.props.indicators );
+	}
+
+	getCandleStyles() {
+		const {highlightedInterval: hi} = this.props;
+		let strokeColor: any = (d: ChartCandle) => {
+			return d.close < d.open ? '#d05773' : '#29946d';
+		}
+
+		if( hi ){
+			strokeColor = function (d: ChartCandle) {
+				let isHighlighted = d.date.getTime() > hi[0] && d.date.getTime() < hi[1];
+				if( isHighlighted ){
+					return d.close < d.open ? '#d05773' : '#29946d';
+				}
+				return d.close < d.open ? '#d0577377' : '#29946d77';
+			}
+		}
+
+		return {
+			wickStroke: strokeColor,
+			stroke: strokeColor,
+			fill: strokeColor,
+			opacity: 1
+		}
 	}
 }
 

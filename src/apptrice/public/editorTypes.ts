@@ -63,13 +63,13 @@ interface Candle {
 interface BotRunUtils {
 	/** Converts candle data in an array into a structured object to make candle property access simpler. */
 	getCandle( candleData: ArrayCandle ): Candle
-	/** Get the quoted asset from a market pair */
-	getQuotedAsset( pair: string ): string
-	/** Get the base asset from a market pair */
-	getBaseAsset( pair: string): string
-	/** Returns `true` when the target series cross over the base series. */
+	/** Converts an array of arrayCandles into an array of structured objects to make candle property access simpler. */
+	getCandles( rawCandles: ArrayCandle[] ): Candle[]
+	/** Returns quoted and base assets of a pair */
+	getPairAssets( pair: string ): {quoted: string, base: string}
+	/** Returns true when the target series cross over the base series. */
 	isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]
-	/** Returns `true` when the target series cross under the base series. */
+	/** Returns true when the target series cross under the base series. */
 	isCrossUnder( targetSeries: number[], baseSeries: number[] ): boolean[]
 }
 

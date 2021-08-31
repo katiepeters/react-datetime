@@ -101,7 +101,7 @@ const apiCacher = {
 									accountId: bot.accountId,
 									botId: bot.id,
 									number: '0.0',
-									code: '',
+									code: input.code,
 									createdAt: Date.now(),
 									updatedAt: Date.now(),
 									isLocked: false,

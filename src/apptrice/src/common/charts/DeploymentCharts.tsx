@@ -19,7 +19,7 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 	}
 
 	render() {
-		const { runInterval, orders, plotterData } = this.props.deployment;
+		const { runInterval, orders, plotterData, activeIntervals, lastRunAt } = this.props.deployment;
 		const exchange = this.props.exchangeProvider;
 
 		return (
@@ -32,6 +32,8 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 						pair={this.state.activePair}
 						exchange={exchange}
 						interval={runInterval}
+						startDate={ activeIntervals[0][0]}
+						endDate={ lastRunAt || Date.now() }
 						orders={this.getActivePairOrders(orders)}
 						indicators={ plotterData.indicators }
 						patterns={plotterData.candlestickPatterns}

@@ -182,6 +182,7 @@ export interface RunnableDeployment {
 	portfolioHistory: PortfolioHistoryItem[]
 	activeIntervals: ActiveInterval[]
 	plotterData: PlotterData
+	lastRunAt?: number
 }
 
 export interface OrderInput {

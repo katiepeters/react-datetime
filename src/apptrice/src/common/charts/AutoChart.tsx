@@ -5,6 +5,8 @@ import TradingChart, {ChartCandle} from './TradingChart';
 import memoizeOne from 'memoize-one';
 import { candleLoader } from '../../state/loaders/candle.loader';
 
+
+
 interface AutoChartProps {
 	pair: string,
 	exchange: string,
@@ -12,65 +14,107 @@ interface AutoChartProps {
 	orders: Order[],
 	indicators?: string[],
 	patterns?: string[],
-	startDate?: number,
-	endDate?: number
+	startDate: number,
+	endDate: number
 }
 
+interface AutoChartState {
+	loadingDate?: number
+	alreadyLoadedDate?: number
+	chartStartDate: number
+	candles?: ArrayCandle[]
+	hasMore: boolean
+}
+
+// Loads candles automatically while moving the chart
 export default class AutoChart extends React.Component<AutoChartProps> {
+	state: AutoChartState = {
+		loadingDate: undefined,
+		alreadyLoadedDate: undefined,
+		chartStartDate: this.getDateToLoad( this.props.interval, this.props.startDate ),
+		candles: undefined,
+		hasMore: false
+	}
+		
 	render() {
-		let {pair, exchange, interval, orders, startDate, endDate} = this.props;
-		if (!startDate || !endDate) {
-			let orderDates = this.getOrderDates(orders, interval);
-			startDate = orderDates.startDate;
-			endDate = orderDates.endDate;
-		}
-
-		let {data: candles} = candleLoader({exchange, pair, runInterval: interval, startDate, endDate});
-
 		return (
 			<div>
-				{ candles ? this.renderChart( candles ) : 'Loading...' }
+				{ this.state.candles ? this.renderChart( this.state.candles || [] ) : 'Loading...' }
 			</div>
 		);
 	}
 
 	renderChart( candles: ArrayCandle[] ) {
+		const {startDate, endDate} = this.props;
 		return (
 			<TradingChart
 				orders={this.props.orders}
 				candles={ getChartCandles(candles) }
 				indicators={ this.props.indicators || [] }
-				patterns={ this.props.patterns || [] } />
+				patterns={ this.props.patterns || [] }
+				onLoadMore={ this._onLoadMore }
+				highlightedInterval={[startDate, endDate]} />
 		)
 	}
 
-	now = 0;
-	getOrderDates( orders: Order[], interval: string ){
-		let {startDate, endDate} = this.getDefaultIntervalDates(interval);
-
-		let halfInterval = (endDate - startDate) / 2;
-		let startOrder = orders[0];
-		let lastOrder = orders[orders.length-1];
-
-		if (startOrder && lastOrder) {
-			return {
-				startDate: startOrder.createdAt - halfInterval,
-				endDate: Math.min(this.now, (lastOrder.closedAt || lastOrder.createdAt) + halfInterval)
-			}
-		}
-		return {startDate, endDate};
+	componentDidUpdate(){
+		this.checkCandlesLoad();
 	}
 
-	getDefaultIntervalDates( interval: string ){
-		if( !this.now ){
-			this.now = Date.now();
+	componentDidMount(){
+		this.checkCandlesLoad();
+	}
+
+	getDateToLoad( interval: string, endDate: number ){
+		// Let's say interval is always 1h for the time being
+		let time = (60 * 60 * 1000) * 200; // 200 candles
+		return endDate - time;
+	}
+
+	checkCandlesLoad() {
+		const {loadingDate, chartStartDate, alreadyLoadedDate, candles } = this.state;
+		if( loadingDate ) return;
+
+		if( alreadyLoadedDate === undefined ){
+			const {interval, endDate} = this.props;
+			const dateToLoad = this.getDateToLoad(interval, endDate);
+			return this.loadCandles(dateToLoad, endDate);
 		}
 
-		const endDate = this.now;
+		let loadedDate = alreadyLoadedDate || Date.now();
+		if( candles && chartStartDate < candles[50][0] ){
+			const {interval} = this.props;
+			const dateToLoad = this.getDateToLoad(interval, loadedDate);
+			return this.loadCandles(dateToLoad, loadedDate);
+		}
+	}
 
-		// Right now interval is just 1h, adapt this based on the interval in the future.
-		const startDate = endDate - (2 * 24 * 60 * 60 * 1000); // two days for one hour interval.
-		return {startDate, endDate};
+	loadCandles( dateToLoad: number, endDate: number ){
+		const {exchange, pair, interval} = this.props;
+		let {data: candles, promise} = candleLoader({
+			exchange, pair, runInterval: interval, startDate: dateToLoad, endDate
+		});
+
+		if( candles ){
+			this.setState({
+				candles: [...candles, ...(this.state.candles || [])],
+				alreadyLoadedDate: dateToLoad
+			})
+		}
+		else {
+			this.setState({loadingDate: dateToLoad});
+			promise.then( response => {
+				this.setState({
+					loadingDate: false,
+					candles: [...response.data, ...(this.state.candles || [])],
+					alreadyLoadedDate: dateToLoad
+				})
+			});
+		}
+	}
+
+	_onLoadMore = (start:number, end: number) => {
+		this.setState({chartStartDate: start});
 	}
 }
 

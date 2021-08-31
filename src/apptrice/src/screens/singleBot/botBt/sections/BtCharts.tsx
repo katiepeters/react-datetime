@@ -20,6 +20,7 @@ export default class BtCharts extends React.Component<BtChartsProps> {
 
 	render() {
 		let { exchange, deployment } = this.props.bt.data;
+		
 		return (
 			<div>
 				<DeploymentCharts
