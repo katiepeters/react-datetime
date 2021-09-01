@@ -4,10 +4,13 @@ import styles from './_CanvasChart.module.css';
 interface CanvasChartProps {
 	width: number,
 	height: number,
-	ratio: number
+	ratio: number,
+	xInitialLimits: [number, number]
 }
 
 export default class CanvasChart extends React.Component<CanvasChartProps> {
+	container = React.createRef<HTMLDivElement>()
+
 	canvases = {
 		bg: React.createRef<HTMLCanvasElement>(),
 		axes: React.createRef<HTMLCanvasElement>(),
@@ -23,7 +26,7 @@ export default class CanvasChart extends React.Component<CanvasChartProps> {
 
 	render() {
 		return (
-			<div className={styles.container}>
+			<div className={styles.container} ref={this.container}>
 				{ this.renderCanvases() }
 				{ this.renderSVGOverlay() }
 			</div>

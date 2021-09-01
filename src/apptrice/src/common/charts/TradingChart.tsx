@@ -3,6 +3,7 @@ import { Orders } from '../../../../lambdas/lambda.types';
 import OrderSeries from './chartMarkers/OrderSeries';
 import OHLC from './chartMarkers/OHLC';
 import memoizeOne from 'memoize-one';
+import { PlotterData } from '../../../../lambdas/model.types';
 
 const { ChartCanvas, Chart } = require('react-stockcharts');
 const { last, timeIntervalBarWidth } = require("react-stockcharts/lib/utils");
@@ -16,7 +17,7 @@ const { ema, wma, sma, tma } = require("react-stockcharts/lib/indicator");
 
 const { discontinuousTimeScaleProvider } = require("react-stockcharts/lib/scale");
 
-// const { scaleTime } = require('d3-scale');
+const { scaleTime } = require('d3-scale');
 const { utcHour } = require('d3-time');
 const { format } = require('d3-format');
 const { timeFormat } = require('d3-time-format');
@@ -37,12 +38,12 @@ interface TradingChartProps {
 	ratio: number,
 	data: any,
 	orders: Orders,
-	indicators?: string[],
 	patterns?: string[],
 	candles: ChartCandle[],
 	includePreviousCandles: boolean,
 	onLoadMore?: (start: number, end: number ) => void,
-	highlightedInterval?: [number, number]
+	highlightedInterval?: [number, number],
+	plotterData?: PlotterData
 }
 
 let chartIndex = 0;
@@ -60,17 +61,7 @@ class TradingChart extends React.Component<TradingChartProps> {
 
 		const indicators = this.getIndicators();
 		const calculatedData = getDataMemo( candles, indicators );
-		const xScaleProvider = discontinuousTimeScaleProvider
-			.inputDateAccessor((d: ChartCandle) => d.date)
-		;
-
 		const height = 400;
-
-		const {
-			data,
-			xScale,
-			displayXAccessor,
-		} = xScaleProvider(calculatedData);
 
 		// This is the data for the x axis
 		const xAccessor = (d: any) => d.date;
@@ -86,12 +77,11 @@ class TradingChart extends React.Component<TradingChartProps> {
 				height={height}
 				ratio={ratio}
 				type="hybrid"
-				data={data}
+				data={candles}
 				xAccessor={xAccessor}
-				xScale={xScale /*scaleTime()*/}
+				xScale={scaleTime()}
 				xExtents={xExtents}
 				margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
-				displayXAccessor={displayXAccessor}
 				pointsPerPxThreshold={.6}
 				onLoadMore={ this.props.onLoadMore }>
 
@@ -100,63 +90,24 @@ class TradingChart extends React.Component<TradingChartProps> {
 					<XAxis axisAt="bottom"
 						orient="bottom"
 						ticks={6}
-						fill="#172e45"
-						strokeOpacity={1}
-						stroke="#172e45"
-						fontSize={10}
 						innerTickSize={-height + 40}
-						tickStroke="#cdccee"
-						tickStrokeOpacity={.15}
-						tickStrokeDasharray="Solid"
-						tickStrokeWidth={1} />
+						{...axisStyles} />
 					<YAxis axisAt="right"
 						orient="right"
 						ticks={5}
-						fill="#172e45"
-						strokeOpacity={1}
-						stroke="#172e45"
-						fontSize={10}
 						innerTickSize={-width + 100}
-						tickStroke="#cdccee"
-						tickStrokeOpacity={.15}
-						tickStrokeDasharray="Solid"
-						tickStrokeWidth={1} />
+						{...axisStyles} />
 					<CandlestickSeries
 						width={timeIntervalBarWidth(utcHour)}
 						yAccessor={ (d: ChartCandle) => ({ open: d.open, high: d.high, low: d.low, close: d.close, date: d.date })}
 						{...this.getCandleStyles() } />
 					<OrderSeries orders={orders} candles={candles} />
-					<EdgeIndicator
-						itemType="last"
-						orient="right"
-						edgeAt="right"
-						yAccessor={ (d:any) => d.close }
-						fill="#011627"
-						textFill="#cdccee"
-						lineStroke="#cdccee"
-						arrowWidth={0}
-						rectHeight={12}
-						fontSize={10} />
-					<MouseCoordinateX
-						at="bottom"
-						orient="bottom"
-						displayFormat={timeFormat("%y-%m-%d %H:%M")}
-						fontSize={10} 
-						rectHeight={14}
-						fill="#172e45"/>
-					<MouseCoordinateY
-						at="right"
-						orient="right"
-						displayFormat={format(".2f")}
-						arrowWidth={0}
-						rectHeight={14}
-						fontSize={10}
-						fill="#172e45" />
+					{ this.renderMouseCoordinates() }
 					<OHLC
 						origin={[-30,0]}
 						textFill="#ffffff" />
-					{ this.renderIndicatorTooltips( indicators || [] )}
-					{ this.renderIndicatorLineSeries( indicators || [] ) }
+					{ this.renderIndicatorTooltips( indicators || [] )}
+					{ this.renderIndicatorLineSeries( indicators || [] ) }
 				</Chart>
 				<Chart id={2}
 					origin={(w: number, h: number) => [0, h - 100]}
@@ -165,9 +116,7 @@ class TradingChart extends React.Component<TradingChartProps> {
 						orient="left"
 						ticks={3}
 						tickFormat={format(".2s")}
-						stroke="#172e45"
-						tickStroke="#cdccee"
-						fontSize={10} />
+						{...axisStyles} />
 					<BarSeries yAccessor={volumeAccessor}
 						fill={(d: any) => d.close > d.open ? "#6BA583" : "#f390dd"} />
 				</Chart>
@@ -177,6 +126,39 @@ class TradingChart extends React.Component<TradingChartProps> {
 					strokeWidth={1} />
 			</ChartCanvas>
 		);
+	}
+
+	renderMouseCoordinates() {
+		return (
+			<>
+				<EdgeIndicator
+					itemType="last"
+					orient="right"
+					edgeAt="right"
+					yAccessor={ (d:any) => d.close }
+					fill="#011627"
+					textFill="#cdccee"
+					lineStroke="#cdccee"
+					arrowWidth={0}
+					rectHeight={12}
+					fontSize={10} />
+				<MouseCoordinateX
+					at="bottom"
+					orient="bottom"
+					displayFormat={timeFormat("%y-%m-%d %H:%M")}
+					fontSize={10} 
+					rectHeight={14}
+					fill="#172e45"/>
+				<MouseCoordinateY
+					at="right"
+					orient="right"
+					displayFormat={format(".2f")}
+					arrowWidth={0}
+					rectHeight={14}
+					fontSize={10}
+					fill="#172e45" />
+			</>
+		)
 	}
 
 	renderIndicatorTooltips( indicators: RunnableIndicator[] ) {
@@ -217,7 +199,7 @@ class TradingChart extends React.Component<TradingChartProps> {
 	}
 
 	getIndicators() {
-		return getIndicatorsMemo( this.props.indicators );
+		return getIndicatorsMemo( this.props.plotterData?.indicators );
 	}
 
 	getCandleStyles() {
@@ -307,3 +289,14 @@ const getDataMemo = memoizeOne( ( data: ChartCandle[], indicators: RunnableIndic
 	indicators.forEach( (i: RunnableIndicator) => calculated = i.func(calculated) );
 	return calculated;
 });
+
+const axisStyles: any = {
+	fill: '#172e45',
+	strokeOpacity: 1,
+	stroke: '#172e45',
+	fontSize: 10,
+	tickStroke: '#cdccee',
+	tickStrokeOpacity: .15,
+	tickStrokeDasharray: 'Solid',
+	tickStrokeWidth: 1
+}

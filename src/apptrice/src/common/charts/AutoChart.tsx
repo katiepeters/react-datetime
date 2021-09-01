@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ArrayCandle } from '../../../../lambdas/lambda.types';
-import { Order } from '../../../../lambdas/model.types';
+import { Order, PlotterData } from '../../../../lambdas/model.types';
 import TradingChart, {ChartCandle} from './TradingChart';
 import memoizeOne from 'memoize-one';
 import { candleLoader } from '../../state/loaders/candle.loader';
@@ -12,7 +12,7 @@ interface AutoChartProps {
 	exchange: string,
 	interval: string,
 	orders: Order[],
-	indicators?: string[],
+	plotterData?: PlotterData,
 	patterns?: string[],
 	startDate: number,
 	endDate: number
@@ -50,7 +50,7 @@ export default class AutoChart extends React.Component<AutoChartProps> {
 			<TradingChart
 				orders={this.props.orders}
 				candles={ getChartCandles(candles) }
-				indicators={ this.props.indicators || [] }
+				plotterData={this.props.plotterData}
 				patterns={ this.props.patterns || [] }
 				onLoadMore={ this._onLoadMore }
 				highlightedInterval={[startDate, endDate]} />

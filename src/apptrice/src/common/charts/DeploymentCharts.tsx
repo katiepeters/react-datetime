@@ -35,8 +35,7 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 						startDate={ activeIntervals[0][0]}
 						endDate={ lastRunAt || Date.now() }
 						orders={this.getActivePairOrders(orders)}
-						indicators={ plotterData.indicators }
-						patterns={plotterData.candlestickPatterns}
+						plotterData={plotterData}
 					/>
 				</div>
 			</div>

@@ -200,10 +200,10 @@ var BotRunPlotter = /** @class */ (function () {
         this.timestamp = timestamp;
     }
     BotRunPlotter.prototype.plotPoint = function (collectionName, value, pair, chart) {
-        return plot(this.points, collectionName, value, pair || 'all', chart || 'main');
+        return plot(this.timestamp, this.points, collectionName, value, pair || 'all', chart || 'main');
     };
     BotRunPlotter.prototype.plotSeries = function (seriesName, value, pair, chart) {
-        return plot(this.series, seriesName, value, pair || 'all', chart || 'secondary');
+        return plot(this.timestamp, this.series, seriesName, value, pair || 'all', chart || 'secondary');
     };
     BotRunPlotter.prototype.getChartPoints = function (pair) {
         getPairPoints(this.points, pair);
@@ -214,20 +214,23 @@ var BotRunPlotter = /** @class */ (function () {
     return BotRunPlotter;
 }());
 exports.BotRunPlotter = BotRunPlotter;
-function plot(collection, name, value, pair, chart) {
+function plot(x, collection, name, y, pair, chart) {
     var pairSeries = collection[pair];
     if (!pairSeries) {
-        pairSeries = collection[pair] = {};
+        pairSeries = {};
+        collection[pair] = pairSeries;
     }
-    var chartSeries = pairSeries[chart] || {};
+    var chartSeries = pairSeries[chart];
     if (!chartSeries) {
-        chartSeries = pairSeries[chart] || {};
+        chartSeries = {};
+        pairSeries[chart] = chartSeries;
     }
-    var points = chartSeries[name] || [];
+    var points = chartSeries[name];
     if (!points) {
-        points = chartSeries[name] = [];
+        points = [];
+        chartSeries[name] = points;
     }
-    points.push({ x: this.timestamp, y: value });
+    points.push({ x: x, y: y });
 }
 function getPairPoints(collection, pair) {
     var allPairsPoints = collection.all || {};

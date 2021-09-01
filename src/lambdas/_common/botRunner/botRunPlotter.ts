@@ -54,19 +54,21 @@ export class BotRunPlotter {
 function plot( x: number, collection: PairPlottingSeries, name: string, y: number, pair: string, chart: string) {
 	let pairSeries = collection[pair];
 	if( !pairSeries ){
-		pairSeries = collection[pair] = {};
+		pairSeries = {};
+		collection[pair] = pairSeries;
 	}
 
-	let chartSeries = pairSeries[chart] || {};
+	let chartSeries = pairSeries[chart];
 	if( !chartSeries ){
-		chartSeries = pairSeries[chart] || {};
+		chartSeries = {};
+		pairSeries[chart] = chartSeries;
 	}
 
-	let points = chartSeries[name] || [];
+	let points = chartSeries[name];
 	if( !points ){
-		points = chartSeries[name] = [];
+		points = [];
+		chartSeries[name] = points;
 	}
-	
 	points.push({x, y});
 }
 
