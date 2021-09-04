@@ -12,6 +12,8 @@ export type ArrayCandle = [
 	number, number, number, number, number, number
 ]
 
+export type CandleAttribute = 'open' | 'close' | 'high' | 'low' | 'volume';
+
 export type BotCandles = {
 	[pair: string]: ArrayCandle[]
 }

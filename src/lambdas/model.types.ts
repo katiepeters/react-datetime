@@ -1,5 +1,5 @@
 import { Balance, Portfolio } from "./lambda.types";
-import { PairPlottingSeries } from "./_common/botRunner/botRunPlotter";
+import { ChartSeries, PairPlottingSeries } from "./_common/botRunner/botRunPlotter";
 
 export interface TableItem {
 	accountId: string
@@ -87,6 +87,13 @@ export interface PlotterData {
 	candlestickPatterns: string[]
 	series: PairPlottingSeries
 	points: PairPlottingSeries
+}
+
+export interface PairPlotterData {
+	indicators: string[]
+	candlestickPatterns: string[]
+	series: ChartSeries
+	points: ChartSeries
 }
 
 type ActiveIntervalClosed = [number, number]

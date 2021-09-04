@@ -1,6 +1,6 @@
 export interface Plotter {
-	plotPoint(collectionName: string, value: number, pair?: string, chart?: string): void
-	plotSeries(seriesName: string, value: number, pair?: string, chart?: string): void
+	plotPoint(collectionName: string, pair: string, value: number, chart?: string): void
+	plotSeries(seriesName: string, pair: string, value: number, chart?: string): void
 }
 
 export interface PlotterInput {
@@ -12,10 +12,10 @@ export interface PlotterInput {
 export interface PairPlottingSeries {
 	[pair: string]: ChartSeries
 }
-interface ChartSeries {
+export interface ChartSeries {
 	[chart: string]: PlotterSeries
 }
-interface PlotterSeries {
+export interface PlotterSeries {
 	[name: string]: Coords[]
 }
 interface Coords {
@@ -34,12 +34,12 @@ export class BotRunPlotter {
 		this.timestamp = timestamp;
 	}
 
-	plotPoint(collectionName: string, value: number, pair?: string, chart?: string) {
-		return plot(this.timestamp, this.points, collectionName, value, pair || 'all', chart || 'main');
+	plotPoint(collectionName: string, pair: string, value: number, chart?: string) {
+		return plot(this.timestamp, this.points, collectionName, value, pair, chart || 'candles');
 	}
 
-	plotSeries(seriesName: string, value: number, pair?: string, chart?: string) {
-		return plot(this.timestamp, this.series, seriesName, value, pair || 'all', chart || 'secondary');
+	plotSeries(seriesName: string, pair: string, value: number, chart?: string) {
+		return plot(this.timestamp, this.series, seriesName, value, pair, chart || 'candles');
 	}
 
 	getChartPoints( pair: string ){

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ArrayCandle } from '../../../../lambdas/lambda.types';
-import { Order, PlotterData } from '../../../../lambdas/model.types';
+import { Order, PairPlotterData, PlotterData } from '../../../../lambdas/model.types';
 import TradingChart, {ChartCandle} from './TradingChart';
 import memoizeOne from 'memoize-one';
 import { candleLoader } from '../../state/loaders/candle.loader';
@@ -47,10 +47,11 @@ export default class AutoChart extends React.Component<AutoChartProps> {
 	renderChart( candles: ArrayCandle[] ) {
 		const {startDate, endDate} = this.props;
 		return (
+			// @ts-ignore // HOCs are breaking the component props ts definitions
 			<TradingChart
 				orders={this.props.orders}
 				candles={ getChartCandles(candles) }
-				plotterData={this.props.plotterData}
+				plotterData={this.getPlotterData()}
 				patterns={ this.props.patterns || [] }
 				onLoadMore={ this._onLoadMore }
 				highlightedInterval={[startDate, endDate]} />
@@ -113,6 +114,12 @@ export default class AutoChart extends React.Component<AutoChartProps> {
 		}
 	}
 
+	getPlotterData() {
+		const {pair, plotterData} = this.props;
+		if( !plotterData ) return;
+		return getPairPlotterData(pair, plotterData);
+	}
+
 	_onLoadMore = (start:number, end: number) => {
 		this.setState({chartStartDate: start});
 	}
@@ -124,7 +131,7 @@ const getChartCandles = memoizeOne( (candles: ArrayCandle[]) => {
 
 function toChartCandle( c: ArrayCandle ): ChartCandle{
 	return {
-		date: new Date(c[0]),
+		date: c[0],
 		open: c[1],
 		close: c[2],
 		high: c[3],
@@ -132,3 +139,13 @@ function toChartCandle( c: ArrayCandle ): ChartCandle{
 		volume: c[5]
 	}
 }
+
+const getPairPlotterData = memoizeOne( (pair:string, plotterData: PlotterData) => {
+	const data: PairPlotterData = {
+		indicators: plotterData.indicators,
+		candlestickPatterns: plotterData.candlestickPatterns,
+		series: plotterData.series[pair] || {},
+		points: plotterData.points[pair] || {}
+	};
+	return data;
+});

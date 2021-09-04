@@ -79,6 +79,10 @@ interface Indicators {
 	sma( candleData: ArrayCandle[], period: number, attr?: CandleAttribute ): number[]
 	/** Calculates the Standard Moving Average from an array of values. */
 	smaArray( candleData: number[], period: number ): number[]
+	/** Calculates the Standard Moving Average for candle volumes. */
+	vma( candleData: ArrayCandle[], period: number ): number[]
+	/** Calculates the Relative Strength Index for an array of candle data. */
+	rsi( candleData: ArrayCandle, period: number): number[]
 }
 
 interface Patterns {
@@ -89,8 +93,8 @@ interface Patterns {
 }
 
 interface Plotter {
-	plotPoint(collectionName: string, value: number, pair?: string, chart?: string): void
-	plotSeries(seriesName: string, value: number, pair?: string, chart?: string): void
+	plotPoint(collectionName: string, pair: string, value: number, chart?: string): void
+	plotSeries(seriesName: string, pair: string, value: number, chart?: string): void
 }
 
 interface BotInput {

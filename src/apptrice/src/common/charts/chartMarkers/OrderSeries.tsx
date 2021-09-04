@@ -4,9 +4,8 @@ import BuyMarker from './BuyMarker';
 import ErrorMarker from './ErrorMarker';
 import SellMarker from './SellMarker';
 
-const GenericChartComponent = require('react-stockcharts/lib/GenericChartComponent').default;
-const { getAxisCanvas } = require('react-stockcharts/lib/GenericComponent');
-const { CircleMarker, SquareMarker } = require('react-stockcharts/lib/series');
+import { GenericChartComponent, getAxisCanvas } from '@react-financial-charts/core';
+import { CircleMarker, Square } from '@react-financial-charts/series';
 
 interface OrderSeriesProps {
 	orders: any,
@@ -45,7 +44,8 @@ function renderOpening(ctx: any, xScale: any, yScale: any, order: Order) {
 	const color = getColor(order.status, order.direction);
 	const point = {
 		x: xScale(order.placedAt),
-		y: yScale(order.price)
+		y: yScale(order.price),
+		datum: order
 	}
 
 	const styles = {
@@ -54,6 +54,7 @@ function renderOpening(ctx: any, xScale: any, yScale: any, order: Order) {
 		r: 2,
 		opacity: .5,
 		strokeWidth: 1,
+		point
 	}
 
 	CircleMarker.drawOnCanvas(styles, point, ctx);
@@ -105,7 +106,7 @@ function renderClosing(ctx: any, xScale: any, yScale: any, order: Order) {
 	}
 	const point = {
 		x: xScale(order.closedAt),
-		y: yScale(order.executedPrice || order.price)
+		y: yScale(order.executedPrice || order.price || order.marketPrice)
 	}
 
 	Marker.drawOnCanvas(styles, point, ctx);
@@ -117,7 +118,7 @@ function getMarker(order: any) {
 		case 'completed':
 			return order.direction === 'buy' ? BuyMarker : SellMarker;
 		case 'cancelled':
-			return SquareMarker;
+			return Square;
 		case 'error':
 			return ErrorMarker;
 		default:

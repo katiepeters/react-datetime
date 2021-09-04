@@ -110,6 +110,14 @@ var BotRunIndicators = /** @class */ (function () {
         this.indicatorsUsed["sma|" + period + "|" + attr] = true;
         return sma_1.sma(candleData, period, attr);
     };
+    BotRunIndicators.prototype.vma = function (candleData, period) {
+        this.indicatorsUsed["vma|" + period] = true;
+        return sma_1.sma(candleData, period, 'volume');
+    };
+    BotRunIndicators.prototype.rsi = function (candleData, period) {
+        this.indicatorsUsed["rsi|" + period] = true;
+        return this.rsi(candleData, period);
+    };
     BotRunIndicators.prototype.smaArray = function (candleData, period) {
         // This indicator can't be displayed in the charts, don't store in the used ones
         return sma_1.smaArray(candleData, period);
@@ -199,11 +207,11 @@ var BotRunPlotter = /** @class */ (function () {
         this.points = points;
         this.timestamp = timestamp;
     }
-    BotRunPlotter.prototype.plotPoint = function (collectionName, value, pair, chart) {
-        return plot(this.timestamp, this.points, collectionName, value, pair || 'all', chart || 'main');
+    BotRunPlotter.prototype.plotPoint = function (collectionName, pair, value, chart) {
+        return plot(this.timestamp, this.points, collectionName, value, pair, chart || 'candles');
     };
-    BotRunPlotter.prototype.plotSeries = function (seriesName, value, pair, chart) {
-        return plot(this.timestamp, this.series, seriesName, value, pair || 'all', chart || 'secondary');
+    BotRunPlotter.prototype.plotSeries = function (seriesName, pair, value, chart) {
+        return plot(this.timestamp, this.series, seriesName, value, pair, chart || 'candles');
     };
     BotRunPlotter.prototype.getChartPoints = function (pair) {
         getPairPoints(this.points, pair);

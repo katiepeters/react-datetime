@@ -16,10 +16,10 @@ function onData( input: BotInput) {
 
     const [pprev, prevCandle, lastCandle] = utils.getCandles(candleData[pair].slice(-3));
     if( pprev.high < prevCandle.high && prevCandle.high >lastCandle.high ){
-        plotter.plotPoint('tops', prevCandle.high );
+        plotter.plotPoint('tops', pair, prevCandle.high );
     }
     if( pprev.low > prevCandle.low && prevCandle.low < lastCandle.low ){
-        plotter.plotPoint('bottoms', prevCandle.low );
+        plotter.plotPoint('bottoms', pair, prevCandle.low );
     }
 
 

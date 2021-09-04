@@ -1,6 +1,4 @@
-import { ArrayCandle } from "../../lambda.types";
-
-type CandleAttribute = 'open' | 'close' | 'high' | 'low' | 'volume';
+import { ArrayCandle, CandleAttribute } from "../../lambda.types";
 
 const attributeIndex = {
 	open: 1,

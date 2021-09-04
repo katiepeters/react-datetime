@@ -8,6 +8,10 @@ export interface Indicators {
 	sma( candleData: ArrayCandle[], period: number, attr?: CandleAttribute ): number[]
 	/** Calculates the Standard Moving Average from an array of values. */
 	smaArray( candleData: number[], period: number ): number[]
+	/** Calculates the Standard Moving Average for candle volumes. */
+	vma( candleData: ArrayCandle[], period: number ): number[]
+	/** Calculates the Relative Strength Index for an array of candle data. */
+	rsi( candleData: ArrayCandle, period: number): number[]
 }
 
 
@@ -24,6 +28,16 @@ export class BotRunIndicators implements Indicators {
 	sma( candleData: ArrayCandle[], period: number, attr: CandleAttribute = 'close' ) {
 		this.indicatorsUsed[`sma|${period}|${attr}`] = true;
 		return sma(candleData, period, attr);
+	}
+
+	vma( candleData: ArrayCandle[], period: number ) {
+		this.indicatorsUsed[`vma|${period}`] = true;
+		return sma(candleData, period, 'volume');
+	}
+
+	rsi( candleData: ArrayCandle, period: number){
+		this.indicatorsUsed[`rsi|${period}`] = true;
+		return this.rsi(candleData, period);
 	}
 
 	smaArray( candleData: number[], period: number) {

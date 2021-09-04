@@ -1,30 +1,32 @@
 import * as React from 'react'
-import { Orders } from '../../../../lambdas/lambda.types';
 import OrderSeries from './chartMarkers/OrderSeries';
 import OHLC from './chartMarkers/OHLC';
 import memoizeOne from 'memoize-one';
-import { PlotterData } from '../../../../lambdas/model.types';
+import { Order, PairPlotterData, PlotterData } from '../../../../lambdas/model.types';
+import ChartX from './components/ChartX';
+import { PlotterSeries } from '../../../../lambdas/_common/botRunner/botRunPlotter';
+import chartUtils, { ChartData, RunnableIndicator } from './chartUtils';
+import { XAxis, YAxis } from '@react-financial-charts/axes';
+import { Chart } from '@react-financial-charts/core';
+import { CandlestickSeries, BarSeries, LineSeries, RSISeries } from '@react-financial-charts/series';
+import { CrossHairCursor, EdgeIndicator, MouseCoordinateX, MouseCoordinateY } from '@react-financial-charts/coordinates';
+import { MovingAverageTooltip, RSITooltip } from '@react-financial-charts/tooltip';
 
-const { ChartCanvas, Chart } = require('react-stockcharts');
-const { last, timeIntervalBarWidth } = require("react-stockcharts/lib/utils");
-const { XAxis, YAxis } = require('react-stockcharts/lib/axes');
-const { CandlestickSeries, BarSeries, LineSeries } = require('react-stockcharts/lib/series');
-const { CrossHairCursor, EdgeIndicator, MouseCoordinateX, MouseCoordinateY } = require('react-stockcharts/lib/coordinates');
-const { fitWidth } = require('react-stockcharts/lib/helper');
-const { MovingAverageTooltip } = require('react-stockcharts/lib/tooltip');
+import { format} from 'd3-format';
+import { timeFormat } from 'd3-time-format';
 
-const { ema, wma, sma, tma } = require("react-stockcharts/lib/indicator");
+interface DataByCharts {
+	[chart: string]: ChartPlotterData
+}
 
-const { discontinuousTimeScaleProvider } = require("react-stockcharts/lib/scale");
-
-const { scaleTime } = require('d3-scale');
-const { utcHour } = require('d3-time');
-const { format } = require('d3-format');
-const { timeFormat } = require('d3-time-format');
-
+interface ChartPlotterData {
+	points: PlotterSeries,
+	series: PlotterSeries,
+	indicators: string[]
+}
 
 export interface ChartCandle {
-	date: Date,
+	date: number,
 	open: number,
 	close: number,
 	high: number,
@@ -32,99 +34,142 @@ export interface ChartCandle {
 	volume: number
 }
 
+
 interface TradingChartProps {
 	width: number,
 	height: number,
 	ratio: number,
 	data: any,
-	orders: Orders,
+	orders: Order[],
 	patterns?: string[],
 	candles: ChartCandle[],
 	includePreviousCandles: boolean,
 	onLoadMore?: (start: number, end: number ) => void,
 	highlightedInterval?: [number, number],
-	plotterData?: PlotterData
+	plotterData?: PairPlotterData
 }
 
 let chartIndex = 0;
-class TradingChart extends React.Component<TradingChartProps> {
+export default class TradingChart extends React.Component<TradingChartProps> {
 	chart?: any
 	id: string = `chart${chartIndex++}`
 
 	render() {
-		const { width, ratio, candles, orders } = this.props;
-		
+		return (
+			<ChartX
+				candles={this.getChartData()}
+				onLoadMore={ this.props.onLoadMore }>
+				{ this.renderCharts() }
+				<CrossHairCursor
+					strokeStyle="#cdccee"
+					strokeDasharray="Dash"
+					strokeWidth={1} />
+			</ChartX>
+		);
+	}
 
+	renderCharts() {
+		const plotterDataByChart = getDataByChart(this.props.plotterData);
+		const chartNames = Object.keys(plotterDataByChart);
+
+		return [
+			this.renderCandlesChart( plotterDataByChart.candles ),
+			this.renderVolumeChart( plotterDataByChart.volume )
+		];
+
+		/*
+		let charts = chartNames.map( (chartName:string, i: number) => {
+			if( chartName === 'candles') return this.renderCandlesChart( plotterDataByChart.candles );
+			if( chartName === 'volume') return this.renderVolumeChart( plotterDataByChart.volume );
+			if( chartName === 'rsi' ) return this.renderRSIChart( plotterDataByChart.rsi, i );
+			return this.renderCustomChart( chartName, plotterDataByChart[chartName], i );
+		});
+
+		charts.push( this.renderXAxisChart() );
+		return charts;
+		*/
+	}
+
+	renderCandlesChart( plotterData: ChartPlotterData ){
+		const {orders} = this.props;
+		const candles = this.getChartData();
+		const indicators = chartUtils.getRunnableIndicators( plotterData?.indicators ).filter( i => i.tooltip === 'ma' );
+
+		return (
+			<Chart id={1} yExtents={(d: any) => [d.high, d.low]}>
+				<XAxis axisAt="bottom" orient="bottom" {...axisStyles }/>
+				<YAxis axisAt="right"
+					orient="right"
+					ticks={5}
+					{...axisStyles} />
+				{ this.renderMouseCoordinates() }
+				{ this.renderIndicatorLineSeries( indicators )}
+				<CandlestickSeries
+					yAccessor={ chartUtils.candleAccessor }
+					{...this.getCandleStyles('#d05773', '#29946d') } />
+				<OrderSeries orders={orders} candles={candles} />
+				<OHLC
+					origin={[-30,0]}
+					textFill="#ffffff" />
+				{ this.renderIndicatorTooltips(indicators) }
+			</Chart>
+		)
+	}
+
+	renderVolumeChart( plotterData: ChartPlotterData ) {
 		const volumeAccessor = (d: any) => {
 			return d.volume;
 		}
-
-		const indicators = this.getIndicators();
-		const calculatedData = getDataMemo( candles, indicators );
-		const height = 400;
-
-		// This is the data for the x axis
-		const xAccessor = (d: any) => d.date;
-		// These are the initial limits for the x zoom
-		const xExtents = [
-			xAccessor(last(candles)),
-			xAccessor(candles[Math.max(0,candles.length - 150)])
-		];
+		return (
+			<Chart id={2}
+				height={100}
+				origin={(w: number, h: number) => [0, h - 100]}
+				yExtents={volumeAccessor}>
+				<YAxis axisAt="left"
+					orient="left"
+					ticks={3}
+					tickFormat={format(".2s")}
+					{...axisStyles}
+					showGridLines={false} />
+				<BarSeries
+					yAccessor={volumeAccessor}
+					fillStyle={ this.getCandleStyles('#78a4b9', '#bd66a9').fill } />
+			</Chart>
+		)
+	}
+	
+	renderRSIChart( plotterData: ChartPlotterData, i: number ) {
+		const indicators = chartUtils.getRunnableIndicators( this.props.plotterData?.indicators ).filter( i => i.type === 'rsi' );
 
 		return (
-			<ChartCanvas
-				width={width}
-				height={height}
-				ratio={ratio}
-				type="hybrid"
-				data={candles}
-				xAccessor={xAccessor}
-				xScale={scaleTime()}
-				xExtents={xExtents}
-				margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
-				pointsPerPxThreshold={.6}
-				onLoadMore={ this.props.onLoadMore }>
+			<Chart id="rsi"
+				yExtents={() => [0,100]}>
+				{ indicators.map( i => (
+					<>
+						<RSISeries yAccessor={chartUtils.getYAccessor(i.key)} />
+						<RSITooltip origin={[-38, 15]}
+							yAccessor={chartUtils.getYAccessor(i.key)}
+							options={{windowSize: i.args[0]}} />
+					</>
+				))}
+			</Chart>
+		)
+	}
 
+	renderCustomChart( chartName: string, plotterData: ChartPlotterData, i:number ) {
+		return (
+			<Chart id={i}
+				yExtents={() => [0,100]}>
+				
+			</Chart>
+		)
+	}
 
-				<Chart id={1} yExtents={(d: any) => [d.high, d.low]}>
-					<XAxis axisAt="bottom"
-						orient="bottom"
-						ticks={6}
-						innerTickSize={-height + 40}
-						{...axisStyles} />
-					<YAxis axisAt="right"
-						orient="right"
-						ticks={5}
-						innerTickSize={-width + 100}
-						{...axisStyles} />
-					<CandlestickSeries
-						width={timeIntervalBarWidth(utcHour)}
-						yAccessor={ (d: ChartCandle) => ({ open: d.open, high: d.high, low: d.low, close: d.close, date: d.date })}
-						{...this.getCandleStyles() } />
-					<OrderSeries orders={orders} candles={candles} />
-					{ this.renderMouseCoordinates() }
-					<OHLC
-						origin={[-30,0]}
-						textFill="#ffffff" />
-					{ this.renderIndicatorTooltips( indicators || [] )}
-					{ this.renderIndicatorLineSeries( indicators || [] ) }
-				</Chart>
-				<Chart id={2}
-					origin={(w: number, h: number) => [0, h - 100]}
-					height={100} yExtents={volumeAccessor}>
-					<YAxis axisAt="left"
-						orient="left"
-						ticks={3}
-						tickFormat={format(".2s")}
-						{...axisStyles} />
-					<BarSeries yAccessor={volumeAccessor}
-						fill={(d: any) => d.close > d.open ? "#6BA583" : "#f390dd"} />
-				</Chart>
-				<CrossHairCursor
-					stroke="#cdccee"
-					strokeDasharray="Dash"
-					strokeWidth={1} />
-			</ChartCanvas>
+	renderXAxisChart(){
+		return (
+			<Chart id="xaxis">
+				<XAxis />
+			</Chart>
 		);
 	}
 
@@ -135,10 +180,11 @@ class TradingChart extends React.Component<TradingChartProps> {
 					itemType="last"
 					orient="right"
 					edgeAt="right"
-					yAccessor={ (d:any) => d.close }
+					yAccessor={ chartUtils.getYAccessor('close') }
+					displayFormat={format(".6f")}
 					fill="#011627"
 					textFill="#cdccee"
-					lineStroke="#cdccee"
+					lineStroke="#444466"
 					arrowWidth={0}
 					rectHeight={12}
 					fontSize={10} />
@@ -152,7 +198,7 @@ class TradingChart extends React.Component<TradingChartProps> {
 				<MouseCoordinateY
 					at="right"
 					orient="right"
-					displayFormat={format(".2f")}
+					displayFormat={format(".6f")}
 					arrowWidth={0}
 					rectHeight={14}
 					fontSize={10}
@@ -182,6 +228,7 @@ class TradingChart extends React.Component<TradingChartProps> {
 				<MovingAverageTooltip
 					origin={[-48, 10]}
 					options={ maOptions }
+					displayFormat={format('.6f')}
 					labelFill="#f390dd"
 					textFill="#b2b1d8" />
 			)
@@ -194,27 +241,23 @@ class TradingChart extends React.Component<TradingChartProps> {
 		return indicators.map( (indicator:any, i: number) => (
 			<LineSeries key={indicator.key}
 				yAccessor={indicator.func.accessor()}
-				stroke={indicator.color} />
+				strokeStyle={indicator.color} />
 		));
 	}
 
-	getIndicators() {
-		return getIndicatorsMemo( this.props.plotterData?.indicators );
-	}
-
-	getCandleStyles() {
+	getCandleStyles( up:string, down:string) {
 		const {highlightedInterval: hi} = this.props;
 		let strokeColor: any = (d: ChartCandle) => {
-			return d.close < d.open ? '#d05773' : '#29946d';
+			return d.close < d.open ? up : down;
 		}
 
 		if( hi ){
 			strokeColor = function (d: ChartCandle) {
-				let isHighlighted = d.date.getTime() > hi[0] && d.date.getTime() < hi[1];
+				let isHighlighted = d.date > hi[0] && d.date < hi[1];
 				if( isHighlighted ){
-					return d.close < d.open ? '#d05773' : '#29946d';
+					return d.close < d.open ? up : down;
 				}
-				return d.close < d.open ? '#d0577377' : '#29946d77';
+				return d.close < d.open ? up+'77' : down+'77';
 			}
 		}
 
@@ -225,78 +268,78 @@ class TradingChart extends React.Component<TradingChartProps> {
 			opacity: 1
 		}
 	}
+
+	getChartData(): ChartData[]{
+		const {candles, plotterData} = this.props; 
+		return augmentData( candles, plotterData?.indicators );
+	}
 }
 
-const TradingChartWidth = fitWidth(TradingChart);
-export default TradingChartWidth;
 
+const augmentData = memoizeOne( (candles: ChartCandle[], indicators?: string[] ) => {
+	let augmented: ChartData[] = candles.map( c => ({...c, calculated:{}}) );
 
-function strokeColor(d: any) {
-	return d.close < d.open ? "#d05773" : "#29946d";
+	if( !indicators || !indicators.length ){
+		return augmented;
+	}
+	
+	chartUtils.getRunnableIndicators(indicators).forEach( (ind) => {
+		augmented = ind.func(augmented);
+	})
+
+	return augmented;
+});
+
+// Simply return the chart is it's there, if not creates, adds and return it
+function getChart( currentCharts: DataByCharts, name: string ): ChartPlotterData{
+	let chart = currentCharts[name];
+	if( !chart ){
+		chart = {points: {}, series: {}, indicators: []};
+		currentCharts[name] = chart;
+	}
+	return chart;
 }
 
-const candleStyles = {
-	wickStroke: strokeColor,
-	stroke: strokeColor,
-	fill: strokeColor,
-	opacity: 1
-}
 
-interface RunnableIndicator {
-	key: string,
-	type: string,
-	args: any[],
-	tooltip: string,
-	color: string,
-	func: Function
-}
+const getDataByChart = memoizeOne( (plotterData?: PairPlotterData) =>  {
+	let charts: DataByCharts = {
+		candles: {points: {}, series: {}, indicators: []},
+		volumes: {points: {}, series: {}, indicators: []}
+	}
+	if( !plotterData ) return charts;
 
-const colors = ['#ff0000', '#ffff00', '#00ff0', '#00ffff', '#0000ff', '#ff00ff'];
-const indicatorFunctions: {[name:string]: Function} = { sma, ema, wma, tma };
-const getIndicatorsMemo = memoizeOne( (sources: string[] | undefined ) => {
+	const { series, points, indicators } = plotterData;
+	Object.keys( series ).forEach( (chartName: string) => {
+		getChart(charts, chartName).series = series[chartName];
+	});
+	
+	Object.keys( points ).forEach( (chartName: string) => {
+		getChart(charts, chartName).points = points[chartName];
+	});
 
-	let indicators: RunnableIndicator[] = [];
-	if( !sources ) return indicators;
-
-	let i = 0;
-
-	sources.forEach( (source:string) => {
-		let [name, ...args] = source.split('|');
-		if( ['sma', 'ema', 'wma', 'tma'].includes(name) ){
-			indicators.push({
-				key: source,
-				type: name,
-				args: args,
-				tooltip: 'ma',
-				color: colors[i++],
-				func: indicatorFunctions[name]()
-					.options({ windowSize: parseInt(args[0])})
-					.merge( (data:any, value: number) => {data[source] = value})
-					.accessor((data:any) => data[source])
-			});
+	indicators.forEach( (indicator:string) => {
+		let type = indicator.split(':')[0];
+		if( type === 'rsi' ){
+			getChart( charts, 'rsi' ).indicators.push(indicator);
+		}
+		else if( type === 'vma' ){
+			getChart( charts, 'volume' ).indicators.push( indicator );
 		}
 		else {
-			console.warn(`Unknown indicator ${name}`)
+			getChart(charts, 'candles').indicators.push( indicator );
 		}
 	});
 
-	return indicators;
-});
-
-
-const getDataMemo = memoizeOne( ( data: ChartCandle[], indicators: RunnableIndicator[] ) => {
-	let calculated = data;
-	indicators.forEach( (i: RunnableIndicator) => calculated = i.func(calculated) );
-	return calculated;
+	return charts;
 });
 
 const axisStyles: any = {
-	fill: '#172e45',
-	strokeOpacity: 1,
-	stroke: '#172e45',
+	tickLabelFill: '#cdccee',
+	strokeStyle: '#172e45',
 	fontSize: 10,
-	tickStroke: '#cdccee',
-	tickStrokeOpacity: .15,
-	tickStrokeDasharray: 'Solid',
-	tickStrokeWidth: 1
+	showGridLines: true,
+	tickStrokeStyle: '#172e45',
+	gridLinesStrokeStyle: '#172e45',
+	gridLinesStrokeDasharray: 'Solid',
+	gridLinesStrokeWidth: 1
 }
