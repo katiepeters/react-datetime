@@ -18,7 +18,7 @@ export interface ChartSeries {
 export interface PlotterSeries {
 	[name: string]: Coords[]
 }
-interface Coords {
+export interface Coords {
 	x: number
 	y: number
 }

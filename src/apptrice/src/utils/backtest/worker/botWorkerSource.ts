@@ -33,7 +33,7 @@ self.onmessage = function (msg: any ){
 	const indicators = new BotRunIndicators( ind );
 	const candlestickPatterns = new BotRunPatterns( patt );
 	const plotterInstance = new BotRunPlotter({
-		points, series, timestamp: Date.now()
+		points, series, timestamp: getLastCandleDate( input.candleData )
 	});
 
 	const plotter: Plotter = {
@@ -79,4 +79,16 @@ self.onmessage = function (msg: any ){
 
 export default function mock() {
 	// This is needed just to not have rogue files
+}
+
+function getLastCandleDate( allPairCandles: any ){
+	let lastDate = 0;
+	Object.keys( allPairCandles ).forEach( (pair: string) => {
+		let candles = allPairCandles[pair];
+		let date = candles[ candles.length - 1 ][0];
+		if( date > lastDate ){
+			lastDate = date;
+		}
+	})
+	return lastDate;
 }

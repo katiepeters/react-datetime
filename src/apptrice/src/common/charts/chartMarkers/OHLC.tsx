@@ -1,4 +1,6 @@
-const { OHLCTooltip, ToolTipText, ToolTipTSpanLabel } = require('react-stockcharts/lib/tooltip');
+import { format } from "d3-format";
+import chartUtils from "../chartUtils";
+import {OHLCTooltip, ToolTipText, ToolTipTSpanLabel} from '@react-financial-charts/tooltip';
 
 
 const displayTexts = {
@@ -17,6 +19,7 @@ export default function OHLC(props: any) {
 			displayTexts={ displayTexts }
 			origin={[-50,0]}
 			labelFill="#f390dd"
+			ohlcFormat={ (n: number) => format( chartUtils.getFormat(n) )(n) }
 			textFill="#b2b1d8">
 			{ defaultDisplay }
 		</OHLCTooltip>

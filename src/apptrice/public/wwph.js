@@ -1055,7 +1055,7 @@ self.onmessage = function (msg) {
     var candlestickPatterns = new botRunPatterns_1.BotRunPatterns(patt);
     var plotterInstance = new botRunPlotter_1.BotRunPlotter({
         points: points, series: series,
-        timestamp: Date.now()
+        timestamp: getLastCandleDate(input.candleData)
     });
     var plotter = {
         plotPoint: function (name, value, pair, chart) {
@@ -1096,6 +1096,17 @@ function mock() {
     // This is needed just to not have rogue files
 }
 exports.default = mock;
+function getLastCandleDate(allPairCandles) {
+    var lastDate = 0;
+    Object.keys(allPairCandles).forEach(function (pair) {
+        var candles = allPairCandles[pair];
+        var date = candles[candles.length - 1][0];
+        if (date > lastDate) {
+            lastDate = date;
+        }
+    });
+    return lastDate;
+}
 
 
 /***/ })
