@@ -5,7 +5,7 @@ import { Coords } from "../../../../lambdas/_common/botRunner/botRunPlotter";
 
 
 const indicatorFunctions: {[name:string]: Function} = { sma, ema, wma, tma, rsi };
-export const colors = ['#ff0000', '#ffff00', '#00dd22', '#00ffff', '#0000ff', '#ff00ff'];
+export const colors = ['#ff0000', '#ffff00', '#00dd22', '#00ffff', '#0000ff', '#ff99cc'];
 
 export interface ChartData extends ChartCandle {
 	calculated: {
@@ -124,7 +124,7 @@ const chartUtils = {
 		if( quantity > 0 ){
 			return '.4f'
 		}
-		return '.6f'
+		return '.7f'
 	},
 	getDrawingIndices( points: Coords[], dataStart: number, dataEnd: number ): DrawingIndices {
 		const length = points.length;

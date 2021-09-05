@@ -3,12 +3,13 @@ import {
     getStrokeDasharrayCanvas,
     strokeDashTypes,
     GenericChartComponent,
+		getAxisCanvas
 } from "@react-financial-charts/core";
 import { line, CurveFactoryLineOnly, CurveFactory } from "d3-shape";
 import { Coords } from "../../../../../lambdas/_common/botRunner/botRunPlotter";
 import chartUtils from "../chartUtils";
 
-export interface LineSeriesProps {
+export interface LineProps {
     /**
      * A factory for a curve generator for the line.
      */
@@ -31,16 +32,17 @@ export interface LineSeriesProps {
     readonly strokeWidth?: number;
 
 		points: Coords[]
+		name: string
 }
 
 /**
- * `LineSeries` component.
+ * `Line` component.
  */
-export class LineSeries extends React.Component<LineSeriesProps> {
+export class Line extends React.Component<LineProps> {
 	public static defaultProps = {
 			strokeDasharray: "Solid",
 			strokeStyle: "#2196f3",
-			strokeWidth: 1,
+			strokeWidth: 2,
 	};
 
 	public render() {
@@ -55,7 +57,8 @@ export class LineSeries extends React.Component<LineSeriesProps> {
 					<GenericChartComponent
 							canvasDraw={this.drawOnCanvas(lineDash)}
 							onClickWhenHover={onClick}
-							drawOn={[]}
+							canvasToDraw={getAxisCanvas}
+							drawOn={['pan']}
 					/>
 			);
 	}
@@ -65,7 +68,7 @@ export class LineSeries extends React.Component<LineSeriesProps> {
 					points,
 					curve,
 					strokeStyle,
-					strokeWidth = LineSeries.defaultProps.strokeWidth,
+					strokeWidth = Line.defaultProps.strokeWidth,
 			} = this.props;
 
 			const {
@@ -73,6 +76,8 @@ export class LineSeries extends React.Component<LineSeriesProps> {
 					chartConfig: { yScale },
 					plotData,
 			} = moreProps;
+
+			ctx.save();
 
 			ctx.lineWidth = strokeWidth;
 
@@ -85,20 +90,20 @@ export class LineSeries extends React.Component<LineSeriesProps> {
 			}
 
 			const dataSeries = line()
-					.x((d) => Math.round(xScale(d.x)))
-					.y((d) => Math.round(yScale(d.y)));
+					.x((d:any) => Math.round(xScale(d.x)))
+					.y((d:any) => Math.round(yScale(d.y)));
 
 			if (curve !== undefined) {
 					dataSeries.curve(curve);
 			}
 
-
 			const startDate = plotData[0].date;
 			const endDate = plotData[plotData.length-1].date;
 			const {startIndex, endIndex} = chartUtils.getDrawingIndices( points, startDate, endDate);
 
+			console.log( [startDate, endDate], [startIndex, endIndex]);
 			ctx.beginPath();
-			dataSeries.context(ctx)(points.slice(startIndex, endIndex-startIndex));
+			dataSeries.context(ctx)(points.slice(startIndex, endIndex));
 			ctx.stroke();
 
 			ctx.restore();

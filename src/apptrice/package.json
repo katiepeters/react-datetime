@@ -177,6 +177,7 @@
   "devDependencies": {
     "@types/canvasjs": "^1.9.6",
     "@types/d3-format": "^3.0.1",
+    "@types/d3-shape": "^3.0.2",
     "@types/d3-time-format": "^4.0.0",
     "@types/react-onclickoutside": "^6.7.3",
     "@types/react-virtualized-auto-sizer": "^1.0.0",

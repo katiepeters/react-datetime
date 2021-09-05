@@ -15,6 +15,7 @@ import { MovingAverageTooltip, RSITooltip } from '@react-financial-charts/toolti
 import { format} from 'd3-format';
 import { timeFormat } from 'd3-time-format';
 import { PointSeries } from './components/PointSeries';
+import { Line } from './components/Line';
 
 interface DataByCharts {
 	[chart: string]: ChartPlotterData
@@ -110,6 +111,7 @@ export default class TradingChart extends React.Component<TradingChartProps> {
 					{...this.getCandleStyles('#d05773', '#29946d') } />
 				<OrderSeries orders={orders} candles={candles} />
 				{ this.renderPoints(plotterData.points) }
+				{ this.renderLines(plotterData.series) }
 				<OHLC
 					origin={[-30,0]}
 					textFill="#ffffff" />
@@ -284,22 +286,24 @@ export default class TradingChart extends React.Component<TradingChartProps> {
 	renderPoints( points?: PlotterSeries ){
 		if( !points ) return;
 
-		const svgAnnotation = {
-        fill: "#2196f3",
-        path: () =>
-            "M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z",
-        pathWidth: 12,
-        pathHeight: 22,
-        tooltip: "Svg Annotation",
-        y: ({ yScale, datum }: any) => yScale(datum.high),
-    };
-
 		return Object.keys(points).map( (name,i) => (
 			<PointSeries  
 				key={name}
 				name={name}
 				points={points[name]}
 				color={ colors[colors.length - i - 1] } />
+		));
+	}
+
+	renderLines( lines?: PlotterSeries ){
+		if( !lines ) return;
+
+		return Object.keys(lines).map( (name,i) => (
+			<Line
+				key={name}
+				name={name}
+				points={lines[name]}
+				strokeStyle={ colors[colors.length - i - 1] } />
 		));
 	}
 }
