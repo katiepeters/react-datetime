@@ -1,4 +1,5 @@
 import { ArrayCandle } from "../../lambda.types";
+import getGrid from "./utils/getGrid";
 
 export interface Candle {
 	open: number
@@ -10,6 +11,11 @@ export interface Candle {
 	getMiddle(): number
 	getAmplitude(): number
 	isBullish(): boolean
+}
+
+export interface GridLevels {
+	above: number[]
+	below: number[]
 }
 
 function getMiddle(): number {
@@ -35,6 +41,8 @@ export interface BotRunUtils {
 	isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]
 	/** Returns true when the target series cross under the base series. */
 	isCrossUnder( targetSeries: number[], baseSeries: number[] ): boolean[]
+	/** Returns consistent price levels above and below the targetPrice */
+	getGrid(targetPrice: number, levelDistance: number, gridSize?: number): GridLevels
 }
 
 export const botRunUtils: BotRunUtils = {
@@ -55,7 +63,9 @@ export const botRunUtils: BotRunUtils = {
 	
 	isCrossUnder( targetSeries: number[], baseSeries: number[]): boolean[] {
 		return isCrossOver(baseSeries, targetSeries);
-	}
+	},
+
+	getGrid: getGrid
 }
 
 function isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]{

@@ -101,7 +101,6 @@ export class Line extends React.Component<LineProps> {
 			const endDate = plotData[plotData.length-1].date;
 			const {startIndex, endIndex} = chartUtils.getDrawingIndices( points, startDate, endDate);
 
-			console.log( [startDate, endDate], [startIndex, endIndex]);
 			ctx.beginPath();
 			dataSeries.context(ctx)(points.slice(startIndex, endIndex));
 			ctx.stroke();

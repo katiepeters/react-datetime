@@ -60,6 +60,11 @@ interface Candle {
 	isBullish(): boolean
 }
 
+interface GridLevels {
+	above: number[]
+	below: number[]
+}
+
 interface BotRunUtils {
 	/** Converts candle data in an array into a structured object to make candle property access simpler. */
 	getCandle( candleData: ArrayCandle ): Candle
@@ -71,6 +76,8 @@ interface BotRunUtils {
 	isCrossOver( targetSeries: number[], baseSeries: number[] ): boolean[]
 	/** Returns true when the target series cross under the base series. */
 	isCrossUnder( targetSeries: number[], baseSeries: number[] ): boolean[]
+	/** Returns consistent price levels above and below the targetPrice */
+	getGrid(targetPrice: number, levelDistance: number, gridSize?: number): GridLevels
 }
 
 type CandleAttribute = 'open' | 'close' | 'high' | 'low' | 'volume';
