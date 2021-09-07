@@ -58,7 +58,16 @@ export default class AutoChart extends React.Component<AutoChartProps> {
 		)
 	}
 
-	componentDidUpdate(){
+	componentDidUpdate(prevProps: AutoChartProps){
+		if( prevProps.pair !== this.props.pair ){
+			this.setState({
+				loadingDate: undefined,
+				alreadyLoadedDate: undefined,
+				chartStartDate: this.getDateToLoad( this.props.interval, this.props.startDate ),
+				candles: undefined,
+				hasMore: false
+			});
+		}
 		this.checkCandlesLoad();
 	}
 

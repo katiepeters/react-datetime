@@ -29,7 +29,7 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 				</div>
 				<div className={styles.chart}>
 					<AutoChart
-						pair={this.state.activePair}
+						pair={this.getActivePair()}
 						exchange={exchange}
 						interval={runInterval}
 						startDate={ activeIntervals[0][0]}
@@ -47,7 +47,7 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 		
 		if( selector === 'dropdown' ){
 			return (
-				<select value={this.state.activePair}
+				<select value={this.getActivePair()}
 					onChange={ (e:React.ChangeEvent<HTMLSelectElement>) => this._onChange(e.target.value)}>
 					{deployment.pairs.map((pair: string) => (
 						<option key={pair} value={pair}>{pair}</option>
@@ -57,7 +57,7 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 		}
 		else {
 			return (
-				<Tabs active={this.state.activePair}
+				<Tabs active={this.getActivePair()}
 					onChange={ this._onChange }>
 					{deployment.pairs.map((pair: string) => (
 						<Tab key={pair} id={pair}>{pair}</Tab>
@@ -68,7 +68,7 @@ export default class DeploymentCharts extends React.Component<DeploymentChartsPr
 	}
 
 	getActivePairOrders(orders: DeploymentOrders ): Order[] {
-		return getPairOrders( orders, this.state.activePair );
+		return getPairOrders( orders, this.getActivePair() );
 	}
 
 	getActivePair(){

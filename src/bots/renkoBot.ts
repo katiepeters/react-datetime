@@ -5,25 +5,67 @@ interface RenkoBlock {
 }
 
 function initializeState( config, state ){
-	state.lastRenkoBlock = false;
-	state.priceSeed = false;
+	state.pairData = {}
+	config.pairs.forEach( (pair:string) => {
+		state.pairData[pair] = {
+			lastRenkoBlock: false,
+			priceSeed: false,
+			isBought: false,
+			blockSize: 0.02
+		}
+	});
 }
 
 
-function onData({ candleData, state, plotter, config, trader, utils }: BotInput ) {
-  const pair = config.pairs[0];
+function onData(input: BotInput ) {
+	let { candleData, state, config } = input;
 
-	if( !state.lastRenkoBlock ){
+	config.pairs.forEach( (pair: string) => {
+		handlePair( pair, state.pairData[pair], candleData[pair], input)
+	});
+}
+
+function handlePair( pair:string, state: any, candleData: ArrayCandle[], input: BotInput ){
+	const {trader, plotter, utils} = input;
+	const {lastRenkoBlock} = state;
+
+	if( !lastRenkoBlock ){
 		state.priceSeed = trader.getPrice(pair);
-		let renko = candlesToRenko( state.priceSeed, candleData[pair], .01, utils );
+		let renko = candlesToRenko( state.priceSeed, candleData, state.blockSize, utils );
 		state.lastRenkoBlock = renko[renko.length - 1];
 		plotter.plotSeries('renko', pair, state.lastRenkoBlock.close );
 		return;
 	}
 
-	let [lastCandle] = candleData[pair].slice(-1);
-	let newBlocks = getNewBlocks(lastCandle[0], state.lastRenkoBlock, lastCandle[2], .01 );
+	let [lastCandle] = candleData.slice(-1);
+	let newBlocks = getNewBlocks(lastCandle[0], lastRenkoBlock, lastCandle[2], state.blockSize );
 	if( newBlocks.length ){
+		let wasUptrend = lastRenkoBlock.open < lastRenkoBlock.close;
+		let [nextBlock] = newBlocks.slice(-1);
+		let isUptrend = nextBlock.open < nextBlock.close;
+
+		if( wasUptrend !== isUptrend ){
+			const {base, quoted} = utils.getPairAssets(pair);
+			if( isUptrend && !state.isBought ){
+				trader.placeOrder({
+					type: 'market',
+					direction: 'buy',
+					pair,
+					amount: trader.getBalance(quoted).free / trader.getPrice(pair)
+				});
+				state.isBought = true;
+			}
+			if( !isUptrend && state.isBought ){
+				trader.placeOrder({
+					type: 'market',
+					direction: 'sell',
+					pair,
+					amount: trader.getBalance(base).free
+				})
+				state.isBought = false;
+			}
+		}
+
 		state.lastRenkoBlock = newBlocks[newBlocks.length-1];
 	}
 

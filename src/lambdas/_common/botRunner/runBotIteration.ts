@@ -159,7 +159,7 @@ function getPortfolioWithPrices( portfolio: Portfolio, pairs: string[], allCandl
 	const quotedAsset = pairs[0].split('/')[1];
 	const baseAssets = pairs.map( (s:string) => s.split('/')[0]);
 
-	logCandles( allCandles );
+	// logCandles( allCandles );
 	
 	let portfolioWithPrices: PortfolioWithPrices = {
 		[quotedAsset]: {

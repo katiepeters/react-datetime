@@ -304,8 +304,8 @@ export default class VirtualAdapter implements ExchangeAdapter {
 			updatedOrder = {
 				...order,
 				status: 'completed',
-				price: candles.getClose(lastCandle),
-				executedPrice: candles.getClose(lastCandle),
+				price: candles.getOpen(lastCandle),
+				executedPrice: candles.getOpen(lastCandle),
 				closedAt: order.placedAt
 			};
 		}
