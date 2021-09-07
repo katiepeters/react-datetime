@@ -15,14 +15,14 @@ function onData({ candleData, state, plotter, config, trader, utils }: BotInput 
 
 	if( !state.lastRenkoBlock ){
 		state.priceSeed = trader.getPrice(pair);
-		let renko = candlesToRenko( state.priceSeed, candleData[pair], .02, utils );
+		let renko = candlesToRenko( state.priceSeed, candleData[pair], .01, utils );
 		state.lastRenkoBlock = renko[renko.length - 1];
 		plotter.plotSeries('renko', pair, state.lastRenkoBlock.close );
 		return;
 	}
 
 	let [lastCandle] = candleData[pair].slice(-1);
-	let newBlocks = getNewBlocks(lastCandle[0], state.lastRenkoBlock, lastCandle[2], .02 );
+	let newBlocks = getNewBlocks(lastCandle[0], state.lastRenkoBlock, lastCandle[2], .01 );
 	if( newBlocks.length ){
 		state.lastRenkoBlock = newBlocks[newBlocks.length-1];
 	}
