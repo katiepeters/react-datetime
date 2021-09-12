@@ -4,6 +4,7 @@ interface RenkoBlock {
 	close: number
 }
 
+const MAX_CONCURRENT_BUYS = 2;
 function initializeState( config, state ){
 	state.pairData = {}
 	config.pairs.forEach( (pair:string) => {
@@ -14,19 +15,33 @@ function initializeState( config, state ){
 			blockSize: 0.02
 		}
 	});
+
+	state.initialized = false;
+	state.pairSlots = [];
 }
 
 
 function onData(input: BotInput ) {
-	let { candleData, state, config } = input;
+	let { candleData, state, config, trader, utils } = input;
+
+	if( !state.initialized ){
+		const baseAssets = config.pairs.map( pair => utils.getPairAssets(pair).base );
+		const {quoted} = utils.getPairAssets(config.pairs[0]);
+		checkAlreadyBoughtPairs(quoted, baseAssets, state, trader);
+		state.initialized = true;
+	}
 
 	config.pairs.forEach( (pair: string) => {
+		// console.log(pair, state.pairData, Object.keys(candleData) );
 		handlePair( pair, state.pairData[pair], candleData[pair], input)
 	});
+
+	console.log( state.pairSlots);
 }
 
 function handlePair( pair:string, state: any, candleData: ArrayCandle[], input: BotInput ){
 	const {trader, plotter, utils} = input;
+	const {pairSlots} = input.state;
 	const {lastRenkoBlock} = state;
 
 	if( !lastRenkoBlock ){
@@ -40,36 +55,45 @@ function handlePair( pair:string, state: any, candleData: ArrayCandle[], input: 
 	let [lastCandle] = candleData.slice(-1);
 	let newBlocks = getNewBlocks(lastCandle[0], lastRenkoBlock, lastCandle[2], state.blockSize );
 	if( newBlocks.length ){
-		let wasUptrend = lastRenkoBlock.open < lastRenkoBlock.close;
 		let [nextBlock] = newBlocks.slice(-1);
 		let isUptrend = nextBlock.open < nextBlock.close;
 
-		if( wasUptrend !== isUptrend ){
-			const {base, quoted} = utils.getPairAssets(pair);
-			if( isUptrend && !state.isBought ){
-				trader.placeOrder({
-					type: 'market',
-					direction: 'buy',
-					pair,
-					amount: trader.getBalance(quoted).free / trader.getPrice(pair)
-				});
-				state.isBought = true;
-			}
-			if( !isUptrend && state.isBought ){
-				trader.placeOrder({
-					type: 'market',
-					direction: 'sell',
-					pair,
-					amount: trader.getBalance(base).free
-				})
-				state.isBought = false;
-			}
+		const {base, quoted} = utils.getPairAssets(pair);
+		if( isUptrend && !pairSlots.includes(pair) && pairSlots.length < MAX_CONCURRENT_BUYS ){
+			trader.placeOrder({
+				type: 'market',
+				direction: 'buy',
+				pair,
+				amount: (trader.getBalance(quoted).free * .45) / trader.getPrice(pair)
+			});
+			pairSlots.push(pair);
+		}
+		if( !isUptrend && pairSlots.includes(pair) ){
+			trader.placeOrder({
+				type: 'market',
+				direction: 'sell',
+				pair,
+				amount: trader.getBalance(base).free
+			})
+			let index = pairSlots.indexOf(pair);
+			let oldPair = [...pairSlots];
+			pairSlots.splice(index, 1);
+			console.log('Selling', oldPair, pairSlots)
 		}
 
 		state.lastRenkoBlock = newBlocks[newBlocks.length-1];
 	}
 
 	plotter.plotSeries('renko', pair, state.lastRenkoBlock.close );
+}
+
+function checkAlreadyBoughtPairs(quotedAsset: string, baseAssets: string[], state: any, trader: Trader ){
+	let i = baseAssets.length;
+	while( i-- > 0 && state.pairSlots.length < MAX_CONCURRENT_BUYS ){
+		if( trader.getBalance(baseAssets[i]).free > 0 ){
+			state.pairSlots.push( `${baseAssets[i]}/${quotedAsset}` );
+		}
+	}
 }
 
 

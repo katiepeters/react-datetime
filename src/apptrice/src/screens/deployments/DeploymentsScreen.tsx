@@ -88,12 +88,21 @@ export default class DeploymentsScreen extends React.Component<ScreenProps> {
 
 	getColumns(): TableColumn<ModelBotDeployment>[] {
 		return [
-			{ field: 'id' },
+			{ field: 'id', renderFn: this._renderId },
 			{ field: 'name' },
-			{ field: 'botId' },
+			{ field: 'botId', title: 'bot', renderFn: this._renderBot },
+			{ field: 'version'},
 			{ field: 'active', title: '', renderFn: this._renderActive },
 			{ field: 'controls', title: '', renderFn: this._renderControls, noSort: true }
 		];
+	}
+
+	_renderId = (item: ModelBotDeployment ) => {
+		return <span>{item.id.slice(0,8)}</span>;
+	}
+
+	_renderBot = (item: ModelBotDeployment) => {
+		return <span>{item.botId.slice(0,8)}</span>;
 	}
 
 	_renderActive = (item: ModelBotDeployment) => {

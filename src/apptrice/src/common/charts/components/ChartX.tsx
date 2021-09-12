@@ -24,7 +24,7 @@ class ChartX extends React.Component<ChartXProps> {
 	margins = { left: 50, right: 50, top: 10, bottom: 30 }
 
 	render() {
-		const { width, ratio, height, children, initialCandlesInView = 140 } = this.props;
+		const { width, ratio, height, children} = this.props;
 		const candles = this.getCandles();
 
 		return (
@@ -48,7 +48,7 @@ class ChartX extends React.Component<ChartXProps> {
 	getExtents(){
 		if( !this.extentsInitialized ){
 			let candles = this.getCandles();
-			let {initialCandlesInView = 150} = this.props;
+			let {initialCandlesInView = 140} = this.props;
 			this.extents = [
 				chartUtils.xAccessor(candles.slice(-1)[0]),
 				chartUtils.xAccessor(candles[Math.max(0,candles.length - initialCandlesInView)])

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Card, InputGroup } from '../../components';
 import styles from './_BtSettings.module.css';
 
-export interface Balances { [pair: string]: number };
+export interface Balances { [pair: string]: string };
 
 interface InitialBalancesProps {
 	pairs: string[]
@@ -46,7 +46,7 @@ export default class InitialBalances extends React.Component<InitialBalancesProp
 					label={pair}>
 					<input name={`${pair}_balance`}
 						// @ts-ignore
-						value={this.props.balances[pair] || '0'}
+						value={this.props.balances[pair]}
 						onChange={e => this.updateBalances(pair, e.target.value)} />
 				</InputGroup>
 			</div>
@@ -54,16 +54,17 @@ export default class InitialBalances extends React.Component<InitialBalancesProp
 	}
 
 	updateBalances(pair: string, value: string) {
+		let parsed = value.replace(/[^\d.]/ig, '');
 		this.props.onChange({
 			...this.props.balances,
-			[pair]: parseFloat(value)
+			[pair]: parsed
 		});
 	}
 
 	componentDidMount() {
 		let balances: Balances = {};
 		this.props.pairs.forEach( pair => {
-			balances[pair] = this.props.balances[pair] || 0
+			balances[pair] = this.props.balances[pair] || '0'
 		});
 		this.props.onChange(balances);
 	}

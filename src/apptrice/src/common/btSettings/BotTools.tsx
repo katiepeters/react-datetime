@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RunInterval } from '../../../../lambdas/model.types';
-import InitialBalances, { Balances } from './InitialBalances';
+import InitialBalances from './InitialBalances';
 import {Button, InputGroup} from '../../components';
 import ProgressBar from './ProgressBar';
 interface BotToolsProps {
@@ -24,7 +24,7 @@ interface BotToolsState {
 	baseAssets: string
 	quotedAsset: string
 	runInterval: RunInterval
-	initialBalances: Balances
+	initialBalances: {[asset: string]: string}
 	testingTimeframe: string
 	startDate: string
 	endDate: string
@@ -40,7 +40,7 @@ export default class BotTools extends React.Component<BotToolsProps> {
 		quotedAsset: 'USD',
 		runInterval: '1h',
 		initialBalances: {
-			USD: 1000
+			USD: '1000'
 		},
 		testingTimeframe : '7',
 		startDate: this.getInputDate(Date.now() - 8 * DAY),
@@ -267,11 +267,16 @@ export default class BotTools extends React.Component<BotToolsProps> {
 		let start = new Date(startDate + 'T00:00:00.000Z');
 		let end = new Date(endDate + 'T23:59:59.999Z');
 
+		let balances: {[asset:string]: number} = {};
+		Object.keys(initialBalances).forEach( (asset:string) => {
+			balances[asset] = parseFloat(initialBalances[asset]);
+		})
+
 		return {
 			baseAssets: this.getPairs().slice(1),
 			quotedAsset,
 			runInterval,
-			initialBalances,
+			initialBalances: balances,
 			startDate: start.getTime(),
 			endDate: end.getTime(),
 			fees: parseFloat(fees),

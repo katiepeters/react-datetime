@@ -45,7 +45,6 @@ export default class Trader {
 
 	placeOrder(orderInput: OrderInput): Order {
 		let order: Order = {
-			price: null,
 			...orderInput,
 			id: uuid(),
 			status: 'pending',

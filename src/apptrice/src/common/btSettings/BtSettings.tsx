@@ -228,10 +228,11 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 		const baseAssets = this.getPairs().slice(1);
 
 		let balances:{[asset:string]: number} = {
-			[quotedAsset]: initialBalances[quotedAsset] || 0
+			[quotedAsset]: initialBalances[quotedAsset] ? parseFloat(initialBalances[quotedAsset]) : 0
 		};
+		
 		baseAssets.forEach( asset => {
-			balances[asset] = initialBalances[asset] || 0
+			balances[asset] = initialBalances[asset] ? parseFloat(initialBalances[asset]) : 0
 		});
 
 		return {
@@ -284,7 +285,7 @@ export default class BtSettings extends React.Component<BtSettingsProps, BtSetti
 			quotedAsset: 'USD',
 			runInterval: '1h',
 			initialBalances: {
-				USD: 1000
+				USD: '1000'
 			},
 			testingTimeframe: '7',
 			startDate: this.getInputDate(Date.now() - 8 * DAY),

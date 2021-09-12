@@ -26,7 +26,7 @@ export async function executor(event: BotExecutorPayload) {
 	}
 
 	const trader = new Trader(
-		event.portfolio, event.orders, event.candles
+		event.portfolio, event.orders, event.candleData
 	);
 
 	const {points, series, indicators: ind, candlestickPatterns: patt} = event.plotterData;
@@ -48,7 +48,7 @@ export async function executor(event: BotExecutorPayload) {
 	// Pass a state object that can be updated
 	try {
 		bot.onData({
-			candleData: event.candles,
+			candleData: event.candleData,
 			config: event.config,
 			trader,
 			state: state,
@@ -60,7 +60,7 @@ export async function executor(event: BotExecutorPayload) {
 	}
 	catch (err) {
 		if (err.stack) {
-			error = translateStack(err.stack);
+			error = translateStack(err.stack, bot.sourceCompiled);
 		}
 		else {
 			console.error( error );
@@ -96,10 +96,12 @@ function getBot( botCode: string ): TradeBot | void {
 	try {
 		let jsCode = ts.transpile(code);
 		eval(jsCode);
+		bot.sourceCompiled = jsCode;
 	}
 	catch( err ) {
 		console.error('Bot code not valid: ', err);
 	}
+	
 	return bot;
 }
 
@@ -119,7 +121,7 @@ function getBotState( event, bot ){
 			}
 			catch (err) {
 				if (err.stack) {
-					error = { error: translateStack(err.stack) };
+					error = { error: translateStack(err.stack, bot.sourceCompiled) };
 				}
 				else {
 					console.error(err);
@@ -131,10 +133,14 @@ function getBotState( event, bot ){
 	return {state, error};
 }
 
-function translateStack( stack: string ): string{
+function translateStack( stack: string, source?:string ): string{
 	let parts = stack.split('\n');
 	let botErrorParts = [ parts[0] ];
 	let i = 1;
+	if( source ){
+		let withLines = source.split('\n').map( (l,i) => `${i+1}: ${l}` ).join('\n');
+		// console.log( withLines );
+	}
 	while( i < parts.length ){
 		let translated = parts[i].replace(/eval at getBot \([^)]*\), /, '');
 		if (translated.includes('<anonymous>') ){

@@ -254,6 +254,7 @@ export default class VirtualAdapter implements ExchangeAdapter {
 	}
 
 	hasEnoughFunds( order: OrderInput ){
+		console.log('Has enough funds', order);
 		if (order.direction === 'buy') {
 			let coin = pairs.getQuoted(order.pair);
 			let balance = this.getBalance(coin).free;

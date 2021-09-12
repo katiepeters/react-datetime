@@ -104,10 +104,15 @@ export default class BotListScreen extends React.Component<ScreenProps> {
 
 	getColumns(): TableColumn<DbBot>[] {
 		return [
+			{ field: 'id', renderFn: this._renderId },
 			{ field: 'name', title: 'Bot name' },
 			{ field: 'accountId', title: 'Account' },
 			{ field: 'controls', title: '', renderFn: this._renderControls, noSort: true}
 		]
+	}
+
+	_renderId = (item: DbBot ) => {
+		return <span>{item.id.slice(0,8)}</span>;
 	}
 
 	_renderControls = (item: DbBot) => {

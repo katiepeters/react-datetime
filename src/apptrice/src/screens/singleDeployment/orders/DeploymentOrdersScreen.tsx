@@ -17,7 +17,7 @@ export default class DeploymentOrdersScreen extends React.Component<SingleDeploy
 	}
 
 	renderList(orders: DeploymentOrders) {
-		if( !Object.keys(orders).length ){
+		if( !Object.keys(orders.items).length ){
 			return <Card>No orders.</Card>;
 		}
 
@@ -28,7 +28,7 @@ export default class DeploymentOrdersScreen extends React.Component<SingleDeploy
 	}
 
 	renderTitle(orders: DeploymentOrders) {
-		let count = Object.keys(orders).length;
+		let count = Object.keys(orders.items).length;
 		return count ?
 			`${count} orders` :
 			'Orders'

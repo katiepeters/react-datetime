@@ -39,6 +39,8 @@ export async function runBotIteration( accountId: string, deploymentId: string, 
 		return;
 	}
 
+	console.log(`Orders to cancel/place: ${result.ordersToCancel.length}, ${result.ordersToPlace.length}`);
+
 	const cancelledOrders = await runner.cancelOrders( adapter, deployment.orders, result.ordersToCancel );
 	const placedOrders = await runner.placeOrders( adapter, result.ordersToPlace );
 	const updatedOrders = mergeResultOrders( deployment.orders, result, cancelledOrders, placedOrders );

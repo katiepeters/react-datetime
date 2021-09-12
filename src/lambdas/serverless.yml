@@ -47,6 +47,7 @@ provider:
     stage: ${self:provider.stage}
   iam:
     role: defaultRole
+  logRetentionInDays: 14
 
 functions:
   apitron:

@@ -110,11 +110,12 @@ export interface Orders {
 export interface TradeBot {
 	initializeState?(config: BotConfigurationExtra, state: BotState): void
 	onData(input: BotInput): void
+	sourceCompiled?: string
 }
 
 export interface BotExecutorPayload {
 	botSource: string,
-	candles: BotCandles,
+	candleData: BotCandles,
 	config: BotConfiguration,
 	state: BotState,
 	orders: DeploymentOrders,

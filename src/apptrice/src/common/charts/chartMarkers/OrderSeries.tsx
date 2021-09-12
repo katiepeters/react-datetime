@@ -148,5 +148,5 @@ function getColor(status: string, direction: string) {
 }
 
 function getLastCandleTime(c: any[]) {
-	return c[c.length - 1].date.getTime();
+	return c[c.length - 1].date;
 }

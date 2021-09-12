@@ -1,15 +1,14 @@
-import { BasicBotDeploymentStats, DBBotDeployment, DeploymentOrders, PortfolioWithPrices, SimpleBotDeployment } from "../../model.types";
-import { ActivityDeployment } from "../dynamo/DeploymentTypes";
+import { BasicBotDeploymentStats, FullBotDeployment, PortfolioWithPrices, ModelBotDeployment, BaseBotDeployment } from "../../model.types";
 
-export function isNewDeployment( deployment: DBBotDeployment ){
+export function isNewDeployment( deployment: FullBotDeployment ){
 	return deployment.state?.newState === 'stateNew';
 }
 
-export function isActiveDeployment( {active}: SimpleBotDeployment ): boolean{
+export function isActiveDeployment( {active}: ModelBotDeployment ): boolean{
 	return active;
 }
 
-export function getActivatedDeployment<T extends ActivityDeployment>( currentDeployment: T ): T{
+export function getActivatedDeployment<T extends BaseBotDeployment>( currentDeployment: T ): T{
 	let activeIntervals = [...(currentDeployment.activeIntervals||[])];
 	let [lastActiveInterval] = activeIntervals.slice(-1);
 	if( !lastActiveInterval || lastActiveInterval.length === 2 ){
@@ -23,7 +22,7 @@ export function getActivatedDeployment<T extends ActivityDeployment>( currentDep
 	return currentDeployment;
 }
 
-export function getDeactivatedDeployment<T extends ActivityDeployment>( currentDeployment: T ){
+export function getDeactivatedDeployment<T extends BaseBotDeployment>( currentDeployment: T ){
 	let activeIntervals = [...(currentDeployment.activeIntervals||[])];
 	let [lastActiveInterval] = activeIntervals.slice(-1);
 	if( lastActiveInterval && lastActiveInterval.length === 1 ){

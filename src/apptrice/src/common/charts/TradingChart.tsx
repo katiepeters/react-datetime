@@ -72,8 +72,7 @@ export default class TradingChart extends React.Component<TradingChartProps> {
 
 	renderCharts() {
 		const plotterDataByChart = getDataByChart(this.props.plotterData);
-		const chartNames = Object.keys(plotterDataByChart);
-
+		
 		return [
 			this.renderCandlesChart( plotterDataByChart.candles ),
 			this.renderVolumeChart( plotterDataByChart.volume )

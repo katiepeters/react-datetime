@@ -15,8 +15,8 @@ const getPrices: QueryHandler = {
 			type: 'pricesType'
 		});
 
-		const {exchange, type, pair} = query;
-		let pair = pair.replace('_', '/');
+		const {exchange, type} = query;
+		let pair = query.pair.replace('_', '/');
 
 		console.log(error);
 		if (error) return { error: { ...error, code: 'invalid_request' } };

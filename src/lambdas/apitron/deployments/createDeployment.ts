@@ -1,7 +1,7 @@
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 import { v4 as uuid } from 'uuid';
-import { CreateBotDeploymentModelInput } from "../../_common/dynamo/DeploymentTypes";
+import { CreateBotDeploymentModelInput } from "../../model.types";
 interface CreateDeploymentInput {
 	name: string
 	accountId: string

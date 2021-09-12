@@ -10,7 +10,7 @@ export interface BtSettingsConfig {
 	baseAssets: string
 	quotedAsset: string
 	runInterval: RunInterval
-	initialBalances: { [asset: string]: number },
+	initialBalances: { [asset: string]: string },
 	testingTimeframe: string
 	startDate?: string
 	endDate?: string
