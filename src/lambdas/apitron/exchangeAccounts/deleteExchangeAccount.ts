@@ -5,22 +5,19 @@ const deleteExchangeAccountHandler: MutationHandler = {
 	name: 'deleteExchangeAccount',
 	async getContext({ query, params, models }: MutationContextInput<any>): Promise<ContextResult> {
 		const { exchangeAccountId } = params;
-		const { accountId } = query;
 
 		// Validate input
-		let { error } = validateShape({ exchangeAccountId, accountId }, {
-			accountId: 'string',
+		let { error } = validateShape({ exchangeAccountId }, {
 			exchangeAccountId: 'string'
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const exchangeAccount = await models.exchangeAccount.getSingle(accountId, exchangeAccountId);
+		const exchangeAccount = await models.exchangeAccount.getSingle(exchangeAccountId);
 		if (!exchangeAccount) return { error: { code: 'not_found', status: 404 } };
 
 
 		return {context: {
-			accountId,
-			exchangeAccountId,
+			id: exchangeAccountId,
 			deleteExtra: exchangeAccount.type === 'virtual'
 		}};
 	},

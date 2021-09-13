@@ -1,42 +1,66 @@
-import { DbBot, DbBotInput } from '../../model.types';
+import { DbBot, DbBotInput, DynamoBot, ModelBot } from '../../model.types';
+import { parseId } from '../utils/resourceId';
 import { DBModel } from './db';
 
-interface DeleteBotInput {
-	accountId: string
-	botId: string
-}
-
 interface UpdateBotInput {
-	accountId: string
 	botId: string
 	update: any
 }
 
-const Db = new DBModel<DbBot>();
+const Db = new DBModel<DynamoBot>();
 
 export default {
-	async getSingle(accountId: string, botId: string): Promise<DbBot | void> {
-		return await Db.getSingle(accountId, `BOT#${botId}`);
+	async getSingle(compoundId: string): Promise<ModelBot | void> {
+		const {accountId, resourceId} = parseId(compoundId);
+		const bot = await Db.getSingle(accountId, `BOT#${resourceId}`);
+		if( bot ){
+			return dynamoToModel(bot);
+		}
 	},
-	async getAccountBots( accountId: string ) {
-		return await Db.getMultiple( accountId, 'BOT#');
+	async getAccountBots( accountId: string ): Promise<ModelBot[]> {
+		return (await Db.getMultiple( accountId, 'BOT#')).map(dynamoToModel);
 	},
 	async create(input: DbBotInput): Promise<void> {
+		const {id, ...baseBot} = input;
 		let bot: DbBot = {
 			createdAt: Date.now(),
 			...input,
-			resourceId: `BOT#${input.id}`
+			resourceId: `BOT#${id}`
 		};
 		delete bot.botId;
 		return await Db.put(bot);
 	},
 
-	async update({accountId, botId, update}: UpdateBotInput ): Promise<void> {
+	async update({botId, update}: UpdateBotInput ): Promise<void> {
+		const {accountId, resourceId} = parseId(botId);
 		console.log( {accountId, botId, update });
-		return await Db.update(accountId, `BOT#${botId}`, update);
+		return await Db.update(accountId, `BOT#${resourceId}`, update);
 	},
 
-	async delete({accountId, botId}: DeleteBotInput): Promise<void> {
-		return await Db.del( accountId, `BOT#${botId}` );
+	async delete(botId: string): Promise<void> {
+		const {accountId, resourceId} = parseId(botId);
+		return await Db.del( accountId, `BOT#${resourceId}` );
+	}
+}
+
+function dynamoToModel( dynamoBot: DynamoBot ): ModelBot {
+	const {resourceId, accountId, ...baseBot} = dynamoBot;
+	let rid = resourceId.replace('BOT#', '') + accountId;
+	let model = {
+		id: rid,
+		accountId,
+		...baseBot
+	};
+
+	console.log('more more', model, rid );
+	return model;
+}
+
+function modelToDynamo( modelbot: ModelBot ): DynamoBot {
+	const {id, ...baseBot} = modelbot;
+	const {resourceId} = parseId(id);
+	return {
+		resourceId: `BOT#${resourceId}`,
+		...baseBot
 	}
 }

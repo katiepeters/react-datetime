@@ -5,17 +5,16 @@ const getSingleBotVersionHandler: QueryHandler = {
 	name: 'getSingleBotVersion',
 	async getContext({ params, query, models }: QueryContextInput): Promise<ContextResult> {
 		const { number } = params;
-		const {accountId, botId} = query;
+		const {botId} = query;
 		
-		const { error } = validateShape({ number, botId, accountId }, {
+		const { error } = validateShape({ number, botId }, {
 			botId: 'string',
-			accountId: 'string',
 			number: 'botVersion'
 		});
 
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const version = await models.botVersion.getSingle(accountId, botId, number);
+		const version = await models.botVersion.getSingle(botId, number);
 		if( !version ){
 			return { error: {code: 'bot_version_not_found'}};
 		}

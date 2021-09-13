@@ -14,7 +14,7 @@ const deleteBotHandler: MutationHandler = {
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const bot = await models.bot.getSingle(accountId, botId);
+		const bot = await models.bot.getSingle(botId);
 		if (!bot) {
 			return { error: { code: 'not_found', reason: 'bot not found', status: 404 } };
 		}

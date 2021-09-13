@@ -5,15 +5,13 @@ const getSingleBotHandler: QueryHandler = {
 	name: 'getSingleBot',
 	async getContext({ params, query, models }: QueryContextInput): Promise<ContextResult> {
 		const { botId } = params;
-		const { accountId } = query;
 
-		const { error } = validateShape({ botId, accountId }, {
-			botId: 'string',
-			accountId: 'string'
+		const { error } = validateShape({ botId }, {
+			botId: 'string'
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const bot = await models.bot.getSingle(accountId, botId);
+		const bot = await models.bot.getSingle(botId);
 		if (!bot) return { error: { code: 'not_found', status: 404 } };
 
 		return { context: { bot } };

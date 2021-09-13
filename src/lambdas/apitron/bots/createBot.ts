@@ -3,6 +3,7 @@ import { validateShape } from "../utils/validators";
 import { v4 as uuid } from 'uuid';
 import { DbBotInput } from "../../model.types";
 import { DbBotVersionCreateInput } from "../../_common/dynamo/BotVersionModel";
+import { createId } from "../../_common/utils/resourceId";
 
 const createBotHandler: MutationHandler = {
 	name: 'createBot',
@@ -20,8 +21,9 @@ const createBotHandler: MutationHandler = {
 
 	getMutations(input: MutationGetterInput): Mutation[] {
 		const {accountId, name, code} = input.body;
+		const id = createId();
 		const bot: DbBotInput = {
-				id: uuid(),
+				id,
 				accountId,
 				name,
 				versions: [
@@ -29,8 +31,7 @@ const createBotHandler: MutationHandler = {
 				]
 		};
 		const version: DbBotVersionCreateInput = {
-			accountId,
-			botId: bot.id,
+			botId: `${id}${accountId}`,
 			number: '0.0',
 			code
 		};

@@ -6,7 +6,6 @@ import { validateShape } from "../utils/validators";
 type VersionBumpType = 'minor' | 'major';
 
 interface CreateBotVersionPayload {
-	accountId: string
 	botId: string
 	// We receive what version bump type we need for the new version
 	type: VersionBumpType
@@ -19,7 +18,6 @@ const createBotVersionHandler: MutationHandler = {
 	async getContext({body, params, models}: MutationContextInput<any>): Promise<ContextResult> {
 		// Validate input
 		let {error} = validateShape(body, {
-			accountId: 'string',
 			botId: 'string',
 			type: 'botVersionType',
 			sourceNumber: 'botVersion?'
@@ -28,14 +26,14 @@ const createBotVersionHandler: MutationHandler = {
 		if( error ) return {error: {...error, code: 'invalid_payload'}};
 
 		const {accountId, botId, type} = body;
-		const bot = await models.bot.getSingle(accountId, botId);
+		const bot = await models.bot.getSingle(botId);
 		if( !bot ){
 			return {error: {code: 'bot_not_found'}};
 		}
 
 		let versionNumber = body.sourceNumber || getLastVersion(bot.versions);
 		const sourceVersion = await models.botVersion.getSingle(
-			accountId, botId, versionNumber
+			botId, versionNumber
 		);
 
 		if( !sourceVersion ){
@@ -70,7 +68,6 @@ const createBotVersionHandler: MutationHandler = {
 
 		// Get version data
 		const version: DbBotVersionCreateInput = {
-			accountId: bot.accountId,
 			botId: bot.id,
 			number: `${nextVersion[0]}.${nextVersion[1]}`,
 			code: sourceVersion.code

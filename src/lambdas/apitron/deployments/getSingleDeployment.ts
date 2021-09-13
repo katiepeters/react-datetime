@@ -7,13 +7,12 @@ const getSingleDeploymentHandler: QueryHandler = {
 		const { deploymentId } = params;
 		const { accountId } = query;
 
-		const {error} = validateShape({deploymentId, accountId}, {
-			deploymentId: 'string',
-			accountId: 'string'
+		const {error} = validateShape({deploymentId}, {
+			deploymentId: 'string'
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const deployment = await models.deployment.getSingleFull(accountId, deploymentId);
+		const deployment = await models.deployment.getSingleFull(deploymentId);
 		if (!deployment) {
 			return { error: { code: 'not_found', reason: 'deployment not found', status: 404 } };
 		}

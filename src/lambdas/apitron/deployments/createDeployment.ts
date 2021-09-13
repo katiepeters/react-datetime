@@ -2,6 +2,7 @@ import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, Mut
 import { validateShape } from "../utils/validators";
 import { v4 as uuid } from 'uuid';
 import { CreateBotDeploymentModelInput } from "../../model.types";
+import { createId, createResourceId } from "../../_common/utils/resourceId";
 interface CreateDeploymentInput {
 	name: string
 	accountId: string
@@ -38,8 +39,8 @@ const createDeploymentHandler: MutationHandler = {
 		// Validate entities
 		const {accountId, botId, version: versionNumber, exchangeAccountId} = body;
 		let [version, exchange] = await Promise.all([
-			models.botVersion.getSingle(accountId, botId, versionNumber),
-			models.exchangeAccount.getSingle(accountId, exchangeAccountId)
+			models.botVersion.getSingle(botId, versionNumber),
+			models.exchangeAccount.getSingle(exchangeAccountId)
 		]);
 
 		if( !version ) return {error: {code: 'unknown_version'}};
@@ -50,7 +51,7 @@ const createDeploymentHandler: MutationHandler = {
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {
-		const id = uuid();
+		const id = createId();
 
 		let deployment: CreateBotDeploymentModelInput = {
 			id,
@@ -67,9 +68,11 @@ const createDeploymentHandler: MutationHandler = {
 	},
 
 	getResponse(input: MutationResponseInput): ResponseResult {
+		let {id,accountId} = input.mutations[0].data;
+
 		return {
 			status: 201,
-			data: {id: input.mutations[0].data.id }
+			data: {id: `${id}${accountId}` }
 		};
 	}
 }

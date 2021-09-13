@@ -37,8 +37,8 @@ export default class VirtualAdapter implements ExchangeAdapter {
 		const { accountId, id: exchangeId } = this.exchangeAccount;
 
 		let [portfolio, orders] = await Promise.all([
-			ExchangeAccountModel.getVirtualPorftolio(accountId, exchangeId),
-			ExchangeAccountModel.getVirtualOrders(accountId, exchangeId)
+			ExchangeAccountModel.getVirtualPorftolio(exchangeId),
+			ExchangeAccountModel.getVirtualOrders(exchangeId)
 		]);
 
 		this.portfolio = portfolio;

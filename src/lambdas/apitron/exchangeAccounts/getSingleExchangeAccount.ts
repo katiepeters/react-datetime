@@ -6,15 +6,13 @@ const getSingleExchangeAccountHandler: QueryHandler = {
 	name: 'getSingleExchangeAccount',
 	async getContext({ params, query, models }: QueryContextInput): Promise<ContextResult> {
 		const {exchangeAccountId} = params;
-		const {accountId} = query;
 
-		const {error} = validateShape({exchangeAccountId, accountId}, {
-			exchangeAccountId: 'string',
-			accountId: 'string'
+		const {error} = validateShape({exchangeAccountId}, {
+			exchangeAccountId: 'string'
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
-		const exchangeAccount = await models.exchangeAccount.getSingle(accountId, exchangeAccountId);
+		const exchangeAccount = await models.exchangeAccount.getSingle(exchangeAccountId);
 		console.log( exchangeAccount );
 		if( !exchangeAccount ) return {error:{code: 'not_found', status: 404}};
 

@@ -8,7 +8,6 @@ const updateDeploymentHandler: MutationHandler = {
 	async getContext({body, params, models}: MutationContextInput<any>): Promise<ContextResult> {
 		// Validate input
 		let {error} = validateShape(body, {
-			accountId: 'string',
 			active: 'boolean?',
 			version: 'string?',
 			name: 'string?'
@@ -20,13 +19,13 @@ const updateDeploymentHandler: MutationHandler = {
 			return {error: {code: 'invalid_payload', reason: 'nothing to update'}};
 		} 
 
-		const deployment = await models.deployment.getSingleModel(body.accountId, params.deploymentId);
+		const deployment = await models.deployment.getSingleModel(params.deploymentId);
 		if( !deployment ){
 			return {error: {code: 'not_found', reason: 'deployment not found', status: 404}};
 		}
 
 		if( body.version ){
-			const version = await models.botVersion.getSingle(deployment.accountId, deployment.botId, body.version );
+			const version = await models.botVersion.getSingle(deployment.botId, body.version );
 			if( !version ){
 				return {error: {code: 'unknown_version'}};
 			}

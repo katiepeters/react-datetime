@@ -12,7 +12,7 @@ import { SupplierdoRunnableBot } from "./SupplierdoRunnableBot";
 
 const SupplierdoRunner: BotRunner = {
 	async getDeployment( accountId: string, deploymentId: string ){
-		const deployment = await BotDeploymentModel.getSingleFull( accountId, deploymentId );
+		const deployment = await BotDeploymentModel.getSingleFull( deploymentId );
 		if( !deployment ){
 			throw new Error('unknown_deployment');
 		}
@@ -20,7 +20,7 @@ const SupplierdoRunner: BotRunner = {
 	},
 
 	async getExchangeAccount( accountId: string, exchangeAccountId: string ){
-		const exchange = await ExchangeAccountModel.getSingle( accountId, exchangeAccountId );
+		const exchange = await ExchangeAccountModel.getSingle( exchangeAccountId );
 		if( !exchange ){
 			throw new Error('unknown_exchange_account');
 		}
@@ -67,7 +67,7 @@ const SupplierdoRunner: BotRunner = {
 	},
 
 	async getBot( accountId: string, botId: string, versionNumber: string ): Promise<RunnableBot>{
-		let botVersion = await BotVersionModel.getSingle(accountId, botId, versionNumber);
+		let botVersion = await BotVersionModel.getSingle(botId, versionNumber);
 
 		if( !botVersion ){
 			throw new CodeError({
@@ -95,8 +95,7 @@ const SupplierdoRunner: BotRunner = {
 		}
 
 		let payload = {
-			accountId: deployment.accountId,
-			deploymentId: deployment.id,
+			id: deployment.id,
 			update: modelUpdate
 		};
 
@@ -111,13 +110,13 @@ const SupplierdoRunner: BotRunner = {
 
 	async updateExchange( exchange: DbExchangeAccount, update: BotRunnerExchangeUpdate ) {
 		let promises = [
-			ExchangeAccountModel.updatePortfolio(exchange.accountId, exchange.id, update.portfolio )
+			ExchangeAccountModel.updatePortfolio(exchange.id, update.portfolio )
 		];
 
 		if( update.orders ){
 			console.log('We are updating exchange orders');
 			promises.push(
-				ExchangeAccountModel.updateOrders(exchange.accountId, exchange.id, update.orders )
+				ExchangeAccountModel.updateOrders(exchange.id, update.orders )
 			);
 		}
 
@@ -161,8 +160,7 @@ const SupplierdoRunner: BotRunner = {
 		];
 
 		await BotDeploymentModel.update({
-			accountId: deployment.accountId,
-			deploymentId: deployment.id,
+			id: deployment.id,
 			update: {logs}
 		});
 	},

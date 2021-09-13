@@ -1,6 +1,7 @@
 import { ContextResult, Mutation, MutationContextInput, MutationGetterInput, MutationHandler, MutationResponseInput, ResponseResult } from "../apitron.types";
 import { validateShape } from "../utils/validators";
 import {v4 as uuid} from 'uuid';
+import { createId } from "../../_common/utils/resourceId";
 
 const createExchangeAccountHandler: MutationHandler = {
 	name: 'createExchangeAccount',
@@ -20,7 +21,7 @@ const createExchangeAccountHandler: MutationHandler = {
 	getMutations(input: MutationGetterInput): Mutation[] {
 		const {accountId, provider, type, key, secret, name, initialBalances} = input.body;
 		let data = {
-			id: uuid(),
+			id: createId(),
 			accountId, provider, type, key, secret, name, initialBalances
 		}
 		return [{
@@ -31,9 +32,10 @@ const createExchangeAccountHandler: MutationHandler = {
 	},
 
 	getResponse(input: MutationResponseInput): ResponseResult {
+		let {id,accountId} = input.mutations[0].data;
 		return {
 			status: 201,
-			data: {id: input.mutations[0].data.id}
+			data: {id: `${id}${accountId}` }
 		};
 	}
 }

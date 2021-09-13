@@ -1,4 +1,5 @@
 import { CreateBotDeploymentModelInput, DynamoBotDeployment, FullBotDeployment, ModelBotDeployment, UpdateBotDeploymentModelInput } from '../../model.types';
+import { parseId } from '../utils/resourceId';
 import s3Helper from '../utils/s3';
 import { DBModel } from './db';
 
@@ -15,14 +16,9 @@ const emptyPlotterData = {
 	series: {},
 	points: {}
 }
-interface DeleteDeploymentInput {
-	accountId: string
-	deploymentId: string
-}
 
 interface UpdateDeploymentInput {
-	accountId: string
-	deploymentId: string
+	id: string
 	update: UpdateBotDeploymentModelInput
 }
 
@@ -32,14 +28,16 @@ export default {
 		return deployments.map( dynamoToModel );
 	},
 
-	async getSingleModel(accountId: string, deploymentId: string): Promise<ModelBotDeployment | void > {
-		let entry = await Db.getSingle(accountId, `${DEPLOYMENT_PREFIX}${deploymentId}`);
+	async getSingleModel(compoundId: string): Promise<ModelBotDeployment | void > {
+		let {accountId, resourceId} = parseId(compoundId);
+		let entry = await Db.getSingle(accountId, `${DEPLOYMENT_PREFIX}${resourceId}`);
 		if( entry ){
 			return dynamoToModel(entry)
 		}
 	},
 
-	async getSingleFull(accountId: string, deploymentId: string): Promise<FullBotDeployment | void > {
+	async getSingleFull(compoundId: string): Promise<FullBotDeployment | void > {
+		let {accountId, resourceId: deploymentId} = parseId(compoundId);
 		let entry = await Db.getSingle(accountId, `${DEPLOYMENT_PREFIX}${deploymentId}`);
 		if( !entry ) return;
 
@@ -104,8 +102,9 @@ export default {
 		return await Db.put(modelToDynamo(input));
 	},
 
-	async update({ accountId, deploymentId, update }: UpdateDeploymentInput ){
+	async update({ id, update }: UpdateDeploymentInput ){
 		let promises: any = [];
+		let {accountId, resourceId: deploymentId} = parseId(id);
 
 		if( needsToUpdateDynamo(update) ) {
 			promises.push(
@@ -137,7 +136,9 @@ export default {
 		}
 	},
 
-	async delete({accountId, deploymentId}: DeleteDeploymentInput) {
+	async delete(id: string) {
+		let {accountId, resourceId: deploymentId} = parseId(id);
+
 		let promises = [
 			Db.del(accountId, `DEPLOYMENT#${deploymentId}`),
 			delLogs(accountId, deploymentId),
@@ -217,9 +218,10 @@ function delPlotterData(accountId: string, deploymentId: string) {
 
 const DEPLOYMENT_PREFIX = 'DEPLOYMENT#';
 function dynamoToModel( dynamoDevelopment: DynamoBotDeployment ): ModelBotDeployment{
-	const {resourceId, ...attrs} = dynamoDevelopment
+	const {resourceId, accountId, ...attrs} = dynamoDevelopment
 	return {
-		id: resourceId.replace(DEPLOYMENT_PREFIX, ''),
+		id: `${resourceId.replace(DEPLOYMENT_PREFIX, '')}${accountId}`,
+		accountId,
 		...attrs,
 		active: attrs.active !== undefined
 	};
@@ -228,7 +230,6 @@ function dynamoToModel( dynamoDevelopment: DynamoBotDeployment ): ModelBotDeploy
 function modelToDynamo( modelDevelopment: ModelBotDeployment): DynamoBotDeployment {
 	const {
 		id,
-		accountId,
 		active,
 		botId, 
 		version, 
@@ -242,9 +243,10 @@ function modelToDynamo( modelDevelopment: ModelBotDeployment): DynamoBotDeployme
 		stats
 	} = modelDevelopment;
 	
+	let {resourceId, accountId} = parseId(id);
 	return {
 		accountId,
-		resourceId: `${DEPLOYMENT_PREFIX}${id}`,
+		resourceId: `${DEPLOYMENT_PREFIX}${resourceId}`,
 		botId, 
 		version, 
 		exchangeAccountId, 

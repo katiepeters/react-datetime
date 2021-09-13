@@ -6,9 +6,8 @@ const updateBotHandler: MutationHandler = {
 	name: 'updateBot',
 	async getContext({body, params, query, models}: MutationContextInput<any>): Promise<ContextResult> {
 		// Validate input
-		let { accountId } = query;
 		let { botId } = params;
-		let {error} = validateShape({...body, accountId, botId}, {
+		let {error} = validateShape({...body, botId}, {
 			code: 'string?',
 			name: 'string?',
 			accountId: 'string',
@@ -16,10 +15,10 @@ const updateBotHandler: MutationHandler = {
 		});
 		if( error ) return {error: {...error, code: 'invalid_payload'}};
 
-		const bot = await models.bot.getSingle(accountId, botId);
+		const bot = await models.bot.getSingle(botId);
 		if( !bot ) return {error: {code: 'not_found', status: 404}};
 
-		return {context: {accountId, botId}};
+		return {context: {botId}};
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {
@@ -35,7 +34,7 @@ const updateBotHandler: MutationHandler = {
 			model: 'bot',
 			action: 'update',
 			data: {
-				accountId, botId, update
+				botId, update
 			}
 		}];
 	},

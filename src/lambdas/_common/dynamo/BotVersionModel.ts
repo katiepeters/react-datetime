@@ -1,10 +1,10 @@
 import { DbBotVersion } from '../../model.types';
+import { parseId } from '../utils/resourceId';
 import { DBModel } from './db';
 
 const Db = new DBModel<DbBotVersion>();
 
 export interface DbBotVersionCreateInput {
-	accountId: string
 	botId: string
 	number: string
 	code?: string
@@ -15,7 +15,6 @@ export interface DbBotVersionCreateInput {
 }
 
 export interface DbBotVersionUpdateInput {
-	accountId: string
 	botId: string
 	number: string
 	code?: string
@@ -24,17 +23,18 @@ export interface DbBotVersionUpdateInput {
 }
 
 export interface DbBotVersionDeleteInput {
-	accountId: string
 	botId: string
 	number: string
 }
 
 export default {
-	async getSingle(accountId: string, botId: string, versionNumber: string ){
+	async getSingle(compoundId: string, versionNumber: string ){
+		const {accountId, resourceId: botId} = parseId(compoundId);
 		return await Db.getSingle(accountId, `BOTVERSION#${botId}#${versionNumber}`);
 	},
 
 	async create(input: DbBotVersionCreateInput){
+		const {accountId, resourceId: botId} = parseId(input.botId);
 		let version: DbBotVersion = {
 			code: '',
 			createdAt: Date.now(),
@@ -42,13 +42,15 @@ export default {
 			isLocked: false,
 			label: '',
 			...input,
-			resourceId: `BOTVERSION#${input.botId}#${input.number}`
+			accountId,
+			resourceId: `BOTVERSION#${botId}#${input.number}`
 		};
 
 		return await Db.put(version);
 	},
 
 	async update(input: DbBotVersionUpdateInput){
+		const {accountId, resourceId: botId} = parseId(input.botId);
 		let update:any = {
 			updatedAt: Date.now()
 		};
@@ -64,16 +66,17 @@ export default {
 		}
 
 		return await Db.update(
-			input.accountId,
-			`BOTVERSION#${input.botId}#${input.number}`,
+			accountId,
+			`BOTVERSION#${botId}#${input.number}`,
 			update
 		);
 	},
 
 	async delete(input: DbBotVersionDeleteInput){
+		const {accountId, resourceId: botId} = parseId(input.botId);
 		return await Db.del(
-			input.accountId,
-			`BOTVERSION#${input.botId}#${input.number}`
+			accountId,
+			`BOTVERSION#${botId}#${input.number}`
 		);
 	}
 }

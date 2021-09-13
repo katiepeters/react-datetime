@@ -64,7 +64,7 @@ app.post('/runnow', function(req, res) {
 	if (!deploymentId) return returnMissingAttr(res, 'deploymentId');
 
 	console.log('getting deployment');
-	BotDeploymentModel.getSingleModel(accountId, deploymentId)
+	BotDeploymentModel.getSingleModel(deploymentId)
 		.then( deployment => {
 			if (!deployment ){
 				return res.status(404)
@@ -116,8 +116,8 @@ function getCandleCount( startDate, endDate, runInterval ){
 	return Math.ceil( length / exchangeUtils.runIntervalTime[runInterval] );
 }
 
-async function setTestData(event) {
-	let { accountId } = event;
+async function setTestData() {
+	let accountId = '0000000000000000000000';
 	let account = await AccountModel.getSingle(accountId);
 	if (!account) {
 		console.log('Creating test data');
@@ -127,7 +127,7 @@ async function setTestData(event) {
 
 		await ExchangeAccountModel.create({
 			accountId,
-			id: 'testExchange',
+			id: '1111111111111111111111',
 			name: 'Test exchange real',
 			provider: 'bitfinex',
 			type: 'real',
@@ -137,7 +137,7 @@ async function setTestData(event) {
 
 		await ExchangeAccountModel.create({
 			accountId,
-			id: 'virtualExchange',
+			id: '2222222222222222222222',
 			name: 'Virtua exchange',
 			provider: 'bitfinex',
 			type: 'virtual',
@@ -148,15 +148,15 @@ async function setTestData(event) {
 		await BotDeploymentModel.create({
 			accountId,
 			name: 'Test deployment',
-			id: 'testDeployment',
-			botId: 'testBot',
+			id: '3333333333333333333333',
+			botId: '4444444444444444444444',
 			version: '0.0',
 			orders: {
 				foreignIdIndex: {},
 				items: {},
 				openOrderIds: []
 			},
-			exchangeAccountId: 'virtualExchange',
+			exchangeAccountId: '2222222222222222222222',
 			runInterval: '1h',
 			pairs: ['BTC/USD', 'ETH/USD'],
 			state: {newState: 'stateNew'},
@@ -173,17 +173,16 @@ async function setTestData(event) {
 		await BotModel.create({
 			name: 'Test bot',
 			accountId,
-			id: 'testBot',
+			id: '4444444444444444444444',
 			versions: [
 				{ lastMinor: 0, available: [{number: 0, createdAt: Date.now()}]}
 			]
 		});
 
 		await BotVersionModel.create({
-			accountId,
-			botId: 'testBot',
+			botId: '4444444444444444444444' + accountId,
 			number: '0.0',
-			code: readFileSync(join(__dirname, '../../../bots/testBot.ts'), 'utf8')
+			code: readFileSync(join(__dirname, '../../../bots/simpleBot.ts'), 'utf8')
 		})
 	}
 	else {
@@ -191,7 +190,7 @@ async function setTestData(event) {
 	}
 }
 
-setTestData({accountId: 'testAccount'});
+setTestData();
 
 
 function returnMissingAttr( res, attrName ){

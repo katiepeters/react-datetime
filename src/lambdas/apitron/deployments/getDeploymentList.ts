@@ -6,7 +6,7 @@ const getDeploymentListHandler: QueryHandler = {
 		if( !query.accountId ){
 			return { error: { code: 'invalid_payload', reason: 'missing accountId'} };
 		}
-
+		console.log( 'Getting deployments', query.accountId );
 		let deployments = await models.deployment.getAccountDeployments( query.accountId );
 
 		return { context: deployments };

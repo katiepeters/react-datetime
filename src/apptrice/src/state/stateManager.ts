@@ -45,9 +45,9 @@ export interface Store {
 }
 
 const manager = lorese<Store>({
-	authenticatedId: 'testAccount',
+	authenticatedId: '0000000000000000000000',
 	accounts: {
-		testAccount: {id: 'testAccount'} 
+		'0000000000000000000000': {id: '0000000000000000000000'} 
 	},
 	deployments: {},
 	bots: {},

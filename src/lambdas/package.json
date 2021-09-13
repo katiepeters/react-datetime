@@ -22,6 +22,7 @@
     "express": "^4.17.1",
     "node-fetch": "^2.6.1",
     "serverless-http": "^2.7.0",
+    "slugid": "^3.0.0",
     "typescript": "^4.2.4",
     "uuid": "^8.3.2"
   },

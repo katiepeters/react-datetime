@@ -23,7 +23,7 @@ const updateBotVersionHandler: MutationHandler = {
 
 		if( error ) return {error: {...error, code: 'invalid_payload'}};
 
-		const version = await models.botVersion.getSingle(accountId, botId, number);
+		const version = await models.botVersion.getSingle(botId, number);
 		if( !version ) return {error: {code: 'not_found', status: 404}};
 
 		if( code !== undefined && version.isLocked ){

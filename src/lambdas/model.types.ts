@@ -29,6 +29,22 @@ export interface VersionHistory {
 	lastMinor: number
 	available: MinorVersion[]
 }
+
+export interface BaseBot {
+	accountId: string
+	name: string
+	versions: VersionHistory[]
+	createdAt: number
+}
+
+export interface DynamoBot extends BaseBot {
+	resourceId: string
+}
+
+export interface ModelBot extends BaseBot {
+	id: string
+}
+
 export interface DbBot extends TableItem {
 	id: string
 	name: string

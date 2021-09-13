@@ -4,21 +4,23 @@ import s3Helper from '../utils/s3';
 import { Portfolio } from '../../lambda.types';
 import { ExchangeOrder } from '../exchanges/ExchangeAdapter';
 import arrayize from '../utils/arrayize';
+import { parseId } from '../utils/resourceId';
 
 const Db = new DBModel<DbExchangeAccount>();
 
  interface DeleteExchangeAccountInput {
-	accountId: string
-	exchangeAccountId: string
+	id: string
 	deleteExtra?: boolean
 }
 
 export default {
-	async getSingle(accountId: string, exchangeId: string): Promise<DbExchangeAccount | void> {
+	async getSingle(compoundId: string): Promise<DbExchangeAccount | void> {
+		let {accountId, resourceId: exchangeId} = parseId(compoundId);
 		return await Db.getSingle(accountId, `EXCHANGE#${exchangeId}`);
 	},
 
-	async getVirtualPorftolio( accountId: string, exchangeId: string ): Promise<Portfolio> {
+	async getVirtualPorftolio( compoundId: string ): Promise<Portfolio> {
+		let {accountId, resourceId: exchangeId} = parseId(compoundId);
 		const portfolio = await getLastPortfolio(accountId, exchangeId);
 		if( portfolio ){
 			return JSON.parse(portfolio);
@@ -26,7 +28,8 @@ export default {
 		return {};
 	},
 
-	async getVirtualOrders( accountId: string, exchangeId: string ) {
+	async getVirtualOrders( compoundId: string ) {
+		let {accountId, resourceId: exchangeId} = parseId(compoundId);
 		const orders = await getOrders(accountId, exchangeId);
 		if (orders) {
 			return JSON.parse(orders);
@@ -34,12 +37,14 @@ export default {
 		return {};
 	},
 
-	async updatePortfolio( accountId: string, exchangeId: string, portfolio: Portfolio ){
+	async updatePortfolio( compoundId: string, portfolio: Portfolio ){
+		let {accountId, resourceId: exchangeId} = parseId(compoundId);
 		await saveLastPortfolio(accountId, exchangeId, JSON.stringify(portfolio) );
 		return {error: false};
 	},
 
-	async updateOrders(accountId: string, exchangeId: string, orders: {[id: string]: ExchangeOrder} ){
+	async updateOrders(compoundId: string, orders: {[id: string]: ExchangeOrder} ){
+		let {accountId, resourceId: exchangeId} = parseId(compoundId);
 		return await saveOrders( accountId, exchangeId, JSON.stringify(orders) );
 	},
 	
@@ -56,7 +61,7 @@ export default {
 			resourceId: `EXCHANGE#${exchangeId}`
 		};
 		
-		console.log('Createing exchange');
+		console.log('Creating exchange');
 		let promises: Promise<any>[] = [
 			Db.put(exchange)
 		];
@@ -72,22 +77,24 @@ export default {
 		// @ts-ignore
 		await Promise.all( promises );
 	},
-	async update(accountId: string, exchangeId: string, update: any ){
+	async update(compoundId: string, update: any ){
+		let {accountId, resourceId: exchangeId} = parseId(compoundId);
 		return await Db.update(accountId, `EXCHANGE#${exchangeId}`, update);
 	},
-	async delete({accountId, exchangeAccountId, deleteExtra}: DeleteExchangeAccountInput){
+	async delete({id, deleteExtra}: DeleteExchangeAccountInput){
+		let {accountId, resourceId: exchangeId} = parseId(id);
 		let promises: Promise<any>[] = [
-			Db.del(accountId, `EXCHANGE#${exchangeAccountId}`)
+			Db.del(accountId, `EXCHANGE#${exchangeId}`)
 		];
 
 		if( deleteExtra ){
 			promises = [...promises, ...[
-				delLastPortfolio(accountId, exchangeAccountId),
-				delOrders(accountId, exchangeAccountId)
+				delLastPortfolio(accountId, exchangeId),
+				delOrders(accountId, exchangeId)
 			]];
 		}
 
-		return await Db.del(accountId, `EXCHANGE#${exchangeAccountId}`);
+		return await Db.del(accountId, `EXCHANGE#${exchangeId}`);
 	}
 }
 
