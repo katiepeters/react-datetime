@@ -1,4 +1,4 @@
-import slugid from 'slugid';
+import {nice} from 'slugid';
 
 interface CompoundId {
 	resourceId: string,
@@ -12,11 +12,12 @@ interface TripleId {
 }
 
 export function createId(): string {
-	return slugid.nice();
+	console.log('SLIGID', nice);
+	return nice();
 }
 
 export function createResourceId(accountId: string): string {
-	return slugid.nice() + accountId;
+	return nice() + accountId;
 }
 
 export function parseId(id: string): CompoundId {

@@ -98,7 +98,7 @@ const apiClient = {
 	},
 
 	loadSingleBot(accountId: string, botId: string): Promise<AxiosResponse> {
-		return axios.get(`${API_URL}/bots/${botId}?accountId=${accountId}`)
+		return axios.get(`${API_URL}/bots/${botId}`)
 			.then(res => {
 				console.log(res);
 				return res;
@@ -107,7 +107,7 @@ const apiClient = {
 	},
 
 	updateBot(accountId: string, botId: string, payload: UpdateBotInput): Promise<AxiosResponse> {
-		return axios.patch(`${API_URL}/bots/${botId}?accountId=${accountId}`, payload)
+		return axios.patch(`${API_URL}/bots/${botId}`, payload)
 			.then(res => {
 				console.log(res);
 				return res;
@@ -116,7 +116,7 @@ const apiClient = {
 	},
 
 	deleteBot(accountId: string, botId: string): Promise<AxiosResponse> {
-		return axios.delete(`${API_URL}/bots/${botId}?accountId=${accountId}`)
+		return axios.delete(`${API_URL}/bots/${botId}`)
 			.then(res => {
 				console.log(res);
 				return res;
@@ -129,7 +129,7 @@ const apiClient = {
 	///////////////
 
 	loadSingleBotVersion(accountId: string, botId: string, number: string) {
-		return axios.get(`${API_URL}/botVersions/${number}?accountId=${accountId}&botId=${botId}`)
+		return axios.get(`${API_URL}/botVersions/${number}?botId=${botId}`)
 			.then( res => {
 				console.log(res);
 				return res;
@@ -147,7 +147,7 @@ const apiClient = {
 	},
 
 	updateBotVersion( accountId: string, botId: string, number: string, update: UpdateBotVersionInput ) {
-		return axios.patch(`${API_URL}/botVersions/${number}?accountId=${accountId}&botId=${botId}`, update)
+		return axios.patch(`${API_URL}/botVersions/${number}?botId=${botId}`, update)
 			.then( res => {
 				console.log(res);
 				return res;
@@ -169,7 +169,7 @@ const apiClient = {
 	},
 
 	loadSingleDeployment( accountId: string, deploymentId: string): Promise<AxiosResponse> {
-		return axios.get(`${API_URL}/deployments/${deploymentId}?accountId=${accountId}`)
+		return axios.get(`${API_URL}/deployments/${deploymentId}`)
 			.then( res => {
 				console.log(res);
 				return res;
@@ -194,7 +194,7 @@ const apiClient = {
 	},
 
 	deleteDeployment(accountId: string, deploymentId: string): Promise<AxiosResponse> {
-		return axios.delete(`${API_URL}/deployments/${deploymentId}?accountId=${accountId}`)
+		return axios.delete(`${API_URL}/deployments/${deploymentId}`)
 			.then(res => {
 				console.log(res);
 				return res;
@@ -228,7 +228,7 @@ const apiClient = {
 	},
 
 	loadSingleExchangeAccount( accountId: string, exchangeAccountId: string ): Promise<AxiosResponse> {
-		return axios.get(`${API_URL}/exchanges/${exchangeAccountId}?accountId=${accountId}`)
+		return axios.get(`${API_URL}/exchanges/${exchangeAccountId}`)
 			.then(res => {
 				console.log(res);
 				return res;
@@ -246,7 +246,7 @@ const apiClient = {
 	},
 
 	deleteExchangeAccount(accountId: string, exchangeAccountId: string ): Promise<AxiosResponse> {
-		return axios.delete(`${API_URL}/exchanges/${exchangeAccountId}?accountId=${accountId}`)
+		return axios.delete(`${API_URL}/exchanges/${exchangeAccountId}`)
 			.then(res => {
 				console.log(res);
 				return res;

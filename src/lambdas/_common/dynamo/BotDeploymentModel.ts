@@ -137,6 +137,7 @@ export default {
 	},
 
 	async delete(id: string) {
+		console.log('Id when deleting', id);
 		let {accountId, resourceId: deploymentId} = parseId(id);
 
 		let promises = [

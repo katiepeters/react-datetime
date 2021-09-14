@@ -1,12 +1,12 @@
 import { DBModel } from './db';
-import { DbExchangeAccount, DbExchangeAccountInput } from '../../model.types';
+import { DynamoExchange, DynamoExchangeInput, ModelExchange } from '../../model.types';
 import s3Helper from '../utils/s3';
 import { Portfolio } from '../../lambda.types';
 import { ExchangeOrder } from '../exchanges/ExchangeAdapter';
 import arrayize from '../utils/arrayize';
 import { parseId } from '../utils/resourceId';
 
-const Db = new DBModel<DbExchangeAccount>();
+const Db = new DBModel<DynamoExchange>();
 
  interface DeleteExchangeAccountInput {
 	id: string
@@ -14,9 +14,12 @@ const Db = new DBModel<DbExchangeAccount>();
 }
 
 export default {
-	async getSingle(compoundId: string): Promise<DbExchangeAccount | void> {
+	async getSingle(compoundId: string): Promise<ModelExchange | void> {
 		let {accountId, resourceId: exchangeId} = parseId(compoundId);
-		return await Db.getSingle(accountId, `EXCHANGE#${exchangeId}`);
+		const exchange = await Db.getSingle(accountId, `EXCHANGE#${exchangeId}`);
+		if( exchange ) {
+			return dynamoToModel(exchange);
+		}
 	},
 
 	async getVirtualPorftolio( compoundId: string ): Promise<Portfolio> {
@@ -48,16 +51,17 @@ export default {
 		return await saveOrders( accountId, exchangeId, JSON.stringify(orders) );
 	},
 	
-	async getAccountExchanges(accountId:string): Promise<DbExchangeAccount[]> {
-		return await Db.getMultiple(accountId, 'EXCHANGE#');
+	async getAccountExchanges(accountId:string): Promise<ModelExchange[]> {
+		let exchanges = await Db.getMultiple(accountId, 'EXCHANGE#');
+		return exchanges.map( dynamoToModel );
 	},
 
-	async create(account: DbExchangeAccountInput): Promise<void> {
+	async create(account: DynamoExchangeInput): Promise<void> {
 		const {accountId, id: exchangeId} = account;
 
 		// @ts-ignore
-		let exchange: DbExchangeAccount = {
-			...arrayize(account).filterKeys(['accountId', 'id', 'name', 'provider', 'type', 'key', 'secret']),
+		let exchange: DynamoExchange = {
+			...arrayize(account).filterKeys(['accountId', 'name', 'provider', 'type', 'key', 'secret']),
 			resourceId: `EXCHANGE#${exchangeId}`
 		};
 		
@@ -124,4 +128,22 @@ function delLastPortfolio(accountId: string, exchangeId: string) {
 }
 function delOrders(accountId: string, exchangeId: string) {
 	return s3Helper.botState.delObject(getOrdersFileName(accountId, exchangeId));
+}
+
+function dynamoToModel( dynamoExchange: DynamoExchange ): ModelExchange {
+	const {resourceId, accountId, ...baseAccount} = dynamoExchange;
+	return {
+		id: resourceId.replace('EXCHANGE#', '') + accountId,
+		...baseAccount
+	}
+}
+
+function modelToDynamo( modelExchange: ModelExchange ): DynamoExchange {
+	const {id, ...baseBot} = modelExchange;
+	const {resourceId, accountId} = parseId(id);
+	return {
+		accountId,
+		resourceId: `EXCHANGE#${resourceId}`,
+		...baseBot
+	}
 }

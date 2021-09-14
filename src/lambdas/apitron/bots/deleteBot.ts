@@ -5,11 +5,9 @@ const deleteBotHandler: MutationHandler = {
 	name: 'deleteBot',
 	async getContext({body, params, query, models}: MutationContextInput<any>): Promise<ContextResult> {
 		const { botId } = params;
-		const { accountId } = query;
 
 		// Validate input
-		let { error } = validateShape({ botId, accountId }, {
-			accountId: 'string',
+		let { error } = validateShape({ botId }, {
 			botId: 'string'
 		});
 		if (error) return { error: { ...error, code: 'invalid_request' } };
@@ -19,7 +17,7 @@ const deleteBotHandler: MutationHandler = {
 			return { error: { code: 'not_found', reason: 'bot not found', status: 404 } };
 		}
 
-		return { context: { accountId, botId } };
+		return { context: botId };
 	},
 
 	getMutations(input: MutationGetterInput): Mutation[] {

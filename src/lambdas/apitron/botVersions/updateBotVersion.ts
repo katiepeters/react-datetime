@@ -5,15 +5,14 @@ const updateBotVersionHandler: MutationHandler = {
 	name: 'updateBotVersion',
 	async getContext({body, params, query, models}: MutationContextInput<any>): Promise<ContextResult> {
 		const {number} = params;
-		const { accountId, botId } = query;
+		const { botId } = query;
 		const { code, isLocked, label } = body;
 
 		// Validate input
-		const input = {number, accountId, botId, code, isLocked, label };
-		console.log( number, accountId, botId );
+		const input = {number, botId, code, isLocked, label };
+		console.log( number, botId );
 
 		let {error} = validateShape(input, {
-			accountId: 'string',
 			botId: 'string',
 			number: 'string',
 			code: 'string?',

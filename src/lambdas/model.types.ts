@@ -18,6 +18,19 @@ export interface DBAccountInput {
 	id: string
 }
 
+export interface BaseAccount {
+	createdAt: number
+}
+
+export interface DynamoAccount extends BaseAccount{
+	accountId: string,
+	resourceId: 'ACCOUNT'
+}
+
+export interface ModelAccount extends BaseAccount {
+	id: string
+}
+
 
 // BOT
 export interface MinorVersion {
@@ -224,6 +237,19 @@ export interface ConsoleEntry {
 
 
 // EXCHANGE ACCOUNT
+
+export interface BaseExchange {
+	name: string
+	provider: 'bitfinex'
+	type: 'real' | 'virtual'
+	key?: string
+	secret?: string
+}
+
+export interface DynamoExchange extends BaseExchange, TableItem {}
+export interface ModelExchange extends BaseExchange {
+	id: string
+}
 export interface DbExchangeAccount extends TableItem {
 	id: string
 	name: string
@@ -257,7 +283,7 @@ export interface CreateExchangeAccountInput {
 	initialBalances: Portfolio
 }
 
-export interface DbExchangeAccountInput {
+export interface DynamoExchangeInput {
 	accountId: string
 	id: string
 	name: string

@@ -22,12 +22,12 @@ export default {
 	},
 	async create(input: DbBotInput): Promise<void> {
 		const {id, ...baseBot} = input;
-		let bot: DbBot = {
+		let bot: DynamoBot = {
 			createdAt: Date.now(),
-			...input,
+			...baseBot,
 			resourceId: `BOT#${id}`
 		};
-		delete bot.botId;
+		
 		return await Db.put(bot);
 	},
 
@@ -46,14 +46,11 @@ export default {
 function dynamoToModel( dynamoBot: DynamoBot ): ModelBot {
 	const {resourceId, accountId, ...baseBot} = dynamoBot;
 	let rid = resourceId.replace('BOT#', '') + accountId;
-	let model = {
+	return {
 		id: rid,
 		accountId,
 		...baseBot
 	};
-
-	console.log('more more', model, rid );
-	return model;
 }
 
 function modelToDynamo( modelbot: ModelBot ): DynamoBot {

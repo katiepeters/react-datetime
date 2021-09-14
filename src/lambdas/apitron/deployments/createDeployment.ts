@@ -37,7 +37,7 @@ const createDeploymentHandler: MutationHandler = {
 		}
 
 		// Validate entities
-		const {accountId, botId, version: versionNumber, exchangeAccountId} = body;
+		const {botId, version: versionNumber, exchangeAccountId} = body;
 		let [version, exchange] = await Promise.all([
 			models.botVersion.getSingle(botId, versionNumber),
 			models.exchangeAccount.getSingle(exchangeAccountId)

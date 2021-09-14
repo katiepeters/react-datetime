@@ -149,14 +149,14 @@ async function setTestData() {
 			accountId,
 			name: 'Test deployment',
 			id: '3333333333333333333333',
-			botId: '4444444444444444444444',
+			botId: '44444444444444444444440000000000000000000000',
 			version: '0.0',
 			orders: {
 				foreignIdIndex: {},
 				items: {},
 				openOrderIds: []
 			},
-			exchangeAccountId: '2222222222222222222222',
+			exchangeAccountId: '22222222222222222222220000000000000000000000',
 			runInterval: '1h',
 			pairs: ['BTC/USD', 'ETH/USD'],
 			state: {newState: 'stateNew'},

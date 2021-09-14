@@ -43,9 +43,10 @@ const createBotHandler: MutationHandler = {
 	},
 
 	getResponse(input: MutationResponseInput): ResponseResult {
+		const {accountId, id} = input.mutations[0].data;
 		return {
 			status: 201,
-			data: {id: input.mutations[0].data.id}
+			data: {id: `${id}${accountId}`}
 		};
 	}
 }

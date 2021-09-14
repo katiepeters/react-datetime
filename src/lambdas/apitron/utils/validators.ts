@@ -5,7 +5,7 @@ import pairUtils from "../../_common/utils/pairs";
 interface ShapeValidationError {
 	code: string
 	field?: string
-	message: string
+	reason: string
 }
 
 interface ShapeValidatorResult {
@@ -17,10 +17,11 @@ export function validateShape(obj: any, shape: any): ShapeValidatorResult{
 		const {error} = validateElement( obj[key], shape[key] );
 		if( error ){
 			console.log(error);
+			const field = error.field ? `${key}.${error.field}` : key;
 			return {
 				error: {
-					...error,
-					field: error.field ? `${key}.${error.field}` : key
+					code: error.code,
+					reason: error.reason.replace('{field}', `'${field}'`)
 				}
 			}
 		}
@@ -63,7 +64,7 @@ function validateFinalType( value: any, type: string ){
 	}
 
 	if (!isValid(value, type)) {
-		return { error: { code: 'invalid_value', message: '{field} is not valid' } };
+		return { error: { code: 'invalid_value', reason: '{field} is not valid' } };
 	}
 	return {};
 }

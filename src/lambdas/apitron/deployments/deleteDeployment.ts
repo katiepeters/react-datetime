@@ -3,14 +3,14 @@ import { validateShape } from "../utils/validators";
 
 const deleteDeploymentHandler: MutationHandler = {
 	name: 'deleteDeployment',
-	async getContext({params, query, models}: MutationContextInput<any>): Promise<ContextResult> {
+	async getContext({params, models}: MutationContextInput<any>): Promise<ContextResult> {
 		const {deploymentId} = params;
 
 		// Validate input
 		let { error } = validateShape({deploymentId}, {
-			accountId: 'string',
 			deploymentId: 'string'
 		});
+		console.log( error );
 		if (error) return { error: { ...error, code: 'invalid_request' } };
 
 		const deployment = await models.deployment.getSingleModel(deploymentId);
